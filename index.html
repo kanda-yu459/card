@@ -4,828 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>つくろう！えカード</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome for cute icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Zen Maru Gothic', 'Kosugi Maru', sans-serif;
-      user-select: none;
-      -webkit-user-select: none;
-      overflow-x: hidden;
-    }
-    /* iOS smooth scrolling and elastic bounce prevention */
-    html, body {
-      position: fixed;
-      width: 100%;
-      height: 100%;
-    }
-    #app-container {
-      height: 100%;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    /* Card interactive shadows */
-    .card-shadow {
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-    }
-    /* Animated bounce for selection */
-    @keyframes card-bounce {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-    .selected-bounce {
-      animation: card-bounce 0.4s ease-in-out;
-    }
-    /* Celebration stars animation */
-    @keyframes star-spin {
-      0% { transform: scale(0) rotate(0deg); opacity: 0; }
-      50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
-      100% { transform: scale(1) rotate(360deg); opacity: 1; }
-    }
-    .star-animation {
-      animation: star-spin 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-    }
-    /* Custom switch styling */
-    .toggle-checkbox:checked {
-      right: 0;
-      border-color: #6366f1;
-      background-color: #4f46e5;
-    }
-    .toggle-checkbox:checked + .toggle-label {
-      background-color: #a5b4fc;
-    }
-  </style>
-</head>
-<body class="bg-indigo-50 text-slate-800">
-
-  <div id="app-container" class="flex flex-col min-h-screen">
-    
-    <!-- Top Header -->
-    <header class="bg-white border-b-4 border-indigo-200 px-6 py-4 flex flex-col xl:flex-row items-center justify-between gap-4 shrink-0 shadow-sm">
-      <div class="flex items-center gap-3">
-        <div class="bg-indigo-500 text-white p-3 rounded-2xl shadow-md transform rotate-[-2deg]">
-          <i class="fa-solid fa-images text-2xl"></i>
-        </div>
-        <div>
-          <h1 class="text-2xl font-bold text-indigo-700 tracking-wide">つくろう！えカード</h1>
-          <p class="text-xs text-indigo-400 font-bold">iPadでかんたん視覚支援＆クイズ</p>
-        </div>
-      </div>
-
-      <!-- Navigation Tabs -->
-      <nav class="flex flex-wrap bg-indigo-100 p-1.5 rounded-2xl gap-1 justify-center">
-        <button onclick="switchTab('create')" id="tab-create" class="px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-1.5 bg-white text-indigo-700 shadow-sm">
-          <i class="fa-solid fa-wand-magic-sparkles"></i> つくる
-        </button>
-        <button onclick="switchTab('practice')" id="tab-practice" class="px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-1.5 text-indigo-600 hover:bg-white/50">
-          <i class="fa-solid fa-arrows-left-right"></i> ２たく
-        </button>
-        <button onclick="switchTab('quiz')" id="tab-quiz" class="px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-1.5 text-indigo-600 hover:bg-white/50">
-          <i class="fa-solid fa-gamepad"></i> クイズ
-        </button>
-        <button onclick="switchTab('morning')" id="tab-morning" class="px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-1.5 text-amber-700 hover:bg-white/50">
-          <i class="fa-solid fa-sun text-amber-500"></i> あさのじゅんび
-        </button>
-        <button onclick="switchTab('evening')" id="tab-evening" class="px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-1.5 text-violet-700 hover:bg-white/50">
-          <i class="fa-solid fa-moon text-violet-500"></i> かえりのじゅんび
-        </button>
-        <button onclick="switchTab('settings')" id="tab-settings" class="px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-1.5 text-teal-700 hover:bg-white/50">
-          <i class="fa-solid fa-gear text-teal-500"></i> せってい
-        </button>
-      </nav>
-    </header>
-
-    <!-- Main Content Area -->
-    <main class="flex-grow p-4 sm:p-6 max-w-7xl mx-auto w-full flex flex-col">
-      
-      <!-- iOS Audio Enabler Banner (Crucial for iPad Safari sound autoplay) -->
-      <div id="audio-banner" class="mb-4 bg-amber-100 border-2 border-amber-300 text-amber-800 p-3.5 rounded-2xl flex items-center justify-between gap-3 shadow-sm">
-        <div class="flex items-center gap-3">
-          <i class="fa-solid fa-volume-high text-xl animate-bounce"></i>
-          <span class="text-sm font-bold">iPadで音をだすために、はじめに下のボタンを押してください！</span>
-        </div>
-        <button onclick="enableAudio()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow transition-all whitespace-nowrap">
-          音をオンにする 🔊
-        </button>
-      </div>
-
-      <!-- PAGE 1: CREATE & LIBRARY -->
-      <section id="page-create" class="space-y-6 flex-grow flex flex-col">
-        <!-- Creator Input Panel -->
-        <div class="bg-white p-5 rounded-3xl border-4 border-indigo-100 card-shadow">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-            <h2 class="text-lg font-bold text-slate-700 flex items-center gap-2">
-              <span class="bg-indigo-100 text-indigo-700 w-7 h-7 rounded-full flex items-center justify-center text-sm">1</span>
-              あたらしい絵カードをつくろう！
-            </h2>
-            
-            <!-- Visual Mode Indicator & Quick setting -->
-            <div class="flex items-center gap-2">
-              <span id="api-status-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1">
-                <i class="fa-solid fa-circle-play text-[8px] animate-pulse text-amber-500"></i> デモモード稼働中
-              </span>
-              <button onclick="toggleQuickApiSettings()" class="text-xs text-indigo-500 hover:text-indigo-700 font-bold flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-indigo-50 transition-all">
-                <i class="fa-solid fa-key"></i> 🔑API設定
-              </button>
-            </div>
-          </div>
-
-          <!-- Quick API Key Input Drawer (Slide down on toggle) -->
-          <div id="quick-api-drawer" class="hidden mb-4 bg-slate-50 border-2 border-slate-200 p-4 rounded-2xl space-y-2">
-            <div class="flex items-center justify-between">
-              <h4 class="text-xs font-black text-slate-500 flex items-center gap-1.5">
-                <i class="fa-solid fa-key text-indigo-500"></i> Google Gemini / Imagen APIキーの入力
-              </h4>
-              <a href="https://aistudio.google.com/" target="_blank" class="text-[10px] text-indigo-600 hover:underline font-bold">
-                APIキーを無料で取得する ↗
-              </a>
-            </div>
-            <div class="flex flex-col sm:flex-row gap-2">
-              <input type="password" id="quick-api-input" placeholder="AI Studioから取得したキーを入力 (AIzaSy...)" 
-                     class="flex-grow px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-400">
-              <div class="flex gap-2">
-                <button onclick="saveQuickApiKey()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm">
-                  キーを保存
-                </button>
-                <button onclick="testQuickApiKey()" class="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1">
-                  <i class="fa-solid fa-rotate animate-spin hidden" id="quick-test-spinner"></i> テスト
-                </button>
-              </div>
-            </div>
-            <p class="text-[10px] text-slate-400">※キーはあなたのブラウザ（LocalStorage）に安全に保存され、他者には送信されません。</p>
-          </div>
-
-          <!-- Two-Way Card Creation Control Panel -->
-          <div class="space-y-4">
-            <!-- Word Input Box -->
-            <div class="relative w-full">
-              <input type="text" id="card-input-word" placeholder="「りんご」「ねこ」「くるま」など言葉をいれてね" 
-                     class="w-full px-5 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:outline-none focus:border-indigo-400 text-lg font-medium transition-all">
-              <button onclick="clearInput()" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                <i class="fa-solid fa-circle-xmark text-lg"></i>
-              </button>
-            </div>
-
-            <!-- Creation Modes Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <!-- Mode A: AI Generation -->
-              <div class="bg-indigo-50/50 p-4 rounded-2xl border-2 border-indigo-100 flex flex-col justify-between">
-                <div>
-                  <h4 class="text-xs font-black text-indigo-700 uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> プランA：AIにイラストを描いてもらう
-                  </h4>
-                  <p class="text-[11px] text-indigo-500 font-bold leading-relaxed mb-3">
-                    言葉を入力するだけで、AIが自動でかわいいイラストカードを描き出します。
-                  </p>
-                </div>
-                <button onclick="generateCard()" id="btn-generate" class="w-full bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white py-3.5 rounded-xl font-bold text-sm shadow transition-all duration-300 flex items-center justify-center gap-2">
-                  <i class="fa-solid fa-palette"></i> AIでお絵かきしてカードをつくる
-                </button>
-              </div>
-
-              <!-- Mode B: External Upload (Gemini / Canva) -->
-              <div class="bg-teal-50/50 p-4 rounded-2xl border-2 border-teal-100 flex flex-col justify-between">
-                <div>
-                  <h4 class="text-xs font-black text-teal-700 uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                    <i class="fa-solid fa-file-image"></i> プランB：自分の画像を入れる (CanvaやGeminiなど)
-                  </h4>
-                  <p class="text-[11px] text-teal-600 font-bold leading-relaxed mb-3">
-                    Canvaで事前に作った画像や、他で作成した画像ファイルをえらんで登録できます。
-                  </p>
-                </div>
-                <div class="flex items-center gap-3">
-                  <label class="flex-grow cursor-pointer bg-white hover:bg-teal-100/50 text-teal-700 border-2 border-teal-200 py-3 px-4 rounded-xl text-xs font-bold text-center transition-all flex items-center justify-center gap-1.5 shadow-sm">
-                    <i class="fa-solid fa-cloud-arrow-up"></i>
-                    <span id="file-label-text">画像ファイルを選択する</span>
-                    <input type="file" id="card-file-input" accept="image/*" onchange="handleFileSelect(event)" class="hidden">
-                  </label>
-                  
-                  <!-- Preview Box -->
-                  <div id="file-preview-container" class="hidden w-12 h-12 rounded-lg border border-teal-200 overflow-hidden bg-white shrink-0 flex items-center justify-center p-0.5 relative">
-                    <img id="file-preview-img" class="w-full h-full object-contain" src="">
-                    <button onclick="clearFileSelection(event)" class="absolute -top-1.5 -right-1.5 bg-rose-500 text-white w-4.5 h-4.5 rounded-full flex items-center justify-center text-[10px] shadow-sm hover:bg-rose-600 transition-all">
-                      <i class="fa-solid fa-xmark"></i>
-                    </button>
-                  </div>
-                </div>
-                <button onclick="createUserCard()" id="btn-upload-create" class="mt-3 w-full bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white py-3.5 rounded-xl font-bold text-sm shadow transition-all duration-300 flex items-center justify-center gap-2">
-                  <i class="fa-solid fa-circle-check"></i> えらんだ画像でカードをつくる
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Library Container -->
-        <div class="bg-white p-6 rounded-3xl border-4 border-indigo-100 card-shadow flex-grow flex flex-col">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-bold text-slate-700 flex items-center gap-2">
-              <i class="fa-solid fa-box-archive text-indigo-500"></i>
-              いままでの絵カード（ライブラリ）
-              <span id="library-count" class="bg-indigo-100 text-indigo-700 text-xs px-2.5 py-1 rounded-full font-bold">0枚</span>
-            </h2>
-            <button onclick="confirmResetLibrary()" class="text-xs text-rose-500 hover:text-rose-700 font-bold flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-all">
-              <i class="fa-solid fa-trash-can"></i> すべて削除
-            </button>
-          </div>
-
-          <!-- Empty Library State -->
-          <div id="library-empty" class="flex-grow flex flex-col items-center justify-center py-12 text-slate-400">
-            <div class="bg-slate-50 p-6 rounded-full mb-4">
-              <i class="fa-regular fa-image text-5xl text-slate-300"></i>
-            </div>
-            <p class="text-base font-bold">まだ絵カードがありません</p>
-            <p class="text-xs mt-1">上のフォームから最初の絵カードをつくってみよう！</p>
-          </div>
-
-          <!-- Library Grid -->
-          <div id="library-grid" class="hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 overflow-y-auto max-h-[450px] p-1">
-            <!-- Dynamic cards inject here -->
-          </div>
-        </div>
-      </section>
-
-      <!-- PAGE 2: TWO-CHOICE PRACTICE -->
-      <section id="page-practice" class="hidden space-y-6 flex-grow flex flex-col justify-between">
-        
-        <div class="bg-white p-4 rounded-2xl border-2 border-indigo-100 flex flex-wrap items-center justify-between gap-3 shadow-sm">
-          <p class="text-slate-600 font-bold text-sm sm:text-base">
-            <i class="fa-solid fa-circle-info text-indigo-500 mr-1"></i>
-            カードをえらんで並べよう。タップするともう片方がグレーアウトするよ。
-          </p>
-          <div class="flex gap-2">
-            <button onclick="openCardPicker('left')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-1">
-              <i class="fa-solid fa-left-long"></i> 左を変える
-            </button>
-            <button onclick="openCardPicker('right')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-1">
-              右を変える <i class="fa-solid fa-right-long"></i>
-            </button>
-            <button onclick="resetPractice()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold transition-all">
-              リセット
-            </button>
-          </div>
-        </div>
-
-        <!-- Big Two-Card Board -->
-        <div class="grid grid-cols-2 gap-6 sm:gap-10 my-auto py-4 flex-grow items-center">
-          <!-- Left Card Container -->
-          <div id="practice-card-left" onclick="selectPracticeCard('left')" class="group relative bg-white border-8 border-white card-shadow rounded-[32px] p-6 flex flex-col items-center justify-center aspect-square cursor-pointer transition-all duration-300 active:scale-95 transform hover:-translate-y-1 select-none">
-            <!-- Empty state -->
-            <div id="practice-left-empty" class="text-slate-300 flex flex-col items-center gap-3">
-              <i class="fa-solid fa-plus text-5xl"></i>
-              <span class="font-bold text-sm">カードをえらぶ</span>
-            </div>
-            <!-- Card Image -->
-            <img id="practice-left-img" class="hidden w-4/5 h-4/5 object-contain rounded-2xl mb-4 pointer-events-none" src="" alt="">
-            <span id="practice-left-label" class="hidden text-3xl sm:text-5xl font-black text-slate-700 tracking-wider"></span>
-            <!-- Dimmer overlay -->
-            <div id="practice-left-overlay" class="absolute inset-0 bg-slate-900/50 backdrop-grayscale opacity-0 rounded-[24px] pointer-events-none transition-all duration-300 flex items-center justify-center">
-              <i class="fa-solid fa-ban text-white/40 text-7xl"></i>
-            </div>
-          </div>
-
-          <!-- Right Card Container -->
-          <div id="practice-card-right" onclick="selectPracticeCard('right')" class="group relative bg-white border-8 border-white card-shadow rounded-[32px] p-6 flex flex-col items-center justify-center aspect-square cursor-pointer transition-all duration-300 active:scale-95 transform hover:-translate-y-1 select-none">
-            <!-- Empty state -->
-            <div id="practice-right-empty" class="text-slate-300 flex flex-col items-center gap-3">
-              <i class="fa-solid fa-plus text-5xl"></i>
-              <span class="font-bold text-sm">カードをえらぶ</span>
-            </div>
-            <!-- Card Image -->
-            <img id="practice-right-img" class="hidden w-4/5 h-4/5 object-contain rounded-2xl mb-4 pointer-events-none" src="" alt="">
-            <span id="practice-right-label" class="hidden text-3xl sm:text-5xl font-black text-slate-700 tracking-wider"></span>
-            <!-- Dimmer overlay -->
-            <div id="practice-right-overlay" class="absolute inset-0 bg-slate-900/50 backdrop-grayscale opacity-0 rounded-[24px] pointer-events-none transition-all duration-300 flex items-center justify-center">
-              <i class="fa-solid fa-ban text-white/40 text-7xl"></i>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- PAGE 3: QUIZ MODE -->
-      <section id="page-quiz" class="hidden space-y-6 flex-grow flex flex-col">
-        
-        <!-- Quiz Control Panel -->
-        <div class="bg-white p-5 rounded-3xl border-4 border-indigo-100 card-shadow flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div class="flex items-center gap-3">
-            <span class="bg-amber-500 text-white w-10 h-10 rounded-2xl flex items-center justify-center text-lg font-black shadow-sm transform rotate-[-3deg]">
-              Q
-            </span>
-            <div>
-              <h3 class="text-lg font-black text-slate-700">どっちかなクイズ！</h3>
-              <p class="text-xs text-slate-400 font-bold">2つの絵カードから、ただしい方を選ぼう！</p>
-            </div>
-          </div>
-          <div class="flex gap-2">
-            <button onclick="startQuiz()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl font-bold transition-all flex items-center gap-2 shadow-sm">
-              <i class="fa-solid fa-play"></i> クイズをスタート
-            </button>
-          </div>
-        </div>
-
-        <!-- Quiz Screen -->
-        <div id="quiz-workspace" class="hidden flex-grow flex flex-col items-center justify-center space-y-6 sm:space-y-8">
-          
-          <!-- Score & Progress -->
-          <div class="flex items-center gap-6 bg-indigo-100/50 px-6 py-2.5 rounded-full border border-indigo-200">
-            <span class="text-sm font-bold text-indigo-700">
-              スコア: <span id="quiz-score" class="text-lg font-black text-indigo-800">0</span>
-            </span>
-            <div class="w-px h-4 bg-indigo-300"></div>
-            <span class="text-sm font-bold text-indigo-700">
-              せいかいりつ: <span id="quiz-accuracy" class="text-lg font-black text-indigo-800">0%</span>
-            </span>
-          </div>
-
-          <!-- Question Prompt Card -->
-          <div class="bg-white px-10 py-6 rounded-3xl border-4 border-amber-300 card-shadow text-center max-w-md w-full relative overflow-hidden transform hover:scale-102 transition-all">
-            <div class="absolute -top-3 -right-3 w-16 h-16 bg-amber-200 rounded-full opacity-40 blur-lg"></div>
-            <p class="text-xs text-amber-500 font-bold uppercase tracking-wider mb-1">おだい</p>
-            <div class="flex items-center justify-center gap-3">
-              <h2 id="quiz-prompt-word" class="text-3xl sm:text-5xl font-black text-slate-800 tracking-wide">？？？</h2>
-              <button onclick="speakPrompt()" class="bg-indigo-100 hover:bg-indigo-200 active:scale-95 text-indigo-700 w-12 h-12 rounded-full flex items-center justify-center transition-all shadow-inner" title="こえできく">
-                <i class="fa-solid fa-volume-high text-lg"></i>
-              </button>
-            </div>
-            <p class="text-sm text-slate-500 font-bold mt-2">はどっちかな？</p>
-          </div>
-
-          <!-- Quiz Choice Cards -->
-          <div class="grid grid-cols-2 gap-6 sm:gap-10 max-w-4xl w-full">
-            
-            <!-- Quiz Left Option -->
-            <div id="quiz-card-left" onclick="submitQuizAnswer('left')" class="group relative bg-white border-8 border-white card-shadow rounded-[32px] p-6 flex flex-col items-center justify-center aspect-square cursor-pointer transition-all duration-300 active:scale-95 select-none">
-              <img id="quiz-left-img" class="w-4/5 h-4/5 object-contain rounded-2xl mb-4 pointer-events-none" src="" alt="">
-              <span id="quiz-left-label" class="text-2xl sm:text-4xl font-black text-slate-700 tracking-wider"></span>
-              <!-- Grayout overlay -->
-              <div id="quiz-left-overlay" class="absolute inset-0 bg-slate-900/50 backdrop-grayscale opacity-0 rounded-[24px] pointer-events-none transition-all duration-300 flex items-center justify-center">
-                <i class="fa-solid fa-ban text-white/40 text-7xl"></i>
-              </div>
-              <!-- Stamp Overlays -->
-              <div id="quiz-left-correct" class="hidden absolute inset-0 bg-emerald-500/10 border-8 border-emerald-400 rounded-[24px] pointer-events-none flex items-center justify-center animate-bounce">
-                <i class="fa-regular fa-circle-check text-emerald-500 text-8xl drop-shadow-md"></i>
-              </div>
-              <div id="quiz-left-wrong" class="hidden absolute inset-0 bg-rose-500/10 border-8 border-rose-400 rounded-[24px] pointer-events-none flex items-center justify-center">
-                <i class="fa-regular fa-circle-xmark text-rose-500 text-8xl drop-shadow-md"></i>
-              </div>
-            </div>
-
-            <!-- Quiz Right Option -->
-            <div id="quiz-card-right" onclick="submitQuizAnswer('right')" class="group relative bg-white border-8 border-white card-shadow rounded-[32px] p-6 flex flex-col items-center justify-center aspect-square cursor-pointer transition-all duration-300 active:scale-95 select-none">
-              <img id="quiz-right-img" class="w-4/5 h-4/5 object-contain rounded-2xl mb-4 pointer-events-none" src="" alt="">
-              <span id="quiz-right-label" class="text-2xl sm:text-4xl font-black text-slate-700 tracking-wider"></span>
-              <!-- Grayout overlay -->
-              <div id="quiz-right-overlay" class="absolute inset-0 bg-slate-900/50 backdrop-grayscale opacity-0 rounded-[24px] pointer-events-none transition-all duration-300 flex items-center justify-center">
-                <i class="fa-solid fa-ban text-white/40 text-7xl"></i>
-              </div>
-              <!-- Stamp Overlays -->
-              <div id="quiz-right-correct" class="hidden absolute inset-0 bg-emerald-500/10 border-8 border-emerald-400 rounded-[24px] pointer-events-none flex items-center justify-center animate-bounce">
-                <i class="fa-regular fa-circle-check text-emerald-500 text-8xl drop-shadow-md"></i>
-              </div>
-              <div id="quiz-right-wrong" class="hidden absolute inset-0 bg-rose-500/10 border-8 border-rose-400 rounded-[24px] pointer-events-none flex items-center justify-center">
-                <i class="fa-regular fa-circle-xmark text-rose-500 text-8xl drop-shadow-md"></i>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- Next Button (revealed after selection) -->
-          <button id="quiz-btn-next" onclick="nextQuizQuestion()" class="invisible bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-4 rounded-2xl shadow-md transition-all flex items-center gap-2 text-lg">
-            つぎの問題へ <i class="fa-solid fa-arrow-right"></i>
-          </button>
-        </div>
-
-        <!-- Quiz No Cards State -->
-        <div id="quiz-no-cards" class="flex-grow flex flex-col items-center justify-center py-12 text-slate-400">
-          <div class="bg-indigo-100 text-indigo-500 p-6 rounded-full mb-4">
-            <i class="fa-solid fa-circle-question text-5xl"></i>
-          </div>
-          <p class="text-lg font-bold">クイズをはじめるには、絵カードが2枚以上必要です</p>
-          <p class="text-sm mt-1 mb-6">「えカードをつくる」タブから、言葉をいれてカードをつくってね！</p>
-          <button onclick="switchTab('create')" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold px-6 py-3 rounded-xl transition-all">
-            カードをつくりにいく
-          </button>
-        </div>
-
-      </section>
-
-      <!-- PAGE 4: MORNING PREPARATION ROUTINE -->
-      <section id="page-morning" class="hidden space-y-4 flex-grow flex flex-col">
-        <!-- Morning Header Info -->
-        <div class="bg-gradient-to-r from-amber-500 to-orange-400 p-4 rounded-3xl border-4 border-amber-200 card-shadow text-white flex flex-col md:flex-row items-center justify-between gap-4">
-          <div class="flex items-center gap-3">
-            <div class="bg-white/20 p-2 rounded-2xl">
-              <i class="fa-solid fa-sun text-2xl animate-pulse text-amber-100"></i>
-            </div>
-            <div>
-              <h2 class="text-lg font-black tracking-wide">あさのじゅんび (1 〜 7)</h2>
-              <p class="text-[11px] text-amber-100 font-bold">じゅんばんをかえたい時は、みぎのボタンをおしてね！</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-3 w-full md:w-auto">
-            <!-- Progress Tracker -->
-            <div class="flex-grow md:flex-grow-0 md:w-48 bg-black/15 h-5 rounded-full p-0.5 overflow-hidden relative">
-              <div id="morning-progress" class="bg-amber-300 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
-              <span id="morning-progress-text" class="absolute inset-0 text-[10px] font-black text-center flex items-center justify-center">0 / 7 できた</span>
-            </div>
-            <button onclick="toggleSortMode('morning')" id="btn-sort-morning" class="bg-white text-amber-700 px-4 py-2 rounded-xl text-xs font-black shadow-sm hover:bg-amber-50 transition-all whitespace-nowrap">
-              じゅんばんをかえる ⇅
-            </button>
-            <button onclick="resetRoutine('morning')" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl text-xs font-black transition-all whitespace-nowrap">
-              やりなおす
-            </button>
-          </div>
-        </div>
-
-        <!-- Morning Step Grid: Landscape-optimized 7-columns -->
-        <div id="morning-grid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3 py-2 flex-grow items-stretch">
-          <!-- Dynamically populated morning cards -->
-        </div>
-      </section>
-
-      <!-- PAGE 5: EVENING PREPARATION ROUTINE -->
-      <section id="page-evening" class="hidden space-y-4 flex-grow flex flex-col">
-        <!-- Evening Header Info -->
-        <div class="bg-gradient-to-r from-violet-600 to-indigo-500 p-4 rounded-3xl border-4 border-violet-300 card-shadow text-white flex flex-col md:flex-row items-center justify-between gap-4">
-          <div class="flex items-center gap-3">
-            <div class="bg-white/20 p-2 rounded-2xl">
-              <i class="fa-solid fa-moon text-2xl animate-bounce text-violet-200"></i>
-            </div>
-            <div>
-              <h2 class="text-lg font-black tracking-wide">かえりのじゅんび (1 〜 7)</h2>
-              <p class="text-[11px] text-violet-100 font-bold">スライドやタップでかんたんにチェック＆並び替えができるよ</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-3 w-full md:w-auto">
-            <!-- Progress Tracker -->
-            <div class="flex-grow md:flex-grow-0 md:w-48 bg-black/15 h-5 rounded-full p-0.5 overflow-hidden relative">
-              <div id="evening-progress" class="bg-violet-300 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
-              <span id="evening-progress-text" class="absolute inset-0 text-[10px] font-black text-center flex items-center justify-center">0 / 7 できた</span>
-            </div>
-            <button onclick="toggleSortMode('evening')" id="btn-sort-evening" class="bg-white text-violet-700 px-4 py-2 rounded-xl text-xs font-black shadow-sm hover:bg-violet-50 transition-all whitespace-nowrap">
-              じゅんばんをかえる ⇅
-            </button>
-            <button onclick="resetRoutine('evening')" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl text-xs font-black transition-all whitespace-nowrap">
-              やりなおす
-            </button>
-          </div>
-        </div>
-
-        <!-- Evening Step Grid: Landscape-optimized 7-columns -->
-        <div id="evening-grid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3 py-2 flex-grow items-stretch">
-          <!-- Dynamically populated evening cards -->
-        </div>
-      </section>
-
-      <!-- PAGE 6: ROUTINE SETTINGS SECTION -->
-      <section id="page-settings" class="hidden space-y-6 flex-grow flex flex-col">
-        <!-- API Key Custom Setting Widget (Moved to the very top of settings for high visibility!) -->
-        <div class="bg-white p-5 rounded-3xl border-4 border-indigo-100 card-shadow">
-          <div class="flex items-center gap-2 border-b-2 border-slate-100 pb-3 mb-4">
-            <span class="bg-indigo-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">
-              <i class="fa-solid fa-key"></i>
-            </span>
-            <h2 class="text-xl font-black text-slate-800">Google Gemini / Imagen API 設定</h2>
-          </div>
-          <p class="text-xs text-slate-500 mb-3">
-            ご自身のGoogle AI Studio APIキーを設定してください。本物のAIによる高クオリティな画像自動生成がスタートします。<br>
-            未設定の場合は、iPad用のかわいい自動デモ生成機能（ローカル動作）に自動で切り替わります。
-          </p>
-          <div class="flex flex-col sm:flex-row gap-3">
-            <input type="password" id="settings-api-key-input" placeholder="AI StudioのAPIキーを入力してください (AIzaSy...)" 
-                   class="flex-grow px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-indigo-400 text-sm font-bold">
-            <div class="flex gap-2">
-              <button onclick="saveApiKey()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl text-sm font-bold shadow transition-all whitespace-nowrap">
-                キーを保存する 💾
-              </button>
-              <button onclick="testGeneralApiKey()" class="bg-teal-500 hover:bg-teal-600 text-white px-6 py-3 rounded-xl text-sm font-bold shadow transition-all whitespace-nowrap flex items-center gap-1.5">
-                <i class="fa-solid fa-rotate animate-spin hidden" id="general-test-spinner"></i> 動作テスト ⚡
-              </button>
-            </div>
-          </div>
-          <div class="text-[11px] text-slate-400 flex items-center justify-between mt-2 px-1">
-            <span>※入力内容はブラウザのみに記憶されます。</span>
-            <a href="https://aistudio.google.com/" target="_blank" class="text-indigo-600 hover:underline font-bold">無料でAPIキーをもらう ↗</a>
-          </div>
-        </div>
-
-        <div class="bg-white p-5 rounded-3xl border-4 border-teal-100 card-shadow">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b-2 border-slate-100 pb-3 mb-4">
-            <div class="flex items-center gap-2">
-              <span class="bg-teal-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">
-                <i class="fa-solid fa-gear"></i>
-              </span>
-              <h2 class="text-xl font-black text-slate-800">準備（じゅんび）ステップの設定</h2>
-            </div>
-            <div class="flex gap-2">
-              <button onclick="restoreDefaultRoutines()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-xs font-black transition-all">
-                はじめの状態にもどす
-              </button>
-              <button onclick="saveAllSettings()" class="bg-teal-500 hover:bg-teal-600 text-white px-6 py-2 rounded-xl text-sm font-black shadow-md transition-all">
-                設定をほぞんする 💾
-              </button>
-            </div>
-          </div>
-
-          <!-- Configuration Toggle Tab sub-menu -->
-          <div class="flex gap-2 bg-slate-100 p-1.5 rounded-2xl w-fit mb-6">
-            <button onclick="switchSettingsTab('morning')" id="btn-set-morning" class="px-5 py-2 rounded-xl text-sm font-bold bg-white text-amber-700 shadow-sm transition-all flex items-center gap-1.5">
-              <i class="fa-solid fa-sun text-amber-500"></i> あさのじゅんび
-            </button>
-            <button onclick="switchSettingsTab('evening')" id="btn-set-evening" class="px-5 py-2 rounded-xl text-sm font-bold text-slate-600 hover:bg-white/50 transition-all flex items-center gap-1.5">
-              <i class="fa-solid fa-moon text-violet-500"></i> かえりのじゅんび
-            </button>
-          </div>
-
-          <!-- Edit Forms Grid -->
-          <div id="settings-form-container" class="space-y-4 max-h-[500px] overflow-y-auto pr-2">
-            <!-- Dynamic Form steps generated from state -->
-          </div>
-        </div>
-      </section>
-
-    </main>
-
-    <!-- Card Selector Modal for 2-Choice Practice Mode -->
-    <div id="picker-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-[32px] border-4 border-indigo-100 max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
-        <div class="bg-indigo-50 px-6 py-4 border-b border-indigo-100 flex items-center justify-between">
-          <h3 class="text-lg font-black text-indigo-800">
-            どのカードをならべますか？
-          </h3>
-          <button onclick="closeCardPicker()" class="text-slate-400 hover:text-slate-600">
-            <i class="fa-solid fa-xmark text-xl"></i>
-          </button>
-        </div>
-        <div class="p-6 overflow-y-auto flex-grow">
-          <div id="picker-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            <!-- Dynamically injected picker cards -->
-          </div>
-          <div id="picker-empty" class="hidden text-center py-12 text-slate-400">
-            <p class="font-bold">カードがまだありません</p>
-            <p class="text-xs mt-1">「えカードをつくる」からカードを作ってください。</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Routine Icon Selector Modal -->
-    <div id="icon-picker-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-[32px] border-4 border-teal-100 max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
-        <div class="bg-teal-50 px-6 py-4 border-b border-teal-100 flex items-center justify-between">
-          <h3 id="icon-picker-title" class="text-lg font-black text-teal-800">
-            アイコンをえらぶ
-          </h3>
-          <button onclick="closeIconPicker()" class="text-slate-400 hover:text-slate-600">
-            <i class="fa-solid fa-xmark text-xl"></i>
-          </button>
-        </div>
-        <div class="p-6 overflow-y-auto flex-grow space-y-6">
-          
-          <!-- Preset SVG Section -->
-          <div>
-            <h4 class="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">おすすめ準備アイコン (プリセット)</h4>
-            <div id="icon-picker-presets" class="grid grid-cols-3 sm:grid-cols-6 gap-3">
-              <!-- Render built-in SVG icons -->
-            </div>
-          </div>
-
-          <!-- User Library AI Cards Section -->
-          <div>
-            <h4 class="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">じぶんで作った絵カード (AIライブラリ)</h4>
-            <div id="icon-picker-customs" class="grid grid-cols-3 sm:grid-cols-6 gap-3">
-              <!-- User AI generated cards list -->
-            </div>
-            <div id="icon-picker-customs-empty" class="hidden text-center py-4 bg-slate-50 rounded-2xl text-slate-400 text-xs mt-1">
-              自分で作った絵カードがありません。「つくる」タブから言葉を入れてつくると、ここに表示されます。
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-    <!-- Routine Celebration Complete Modal Overlay -->
-    <div id="celebration-overlay" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
-      <div class="bg-white border-8 border-yellow-300 rounded-[40px] max-w-md w-full p-8 text-center shadow-2xl relative overflow-hidden transform scale-95 transition-all">
-        <!-- Visual Confetti effect inside -->
-        <div class="absolute inset-0 pointer-events-none opacity-40">
-          <div class="absolute top-4 left-6 w-8 h-8 text-rose-400 text-3xl rotate-12"><i class="fa-solid fa-heart"></i></div>
-          <div class="absolute bottom-6 right-10 w-10 h-10 text-amber-400 text-4xl -rotate-12"><i class="fa-solid fa-star"></i></div>
-          <div class="absolute top-1/2 left-10 w-8 h-8 text-emerald-400 text-3xl"><i class="fa-solid fa-sparkles"></i></div>
-          <div class="absolute bottom-1/2 right-6 w-8 h-8 text-sky-400 text-3xl"><i class="fa-solid fa-music"></i></div>
-        </div>
-
-        <div class="relative z-10 space-y-6">
-          <div class="w-28 h-28 bg-gradient-to-tr from-amber-400 to-yellow-300 text-white rounded-full mx-auto flex items-center justify-center text-5xl shadow-lg star-animation border-4 border-white">
-            <i class="fa-solid fa-star text-white drop-shadow"></i>
-          </div>
-          <div>
-            <h3 class="text-3xl font-black text-indigo-900 tracking-wide">たいへんよくできました！</h3>
-            <p class="text-slate-500 font-bold text-sm mt-3 px-2">
-              じゅんびがぜんぶ終わったよ！とってもかっこいいね！このちょうしでがんばろう！
-            </p>
-          </div>
-          <button onclick="closeCelebration()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white text-lg font-black py-4 rounded-2xl shadow-lg transition-all transform active:scale-95">
-            おわり！ 🌟
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Loading Overlay -->
-    <div id="loading-overlay" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex flex-col items-center justify-center z-50">
-      <div class="bg-white p-8 rounded-[32px] border-4 border-indigo-200 flex flex-col items-center space-y-4 max-w-sm w-full text-center shadow-2xl mx-4">
-        <div class="relative w-20 h-20">
-          <div class="absolute inset-0 rounded-full border-4 border-indigo-100"></div>
-          <div class="absolute inset-0 rounded-full border-4 border-indigo-500 border-t-transparent animate-spin"></div>
-          <div class="absolute inset-4 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-500">
-            <i class="fa-solid fa-paintbrush text-2xl animate-pulse"></i>
-          </div>
-        </div>
-        <div>
-          <h4 class="text-lg font-black text-slate-700">お絵描き中...</h4>
-          <p id="loading-status-text" class="text-xs text-slate-400 mt-1">かわいいイラストを描いています。<br>ちょっと待ってね！ (15秒ほどかかる場合があります)</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Alert / Confirm Modal Dialog -->
-    <div id="custom-alert" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-[24px] border-4 border-indigo-100 max-w-sm w-full p-6 text-center shadow-2xl">
-        <div id="alert-icon-container" class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl"></div>
-        <h3 id="alert-title" class="text-lg font-black text-slate-800">タイトル</h3>
-        <p id="alert-message" class="text-sm text-slate-500 mt-2">メッセージ内容</p>
-        <div class="mt-6 flex justify-center gap-2">
-          <button id="alert-btn-cancel" onclick="closeAlert(false)" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-bold text-sm transition-all"></button>
-          <button id="alert-btn-ok" onclick="closeAlert(true)" class="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow transition-all">OK</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="bg-slate-50 border-t border-slate-200 py-4 px-6 text-center text-xs text-slate-400 font-medium shrink-0">
-      <p>© 2026 つくろう！えカード - iPadえカードアプリ</p>
-    </footer>
-
-  </div>
-
-  <script>
-    // === API CONFIGURATION ===
-    let GEMINI_API_KEY = ""; // Loaded from LocalStorage dynamically
-
-    let db;
-    let library = [];
-    let currentTab = 'create';
-    let currentSettingsTab = 'morning';
-    
-    // Practice selection states
-    let leftPracticeCard = null;
-    let rightPracticeCard = null;
-    let currentPickerTarget = null;
-
-    // Quiz states
-    let quizQuestions = [];
-    let currentQuestionIdx = 0;
-    let quizScore = 0;
-    let quizTotalAnswered = 0;
-    let isQuizAnswered = false;
-
-    // Routine checklist tracking - 7 items
-    let morningState = [false, false, false, false, false, false, false];
-    let eveningState = [false, false, false, false, false, false, false];
-
-    // Sorting Mode variables
-    let isSortModeMorning = false;
-    let isSortModeEvening = false;
-
-    // Custom Alert/Confirm callback tracking
-    let alertPromiseResolve = null;
-
-    // Audio Context instance (Web Audio API)
-    let audioCtx = null;
-
-    const fallbackSVGs = {
-      apple: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="53" r="35" fill="%23f43f5e"/><path d="M50,18 C52,25 45,30 40,30 C38,22 45,18 50,18 Z" fill="%2322c55e"/><path d="M50,22 L50,10" stroke="%2378350f" stroke-width="4" stroke-linecap="round"/><circle cx="38" cy="45" r="4" fill="%23fff" opacity="0.8"/><circle cx="62" cy="45" r="4" fill="%23fff" opacity="0.8"/><path d="M42,62 Q50,68 58,62" stroke="%23fff" stroke-width="4" stroke-linecap="round" fill="none"/></svg>`,
-      banana: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M20,25 Q40,20 65,40 Q85,60 80,80 Q65,80 45,60 Q25,40 20,25 Z" fill="%23eab308"/><path d="M18,22 L24,28" stroke="%23713f12" stroke-width="6" stroke-linecap="round"/><path d="M78,78 L84,84" stroke="%23451a03" stroke-width="6" stroke-linecap="round"/><path d="M35,35 Q50,32 68,48" stroke="%23ca8a04" stroke-width="3" stroke-linecap="round" fill="none"/></svg>`,
-      dog: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="%23fdba74"/><ellipse cx="25" cy="45" rx="8" ry="20" fill="%23ea580c" transform="rotate(15 25 45)"/><ellipse cx="75" cy="45" rx="8" ry="20" fill="%23ea580c" transform="rotate(-15 75 45)"/><circle cx="38" cy="45" r="5" fill="%231e293b"/><circle cx="62" cy="45" r="5" fill="%231e293b"/><ellipse cx="50" cy="56" rx="7" ry="5" fill="%230f172a"/><path d="M44,64 Q50,68 56,64" stroke="%230f172a" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M48,58 L48,64" stroke="%230f172a" stroke-width="2"/><path d="M52,58 L52,64" stroke="%230f172a" stroke-width="2"/></svg>`,
-      car: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M15,60 L20,42 Q25,30 45,30 L65,30 Q80,30 85,45 L90,60 Z" fill="%233b82f6"/><rect x="10" y="55" width="80" height="15" rx="5" fill="%231d4ed8"/><circle cx="30" cy="72" r="12" fill="%231e293b"/><circle cx="30" cy="72" r="5" fill="%23cbd5e1"/><circle cx="70" cy="72" r="12" fill="%231e293b"/><circle cx="70" cy="72" r="5" fill="%23cbd5e1"/><rect x="25" y="38" width="18" height="12" rx="2" fill="%23e2e8f0"/><rect x="48" y="38" width="22" height="12" rx="2" fill="%23e2e8f0"/></svg>`
-    };
-
-    // Routine SVG assets
-    const routineSVGs = {
-      okiru: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="26" fill="%23f97316"/><circle cx="50" cy="50" r="18" fill="%23facc15"/><path d="M50,10 L50,22 M50,78 L50,90 M10,50 L22,50 M78,50 L90,50 M22,22 L30,30 M70,70 L78,78 M22,78 L30,70 M70,22 L78,30" stroke="%23eab308" stroke-width="5" stroke-linecap="round"/><path d="M38,48 Q50,40 62,48" stroke="%237c2d12" stroke-width="3" fill="none"/><circle cx="42" cy="54" r="3" fill="%237c2d12"/><circle cx="58" cy="54" r="3" fill="%237c2d12"/><path d="M46,62 Q50,66 54,62" stroke="%237c2d12" stroke-width="2.5" fill="none"/></svg>`,
-      toilet: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="30" y="15" width="40" height="20" rx="6" fill="%23cbd5e1"/><rect x="35" y="35" width="30" height="35" rx="8" fill="%23e2e8f0"/><ellipse cx="50" cy="35" rx="18" ry="4" fill="%2394a3b8"/><rect x="25" y="65" width="50" height="15" rx="5" fill="%2364748b"/><path d="M62,25 L62,20" stroke="%231e293b" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="48" r="8" fill="%2338bdf8" opacity="0.6"/></svg>`,
-      kigaeru: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M20,38 L38,22 L50,30 L62,22 L80,38 L72,55 L62,50 L62,80 L38,80 L38,50 L28,55 Z" fill="%23ec4899"/><path d="M42,22 Q50,15 58,22" stroke="%23f472b6" stroke-width="4" fill="none"/><circle cx="50" cy="50" r="4" fill="%23fff"/><circle cx="50" cy="65" r="4" fill="%23fff"/></svg>`,
-      gohan: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="%23fef08a"/><path d="M15,50 Q15,85 50,85 Q85,85 85,50 Z" fill="%2338bdf8"/><rect x="40" y="25" width="20" height="25" rx="4" fill="%23fff"/><rect x="18" y="55" width="64" height="6" fill="%230284c7"/><path d="M22,35 L22,65" stroke="%23cbd5e1" stroke-width="5" stroke-linecap="round"/><path d="M78,35 L78,65" stroke="%23cbd5e1" stroke-width="5" stroke-linecap="round"/></svg>`,
-      hamigaki: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M15,80 L75,20 L85,30 L25,90 Z" fill="%2310b981"/><path d="M70,15 L90,35" stroke="%2322c55e" stroke-width="4"/><rect x="68" y="10" width="12" height="15" rx="3" fill="%23fff" transform="rotate(-45 68 10)"/><path d="M15,80 L25,90" stroke="%23047857" stroke-width="6"/></svg>`,
-      bag: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="25" y="30" width="50" height="50" rx="12" fill="%23a855f7"/><rect x="30" y="45" width="40" height="30" rx="8" fill="%23c084fc"/><path d="M35,30 Q50,15 65,30" stroke="%23a855f7" stroke-width="6" stroke-linecap="round" fill="none"/><circle cx="50" cy="38" r="5" fill="%23facc15"/></svg>`,
-      go_out: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="28" y="15" width="44" height="70" rx="6" fill="%23b45309" stroke="%2378350f" stroke-width="4"/><circle cx="38" cy="50" r="4.5" fill="%23facc15"/><rect x="15" y="80" width="70" height="10" fill="%2394a3b8" rx="2"/><path d="M18,52 L26,45 L26,59 Z" fill="%2338bdf8" stroke="%230284c7" stroke-width="2"/></svg>`,
-
-      // Evening steps
-      tearai: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50,15 L50,30" stroke="%2394a3b8" stroke-width="8" stroke-linecap="round"/><path d="M40,30 L60,30" fill="none" stroke="%2364748b" stroke-width="8" stroke-linecap="round"/><path d="M50,30 Q50,55 35,60" fill="none" stroke="%2338bdf8" stroke-width="6" stroke-linecap="round"/><path d="M50,30 Q50,55 65,60" fill="none" stroke="%2338bdf8" stroke-width="6" stroke-linecap="round"/><circle cx="35" cy="72" r="10" fill="%2338bdf8" opacity="0.6"/><circle cx="65" cy="72" r="10" fill="%2338bdf8" opacity="0.6"/><circle cx="50" cy="78" r="12" fill="%2338bdf8" opacity="0.4"/></svg>`,
-      oheyagi: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M20,38 L38,22 L50,30 L62,22 L80,38 L72,55 L62,50 L62,80 L38,80 L38,50 L28,55 Z" fill="%233b82f6"/><path d="M42,22 Q50,15 58,22" stroke="%2360a5fa" stroke-width="4" fill="none"/><circle cx="50" cy="50" r="4" fill="%23facc15"/><circle cx="50" cy="65" r="4" fill="%23facc15"/></svg>`,
-      backpack_away: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="15" y="15" width="70" height="70" rx="10" fill="%23f59e0b" stroke="%23b45309" stroke-width="4"/><line x1="15" y1="50" x2="85" y2="50" stroke="%23b45309" stroke-width="4"/><rect x="25" y="58" width="18" height="18" rx="4" fill="%23a855f7"/><rect x="57" y="58" width="18" height="18" rx="4" fill="%233b82f6"/></svg>`,
-      syukudai: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="20" y="15" width="60" height="70" rx="6" fill="%23f8fafc" stroke="%23cbd5e1" stroke-width="4"/><line x1="30" y1="30" x2="70" y2="30" stroke="%2394a3b8" stroke-width="4" stroke-linecap="round"/><line x1="30" y1="45" x2="70" y2="45" stroke="%2394a3b8" stroke-width="4" stroke-linecap="round"/><line x1="30" y1="60" x2="55" y2="60" stroke="%2394a3b8" stroke-width="4" stroke-linecap="round"/><path d="M70,60 L85,80 L75,85 L60,65 Z" fill="%23f43f5e"/></svg>`,
-      tomorrow_prep: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="20" y="20" width="60" height="64" rx="8" fill="%23ec4899"/><rect x="26" y="26" width="48" height="52" rx="4" fill="%23fff"/><path d="M35,45 L45,55 L65,35" stroke="%2310b981" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`,
-      kataduke: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="15" y="45" width="30" height="30" rx="4" fill="%23ef4444"/><rect x="55" y="45" width="30" height="30" rx="4" fill="%233b82f6"/><polygon points="50,15 30,45 70,45" fill="%23eab308"/></svg>`,
-      oyasumi: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="15" y="45" width="70" height="38" rx="6" fill="%233b82f6" stroke="%231d4ed8" stroke-width="4"/><rect x="20" y="28" width="30" height="18" rx="4" fill="%23ffffff" stroke="%23cbd5e1" stroke-width="2"/><path d="M15,45 Q50,48 85,45" stroke="%231d4ed8" stroke-width="4"/><circle cx="68" cy="22" r="10" fill="%23facc15"/><path d="M72,22 A10,10 0 0,1 62,12" stroke="%23eab308" stroke-width="2" fill="none"/></svg>`
-    };
-
-    // Default routines templates
-    const defaultMorningSteps = [
-      { id: 'm1', word: 'おきる', img: routineSVGs.okiru, desc: 'あさ、おきよう！', enabled: true },
-      { id: 'm2', word: 'トイレ', img: routineSVGs.toilet, desc: 'トイレにいこう！', enabled: true },
-      { id: 'm3', word: 'きがえる', img: routineSVGs.kigaeru, desc: 'ようふくにおきがえ！', enabled: true },
-      { id: 'm4', word: 'ごはん', img: routineSVGs.gohan, desc: 'ごはんをたべよう！', enabled: true },
-      { id: 'm5', word: 'はみがき', img: routineSVGs.hamigaki, desc: 'はをきれいにみがこう！', enabled: true },
-      { id: 'm6', word: 'じゅんび', img: routineSVGs.bag, desc: 'かばんに荷物をいれよう！', enabled: true },
-      { id: 'm7', word: 'いってきます', img: routineSVGs.go_out, desc: 'げんきにでかけよう！', enabled: true }
-    ];
-
-    const defaultEveningSteps = [
-      { id: 'e1', word: 'てあらい', img: routineSVGs.tearai, desc: 'てあらい・うがい！', enabled: true },
-      { id: 'e2', word: 'きがえる', img: routineSVGs.oheyagi, desc: 'おへやぎにきがえよう！', enabled: true },
-      { id: 'e3', word: 'かたづけ', img: routineSVGs.backpack_away, desc: 'かばんをおこう！', enabled: true },
-      { id: 'e4', word: 'しゅくだい', img: routineSVGs.syukudai, desc: 'しゅくだいをしよう！', enabled: true },
-      { id: 'e5', word: 'あしたのじゅんび', img: routineSVGs.tomorrow_prep, desc: 'あしたの用意をしよう！', enabled: true },
-      { id: 'e6', word: 'おもちゃ', img: routineSVGs.kataduke, desc: 'おもちゃを片づけよう！', enabled: true },
-      { id: 'e7', word: 'おやすみ', img: routineSVGs.oyasumi, desc: 'おふとんにはいろう！', enabled: true }
-    ];
-
-    let morningSteps = [];
-    let eveningSteps = [];
-    let activeEditStepIdx = -1;
-
-    function initDatabase() {
-      return new Promise((resolve, reject) => {
-        const request = indexedDB.open('EcardAppDB', 1);
-        
-        request.onupgradeneeded = (event) => {
-          const database = event.target.result;
-          if (!database.objectStoreNames.contains('cards')) {
-            database.createObjectStore('cards', { keyPath: 'id' });
-          }
-        };
-
-        request.onsuccess = (event) => {
-          db = event.target.result;
-          resolve();
-        };
-
-        request.onerror = (event) => {
-          reject(event);
-        };
-      });
-    }
-
-    // Load saved library cards
-    async function loadLibrary() {
-      if (!db) return;
-      return new Promise((resolve) => {
-        const transaction = db.transaction(['cards'], 'readonly');
-        const store = transaction.objectStore('cards');
-        const request = store.getAll();
-
-        request.onsuccess = () => {
-          library = request.result || [];
-          updateLibraryCount();
-          renderLibraryGrid();
-          resolve(library);
-        };
-      });
-    }
-
-    // Save cards to DB
-    async function saveCardToDatabase(card) {
-      if (!db) return;
-      return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['cards'], 'readwrite');
-        const store = transaction.objectStore('cards');
-        const request = store.put(card);
-
-        request.onsuccess = () => resolve();
-        request.onerror = (e) => reject(e);
-      });
-    }
-
-    // Clear entire DB
-    async function clearDatabase() {
-      if (!db) return;
-      return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['cards'], 'readwrite');
-        const store = transaction.objectStore('cards');
-        const request = store.clear();
-
-        request.onsuccess = () => resolve();
-        request.onerror = (e) => reject(e);<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>つくろう！えカード</title>
   
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -884,7 +62,7 @@
 
   <div id="app-container" class="flex flex-col min-h-screen">
     
-    <!-- Header -->
+    <!-- Top Header -->
     <header class="bg-white border-b-4 border-indigo-200 px-6 py-4 flex flex-col xl:flex-row items-center justify-between gap-4 shrink-0 shadow-sm">
       <div class="flex items-center gap-3">
         <div class="bg-indigo-500 text-white p-3 rounded-2xl shadow-md transform rotate-[-2deg]">
@@ -896,7 +74,7 @@
         </div>
       </div>
 
-      <!-- Nav -->
+      <!-- Navigation Tabs -->
       <nav class="flex flex-wrap bg-indigo-100 p-1.5 rounded-2xl gap-1 justify-center">
         <button onclick="switchTab('create')" id="tab-create" class="px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-1.5 bg-white text-indigo-700 shadow-sm">
           <i class="fa-solid fa-wand-magic-sparkles"></i> つくる
@@ -919,7 +97,7 @@
       </nav>
     </header>
 
-    <!-- Main -->
+    <!-- Main Content Area -->
     <main class="flex-grow p-4 sm:p-6 max-w-7xl mx-auto w-full flex flex-col">
       
       <!-- Audio Banner -->
@@ -935,9 +113,10 @@
 
       <!-- PAGE 1: CREATE & LIBRARY -->
       <section id="page-create" class="space-y-6 flex-grow flex flex-col">
+        <!-- Two Ways of Card Creation -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
-          <!-- Plan A: AI -->
+          <!-- Plan A: AI Sparkle Generator -->
           <div class="bg-white p-5 rounded-3xl border-4 border-indigo-100 card-shadow flex flex-col justify-between">
             <div>
               <div class="flex items-center justify-between mb-3">
@@ -970,7 +149,7 @@
             </div>
           </div>
 
-          <!-- Plan B: Upload -->
+          <!-- Plan B: Local File & Canva Image Upload Loader -->
           <div class="bg-white p-5 rounded-3xl border-4 border-teal-100 card-shadow flex flex-col justify-between">
             <div>
               <h2 class="text-base sm:text-lg font-black text-slate-700 flex items-center gap-2 mb-3">
@@ -992,6 +171,7 @@
               </div>
             </div>
 
+            <!-- Upload Preview and Submit -->
             <div class="flex items-center justify-between gap-3 border-t border-slate-100 pt-3">
               <div class="flex items-center gap-2">
                 <div id="upload-preview-container" class="hidden w-11 h-11 bg-slate-100 border border-slate-200 rounded-lg overflow-hidden flex items-center justify-center p-0.5">
@@ -1031,19 +211,31 @@
           </div>
         </div>
 
-        <!-- Library -->
+        <!-- Library Container -->
         <div class="bg-white p-6 rounded-3xl border-4 border-indigo-100 card-shadow flex-grow flex flex-col">
-          <div class="flex items-center justify-between mb-4">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
             <h2 class="text-lg font-bold text-slate-700 flex items-center gap-2">
               <i class="fa-solid fa-box-archive text-indigo-500"></i>
               いままでの絵カード（ライブラリ）
               <span id="library-count" class="bg-indigo-100 text-indigo-700 text-xs px-2.5 py-1 rounded-full font-bold">0枚</span>
             </h2>
-            <button onclick="confirmResetLibrary()" class="text-xs text-rose-500 hover:text-rose-700 font-bold flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-all">
-              <i class="fa-solid fa-trash-can"></i> すべて削除
-            </button>
+            
+            <!-- Direct Backup & Action Buttons -->
+            <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+              <button onclick="exportBackupData()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-black px-3 py-2 rounded-xl border border-indigo-200 transition-all flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-download"></i> バックアップ保存
+              </button>
+              <button onclick="document.getElementById('backup-file-input-quick').click()" class="bg-teal-50 hover:bg-teal-100 text-teal-700 text-xs font-black px-3 py-2 rounded-xl border border-teal-200 transition-all flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-upload"></i> 復元
+              </button>
+              <input type="file" id="backup-file-input-quick" accept=".json" onchange="importBackupData(event)" class="hidden">
+              <button onclick="confirmResetLibrary()" class="text-xs text-rose-500 hover:text-rose-700 font-bold flex items-center gap-1 px-3 py-2 rounded-xl hover:bg-rose-50 transition-all">
+                <i class="fa-solid fa-trash-can"></i> すべて削除
+              </button>
+            </div>
           </div>
 
+          <!-- Empty Library State -->
           <div id="library-empty" class="flex-grow flex flex-col items-center justify-center py-12 text-slate-400">
             <div class="bg-slate-50 p-6 rounded-full mb-4">
               <i class="fa-regular fa-image text-5xl text-slate-300"></i>
@@ -1052,6 +244,7 @@
             <p class="text-xs mt-1">上のフォームから最初の絵カードをつくってみよう！</p>
           </div>
 
+          <!-- Library Grid -->
           <div id="library-grid" class="hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 overflow-y-auto max-h-[450px] p-1"></div>
         </div>
       </section>
@@ -1253,7 +446,7 @@
       <!-- PAGE 6: ROUTINE & BACKUP SETTINGS SECTION -->
       <section id="page-settings" class="hidden space-y-6 flex-grow flex flex-col">
         
-        <!-- NEW: BACKUP & RESTORE DATA SECTION -->
+        <!-- BACKUP & RESTORE DATA SECTION (Top of settings) -->
         <div class="bg-white p-5 rounded-3xl border-4 border-indigo-200 card-shadow">
           <div class="flex items-center gap-2 border-b-2 border-slate-100 pb-3 mb-4">
             <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">
@@ -1263,17 +456,15 @@
           </div>
           <p class="text-xs text-slate-500 mb-4 leading-relaxed">
             作った絵カード（Canva画像含む）や日課の設定を<strong>「1つのバックアップファイル」としてiPadやパソコンに保存</strong>できます。<br>
-            アプリを更新したり別の端末に移行したい時は、保存したファイルを読み込むだけですべて元通りに復元できます。
+            アプリを更新した際や別のiPadに移す時は、保存したファイルを読み込むだけですべて元通りに復元できます。
           </p>
           
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <!-- Export Button -->
             <button onclick="exportBackupData()" class="bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-2xl font-black text-sm shadow transition-all flex items-center justify-center gap-2">
               <i class="fa-solid fa-download text-lg"></i>
               バックアップをファイルに保存 📥
             </button>
 
-            <!-- Import Button with hidden input -->
             <div class="relative">
               <input type="file" id="backup-file-input" accept=".json" onchange="importBackupData(event)" class="hidden">
               <button onclick="document.getElementById('backup-file-input').click()" class="w-full bg-teal-600 hover:bg-teal-700 text-white p-4 rounded-2xl font-black text-sm shadow transition-all flex items-center justify-center gap-2">
@@ -1640,7 +831,7 @@
       localStorage.setItem('ecard_evening_steps_v3', JSON.stringify(eveningSteps));
     }
 
-    // === BACKUP EXPORT & IMPORT (NEW) ===
+    // === BACKUP EXPORT & IMPORT ===
     async function exportBackupData() {
       try {
         await loadLibrary();
@@ -1667,7 +858,7 @@
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
 
-        showCustomAlert("success", "保存完了 📥", `絵カード（${library.length}枚）と設定をバックアップファイルとしてダウンロードしました！`);
+        showCustomAlert("success", "保存完了 📥", `絵カード（${library.length}枚）と設定をバックアップファイルとしてダウンロード保存しました！`);
       } catch (err) {
         console.error(err);
         showCustomAlert("error", "エラー", "バックアップファイルの作成に失敗しました。");
@@ -1711,13 +902,15 @@
               toggleLoading(false);
               showCustomAlert("success", "復元完了 📤", `${imported.library.length}枚の絵カードと日課の設定を復元しました！`);
             }
-            document.getElementById('backup-file-input').value = "";
+            if (document.getElementById('backup-file-input')) document.getElementById('backup-file-input').value = "";
+            if (document.getElementById('backup-file-input-quick')) document.getElementById('backup-file-input-quick').value = "";
           });
 
         } catch (err) {
           console.error(err);
-          showCustomAlert("error", "復元エラー", "バックアップファイルの読み込みに失敗しました。ファイルが壊れている可能性があります。");
-          document.getElementById('backup-file-input').value = "";
+          showCustomAlert("error", "復元エラー", "バックアップファイルの読み込みに失敗しました。");
+          if (document.getElementById('backup-file-input')) document.getElementById('backup-file-input').value = "";
+          if (document.getElementById('backup-file-input-quick')) document.getElementById('backup-file-input-quick').value = "";
         }
       };
       reader.readAsText(file);
@@ -2611,6 +1804,7 @@
           window.speechSynthesis.cancel();
           const utterance = new SpeechSynthesisUtterance(`${step.word}、できたね！えらい！`);
           utterance.lang = 'ja-JP';
+          utterance.rate = 1.0;
           window.speechSynthesis.speak(utterance);
         }
       } else {
