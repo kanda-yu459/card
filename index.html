@@ -74,7 +74,7 @@
         </div>
       </div>
 
-      <!-- Nav: シーンに統合 -->
+      <!-- Nav -->
       <nav class="flex flex-wrap bg-indigo-100 p-1.5 rounded-2xl gap-1 justify-center">
         <button onclick="switchTab('create')" id="tab-create" class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-1.5 bg-white text-indigo-700 shadow-sm">
           <i class="fa-solid fa-wand-magic-sparkles"></i> つくる
@@ -377,7 +377,7 @@
 
       <!-- PAGE 4: SCENES DYNAMIC ROUTINES (シーン・手順表) -->
       <section id="page-scenes" class="hidden space-y-4 flex-grow flex flex-col">
-        <!-- Scene Switcher Top Control Bar -->
+        <!-- Scene Top Bar -->
         <div class="bg-white p-4 rounded-3xl border-4 border-amber-200 card-shadow flex flex-col md:flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-3 w-full md:w-auto">
             <div class="bg-amber-500 text-white w-10 h-10 rounded-2xl flex items-center justify-center text-lg font-black shadow-sm">
@@ -385,20 +385,20 @@
             </div>
             <div class="flex-grow">
               <span class="text-[10px] font-black text-amber-600 uppercase tracking-wider block">シーンをえらぶ</span>
-              <!-- Scene Dropdown -->
               <select id="scene-select" onchange="onSceneSelectChange(this.value)" class="bg-amber-50 border-2 border-amber-300 text-amber-900 text-base font-black rounded-xl px-3 py-1.5 focus:outline-none focus:border-amber-500 cursor-pointer w-full sm:w-64">
-                <!-- Dynamically injected scene options -->
               </select>
             </div>
           </div>
 
-          <!-- Scene Quick Actions -->
+          <!-- Actions -->
           <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end">
-            <!-- Progress Tracker -->
             <div class="flex-grow md:flex-grow-0 w-36 sm:w-44 bg-slate-100 h-6 rounded-full p-0.5 overflow-hidden relative border border-slate-200">
               <div id="scene-progress" class="bg-amber-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
               <span id="scene-progress-text" class="absolute inset-0 text-[10px] font-black text-slate-700 text-center flex items-center justify-center">0 / 0 できた</span>
             </div>
+            <button onclick="openAddCardToSceneModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl text-xs font-black shadow transition-all whitespace-nowrap flex items-center gap-1">
+              <i class="fa-solid fa-plus"></i> カードを追加
+            </button>
             <button onclick="toggleSceneSortMode()" id="btn-sort-scene" class="bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 px-3.5 py-2 rounded-xl text-xs font-black shadow-sm transition-all whitespace-nowrap">
               じゅんばん ⇅
             </button>
@@ -411,10 +411,8 @@
           </div>
         </div>
 
-        <!-- Dynamic Grid of Scene Steps -->
-        <div id="scene-grid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-3 py-2 flex-grow items-stretch">
-          <!-- Dynamically populated cards -->
-        </div>
+        <!-- Dynamic Grid -->
+        <div id="scene-grid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-3 py-2 flex-grow items-stretch"></div>
       </section>
 
       <!-- PAGE 5: SETTINGS & SCENE CONFIGURATION -->
@@ -429,8 +427,8 @@
             <h2 class="text-xl font-black text-slate-800">絵カードと全シーンのバックアップ・復元</h2>
           </div>
           <p class="text-xs text-slate-500 mb-4 leading-relaxed">
-            作った絵カード（Canva画像含む）と<strong>すべてのシーン・手順表の設定を「1つのバックアップファイル」として保存</strong>できます。<br>
-            アプリの更新時や別の端末への移行時に読み込むだけで、すべて元通りに復元できます。
+            作った絵カードと<strong>すべてのシーン・手順表の設定をファイルとして保存</strong>できます。<br>
+            アプリ更新時や別のiPadに移行する際は、保存したファイルを読み込むだけですべて元通りに復元できます。
           </p>
           
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -476,11 +474,10 @@
             <div class="flex items-center gap-2">
               <span class="text-xs font-black text-slate-600">編集するシーン：</span>
               <select id="settings-scene-select" onchange="onSettingsSceneSelectChange(this.value)" class="bg-white border-2 border-teal-300 text-teal-900 text-sm font-black rounded-xl px-3 py-1.5 focus:outline-none focus:border-teal-500 cursor-pointer">
-                <!-- Injected options -->
               </select>
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-xs font-black text-slate-600">シーン名の変更：</span>
+              <span class="text-xs font-black text-slate-600">シーン名：</span>
               <input type="text" id="settings-scene-name-input" class="px-3 py-1.5 bg-white border-2 border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:border-teal-400">
               <button onclick="renameCurrentScene()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-xl text-xs font-bold transition-all">
                 改名
@@ -489,7 +486,7 @@
           </div>
 
           <div id="settings-form-container" class="space-y-4 max-h-[500px] overflow-y-auto pr-2">
-            <!-- Dynamic Form steps generated from active scene -->
+            <!-- Dynamic Form steps -->
           </div>
         </div>
 
@@ -522,17 +519,15 @@
 
     </main>
 
-    <!-- NEW SCENE CREATION MODAL (新シーン作成ダイアログ) -->
+    <!-- NEW SCENE CREATION MODAL -->
     <div id="new-scene-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-[32px] border-4 border-amber-200 max-w-sm w-full p-6 text-center shadow-2xl">
         <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl mx-auto mb-3 flex items-center justify-center text-2xl">
           <i class="fa-solid fa-clapperboard"></i>
         </div>
         <h3 class="text-lg font-black text-slate-800">あたらしいシーンをつくる</h3>
-        <p class="text-xs text-slate-400 mt-1 mb-4">場面の名前を入れてね（例: きゅうしょく、おでかけ、たいいく）</p>
-        
+        <p class="text-xs text-slate-400 mt-1 mb-4">場面の名前を入れてね（例: きゅうしょく、おでかけ）</p>
         <input type="text" id="new-scene-title-input" placeholder="シーン名を入力" class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-amber-400 text-sm font-bold mb-4">
-        
         <div class="flex justify-center gap-2">
           <button onclick="closeNewSceneModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-bold text-xs transition-all">
             キャンセル
@@ -540,6 +535,31 @@
           <button onclick="submitCreateNewScene()" class="bg-amber-500 hover:bg-amber-600 text-white px-6 py-2.5 rounded-xl font-bold text-xs shadow transition-all">
             シーンを作成 🌟
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ICON / CARD PICKER MODAL (カード差し替え・追加用) -->
+    <div id="icon-picker-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-[32px] border-4 border-teal-100 max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
+        <div class="bg-teal-50 px-6 py-4 border-b border-teal-100 flex items-center justify-between">
+          <h3 id="icon-picker-title" class="text-lg font-black text-teal-800">カード・アイコンをえらぶ</h3>
+          <button onclick="closeIconPicker()" class="text-slate-400 hover:text-slate-600">
+            <i class="fa-solid fa-xmark text-xl"></i>
+          </button>
+        </div>
+        <div class="p-6 overflow-y-auto flex-grow space-y-6">
+          <div>
+            <h4 class="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">作った絵カード（ライブラリ）</h4>
+            <div id="icon-picker-customs" class="grid grid-cols-3 sm:grid-cols-6 gap-3"></div>
+            <div id="icon-picker-customs-empty" class="hidden text-center py-4 bg-slate-50 rounded-2xl text-slate-400 text-xs mt-1">
+              作った絵カードがありません。「つくる」タブからカードを作るとここから選べます。
+            </div>
+          </div>
+          <div>
+            <h4 class="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">おすすめ準備アイコン (プリセット)</h4>
+            <div id="icon-picker-presets" class="grid grid-cols-3 sm:grid-cols-6 gap-3"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -558,7 +578,6 @@
         
         <div class="p-6 space-y-5">
           <input type="hidden" id="edit-card-id">
-          
           <div class="flex flex-col sm:flex-row items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
             <div class="w-24 h-24 bg-white rounded-xl border-2 border-slate-200 p-1 flex items-center justify-center overflow-hidden shrink-0">
               <img id="edit-preview-img" class="w-full h-full object-contain pointer-events-none" src="" alt="">
@@ -603,30 +622,6 @@
           <div id="picker-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
           <div id="picker-empty" class="hidden text-center py-12 text-slate-400">
             <p class="font-bold">カードがまだありません</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="icon-picker-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-[32px] border-4 border-teal-100 max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
-        <div class="bg-teal-50 px-6 py-4 border-b border-teal-100 flex items-center justify-between">
-          <h3 id="icon-picker-title" class="text-lg font-black text-teal-800">アイコンをえらぶ</h3>
-          <button onclick="closeIconPicker()" class="text-slate-400 hover:text-slate-600">
-            <i class="fa-solid fa-xmark text-xl"></i>
-          </button>
-        </div>
-        <div class="p-6 overflow-y-auto flex-grow space-y-6">
-          <div>
-            <h4 class="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">おすすめ準備アイコン (プリセット)</h4>
-            <div id="icon-picker-presets" class="grid grid-cols-3 sm:grid-cols-6 gap-3"></div>
-          </div>
-          <div>
-            <h4 class="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">作った絵カード (ライブラリ)</h4>
-            <div id="icon-picker-customs" class="grid grid-cols-3 sm:grid-cols-6 gap-3"></div>
-            <div id="icon-picker-customs-empty" class="hidden text-center py-4 bg-slate-50 rounded-2xl text-slate-400 text-xs mt-1">
-              自分で作った絵カードがありません。
-            </div>
           </div>
         </div>
       </div>
@@ -701,10 +696,10 @@
     let quizTotalAnswered = 0;
     let isQuizAnswered = false;
 
-    // === SCENES DATA STRUCTURE (複数のシーンを無制限に管理) ===
+    // SCENES DATA
     let scenes = [];
     let currentSceneId = 'morning';
-    let sceneCheckStates = {}; // { sceneId: [boolean, boolean, ...] }
+    let sceneCheckStates = {};
     let isSortModeScene = false;
 
     let alertPromiseResolve = null;
@@ -712,6 +707,7 @@
     let uploadedImageBase64 = "";
     let editingCardImageBase64 = "";
     let activeEditStepIdx = -1;
+    let iconPickerMode = 'change'; // 'change' または 'add'
 
     const fallbackSVGs = {
       apple: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="53" r="35" fill="%23f43f5e"/><path d="M50,18 C52,25 45,30 40,30 C38,22 45,18 50,18 Z" fill="%2322c55e"/><path d="M50,22 L50,10" stroke="%2378350f" stroke-width="4" stroke-linecap="round"/><circle cx="38" cy="45" r="4" fill="%23fff" opacity="0.8"/><circle cx="62" cy="45" r="4" fill="%23fff" opacity="0.8"/><path d="M42,62 Q50,68 58,62" stroke="%23fff" stroke-width="4" stroke-linecap="round" fill="none"/></svg>`,
@@ -736,7 +732,6 @@
       oyasumi: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="15" y="45" width="70" height="38" rx="6" fill="%233b82f6" stroke="%231d4ed8" stroke-width="4"/><rect x="20" y="28" width="30" height="18" rx="4" fill="%23ffffff" stroke="%23cbd5e1" stroke-width="2"/><path d="M15,45 Q50,48 85,45" stroke="%231d4ed8" stroke-width="4"/><circle cx="68" cy="22" r="10" fill="%23facc15"/><path d="M72,22 A10,10 0 0,1 62,12" stroke="%23eab308" stroke-width="2" fill="none"/></svg>`
     };
 
-    // Default built-in scenes
     const defaultScenesData = [
       {
         id: 'morning',
@@ -762,17 +757,6 @@
           { id: 'e5', word: 'あしたのじゅんび', img: routineSVGs.tomorrow_prep, desc: 'あしたの用意をしよう！', enabled: true },
           { id: 'e6', word: 'おもちゃ', img: routineSVGs.kataduke, desc: 'おもちゃを片づけよう！', enabled: true },
           { id: 'e7', word: 'おやすみ', img: routineSVGs.oyasumi, desc: 'おふとんにはいろう！', enabled: true }
-        ]
-      },
-      {
-        id: 'lunch',
-        title: 'きゅうしょく・ごはん',
-        steps: [
-          { id: 'l1', word: 'てあらい', img: routineSVGs.tearai, desc: '手をきれいにあらう！', enabled: true },
-          { id: 'l2', word: 'じゅんび', img: routineSVGs.bag, desc: 'ランチョンマットをしく！', enabled: true },
-          { id: 'l3', word: 'ごはん', img: routineSVGs.gohan, desc: 'おいしくたべよう！', enabled: true },
-          { id: 'l4', word: 'かたづけ', img: routineSVGs.kataduke, desc: 'しょっきをかたづける！', enabled: true },
-          { id: 'l5', word: 'はみがき', img: routineSVGs.hamigaki, desc: 'はをみがこう！', enabled: true }
         ]
       }
     ];
@@ -831,7 +815,6 @@
       });
     }
 
-    // === SCENES INITIALIZATION & STORAGE ===
     function initScenes() {
       const storedScenes = localStorage.getItem('ecard_dynamic_scenes_v1');
       const storedApiKey = localStorage.getItem('gemini_api_key');
@@ -855,7 +838,7 @@
         scenes = JSON.parse(JSON.stringify(defaultScenesData));
       }
 
-      if (scenes.length === 0) {
+      if (!scenes || scenes.length === 0) {
         scenes = JSON.parse(JSON.stringify(defaultScenesData));
       }
 
@@ -889,7 +872,7 @@
       `).join('');
 
       const activeScene = scenes.find(s => s.id === currentSceneId) || scenes[0];
-      document.getElementById('settings-scene-name-input').value = activeScene.title;
+      document.getElementById('settings-scene-name-input').value = activeScene ? activeScene.title : '';
     }
 
     function onSceneSelectChange(newId) {
@@ -912,12 +895,12 @@
       const activeScene = scenes.find(s => s.id === currentSceneId);
       if (!activeScene) return;
 
-      const steps = activeScene.steps;
+      const steps = activeScene.steps || [];
       const state = sceneCheckStates[activeScene.id] || [];
 
       const visibleSteps = steps.filter(step => step.enabled !== false);
       if (visibleSteps.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-12 bg-white rounded-3xl border-2 border-slate-100 text-slate-400 w-full"><p class="font-bold">ステップがすべて非表示になっています。</p><p class="text-xs mt-1">「せってい」からステップをONにするか、追加してください。</p></div>`;
+        grid.innerHTML = `<div class="col-span-full text-center py-12 bg-white rounded-3xl border-2 border-slate-100 text-slate-400 w-full"><p class="font-bold">カードがありません。</p><p class="text-xs mt-1">右上の「カードを追加」ボタンからカードを選んでください。</p></div>`;
         document.getElementById('scene-progress').style.width = `0%`;
         document.getElementById('scene-progress-text').innerText = `0 / 0 できた`;
         return;
@@ -961,7 +944,7 @@
 
             <div class="text-center w-full mt-2">
               <h4 class="font-black text-slate-800 text-sm sm:text-base tracking-wide truncate ${isDone ? 'line-through text-slate-400' : ''}">${step.word}</h4>
-              <p class="text-[10px] text-slate-400 font-bold mt-0.5 leading-tight h-5 overflow-hidden">${step.desc}</p>
+              <p class="text-[10px] text-slate-400 font-bold mt-0.5 leading-tight h-5 overflow-hidden">${step.desc || ''}</p>
             </div>
           </div>
         `;
@@ -1047,7 +1030,6 @@
       renderSceneBoard();
     }
 
-    // === NEW SCENE CREATION & MODIFICATION MODAL ===
     function openNewSceneModal() {
       document.getElementById('new-scene-title-input').value = "";
       document.getElementById('new-scene-modal').classList.remove('hidden');
@@ -1068,15 +1050,11 @@
       const newScene = {
         id: newId,
         title: title,
-        steps: [
-          { id: 'st1', word: 'じゅんび', img: routineSVGs.bag, desc: 'はじめの用意！', enabled: true },
-          { id: 'st2', word: 'がんばる', img: routineSVGs.okiru, desc: 'しっかりやろう！', enabled: true },
-          { id: 'st3', word: 'かたづけ', img: routineSVGs.kataduke, desc: 'きれいにかたづける！', enabled: true }
-        ]
+        steps: []
       };
 
       scenes.push(newScene);
-      sceneCheckStates[newId] = [false, false, false];
+      sceneCheckStates[newId] = [];
       currentSceneId = newId;
 
       saveScenesToStorage();
@@ -1084,7 +1062,7 @@
       closeNewSceneModal();
       renderSceneBoard();
 
-      showCustomAlert("success", "シーン作成完了 🌟", `新しいシーン「<strong>${title}</strong>」を作成しました！「せってい」からステップを自由に追加・変更できます。`);
+      showCustomAlert("success", "シーン作成完了 🌟", `新しいシーン「<strong>${title}</strong>」を作成しました！「カードを追加」ボタンからカードを並べましょう。`);
     }
 
     function renameCurrentScene() {
@@ -1120,25 +1098,15 @@
       });
     }
 
+    // カードを直接追加するモーダルを開く
+    function openAddCardToSceneModal() {
+      iconPickerMode = 'add';
+      openIconPicker(-1);
+    }
+
     function addNewStepToCurrentScene() {
-      const activeScene = scenes.find(s => s.id === currentSceneId);
-      if (!activeScene) return;
-
-      const newStepId = 'step_' + Date.now();
-      activeScene.steps.push({
-        id: newStepId,
-        word: 'あたらしい手順',
-        img: routineSVGs.bag,
-        desc: '手順の説明をいれてね！',
-        enabled: true
-      });
-
-      if (!sceneCheckStates[activeScene.id]) sceneCheckStates[activeScene.id] = [];
-      sceneCheckStates[activeScene.id].push(false);
-
-      saveScenesToStorage();
-      renderSettingsForms();
-      showCustomAlert("success", "ステップ追加", "新しいステップを追加しました！下の設定欄から名前やアイコンを変更してください。");
+      iconPickerMode = 'add';
+      openIconPicker(-1);
     }
 
     function renderSettingsForms() {
@@ -1146,7 +1114,12 @@
       const activeScene = scenes.find(s => s.id === currentSceneId);
       if (!activeScene) return;
 
-      const steps = activeScene.steps;
+      const steps = activeScene.steps || [];
+
+      if (steps.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">ステップがまだありません。右上の「ステップ追加」を押してカードを選んでください。</p>`;
+        return;
+      }
 
       container.innerHTML = steps.map((step, idx) => {
         const isEnabled = step.enabled !== false;
@@ -1163,11 +1136,11 @@
               </div>
             </div>
 
-            <div class="shrink-0 flex flex-col items-center gap-1.5 bg-white p-3 rounded-xl border border-slate-200 shadow-sm w-28 h-28 justify-center cursor-pointer hover:border-teal-400 transition-all" onclick="openIconPicker(${idx})">
+            <div class="shrink-0 flex flex-col items-center gap-1.5 bg-white p-3 rounded-xl border border-slate-200 shadow-sm w-28 h-28 justify-center cursor-pointer hover:border-teal-400 transition-all" onclick="openChangeIconPicker(${idx})">
               <div class="w-14 h-14 flex items-center justify-center p-0.5 overflow-hidden rounded-lg bg-slate-50">
                 <img id="settings-preview-img-${idx}" class="w-full h-full object-contain" src="${step.img}" alt="">
               </div>
-              <span class="text-[10px] font-black text-slate-400">アイコン変更</span>
+              <span class="text-[10px] font-black text-slate-400">画像を変更</span>
             </div>
 
             <div class="flex-grow w-full space-y-2">
@@ -1178,7 +1151,7 @@
                 </div>
                 <div class="sm:col-span-2">
                   <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">説明</label>
-                  <input type="text" id="settings-desc-${idx}" value="${step.desc}" oninput="updateStepData(${idx}, 'desc', this.value)" class="w-full px-3 py-2 border-2 border-slate-200 rounded-xl focus:border-teal-400 text-sm font-semibold bg-white">
+                  <input type="text" id="settings-desc-${idx}" value="${step.desc || ''}" oninput="updateStepData(${idx}, 'desc', this.value)" class="w-full px-3 py-2 border-2 border-slate-200 rounded-xl focus:border-teal-400 text-sm font-semibold bg-white">
                 </div>
               </div>
             </div>
@@ -1195,25 +1168,30 @@
       const activeScene = scenes.find(s => s.id === currentSceneId);
       if (!activeScene) return;
       activeScene.steps[idx].enabled = !activeScene.steps[idx].enabled;
+      saveScenesToStorage();
     }
 
     function updateStepData(idx, field, value) {
       const activeScene = scenes.find(s => s.id === currentSceneId);
       if (!activeScene) return;
       activeScene.steps[idx][field] = value;
+      saveScenesToStorage();
     }
 
     function removeStepFromScene(idx) {
       const activeScene = scenes.find(s => s.id === currentSceneId);
       if (!activeScene) return;
-      if (activeScene.steps.length <= 1) {
-        showCustomAlert("warning", "削除できません", "ステップは最低1つ必要です。");
-        return;
-      }
       activeScene.steps.splice(idx, 1);
-      sceneCheckStates[activeScene.id].splice(idx, 1);
+      if (sceneCheckStates[activeScene.id]) {
+        sceneCheckStates[activeScene.id].splice(idx, 1);
+      }
       saveScenesToStorage();
       renderSettingsForms();
+    }
+
+    function openChangeIconPicker(idx) {
+      iconPickerMode = 'change';
+      openIconPicker(idx);
     }
 
     function openIconPicker(idx) {
@@ -1251,16 +1229,56 @@
     }
 
     function selectIconForStep(type, id) {
-      if (activeEditStepIdx === -1) return;
       const activeScene = scenes.find(s => s.id === currentSceneId);
       if (!activeScene) return;
 
-      let selectedImgSrc = type === 'preset' ? routineSVGs[id] : library.find(c => c.id === id)?.imageUrl;
-      if (selectedImgSrc) {
-        activeScene.steps[activeEditStepIdx].img = selectedImgSrc;
-        document.getElementById(`settings-preview-img-${activeEditStepIdx}`).src = selectedImgSrc;
+      let selectedImgSrc = '';
+      let defaultWord = 'じゅんび';
+      let defaultDesc = 'がんばろう！';
+
+      if (type === 'preset') {
+        selectedImgSrc = routineSVGs[id];
+        defaultWord = id;
+      } else {
+        const found = library.find(c => c.id === id);
+        if (found) {
+          selectedImgSrc = found.imageUrl;
+          defaultWord = found.word;
+          defaultDesc = `${found.word}をしよう！`;
+        }
       }
+
+      if (!selectedImgSrc) return;
+
+      if (iconPickerMode === 'add') {
+        // 新しいステップとして追加
+        const newStep = {
+          id: 'step_' + Date.now(),
+          word: defaultWord,
+          img: selectedImgSrc,
+          desc: defaultDesc,
+          enabled: true
+        };
+        activeScene.steps.push(newStep);
+        if (!sceneCheckStates[activeScene.id]) sceneCheckStates[activeScene.id] = [];
+        sceneCheckStates[activeScene.id].push(false);
+      } else if (activeEditStepIdx !== -1 && activeScene.steps[activeEditStepIdx]) {
+        // 既存ステップの画像と名前を変更
+        activeScene.steps[activeEditStepIdx].img = selectedImgSrc;
+        if (type === 'custom') {
+          activeScene.steps[activeEditStepIdx].word = defaultWord;
+          activeScene.steps[activeEditStepIdx].desc = defaultDesc;
+        }
+      }
+
+      saveScenesToStorage();
       closeIconPicker();
+
+      if (currentTab === 'scenes') {
+        renderSceneBoard();
+      } else {
+        renderSettingsForms();
+      }
     }
 
     function saveAllSceneSettings() {
@@ -1270,7 +1288,7 @@
       renderSettingsForms();
     }
 
-    // === BACKUP EXPORT & IMPORT (全シーン・ライブラリの完全保存) ===
+    // === BACKUP EXPORT & IMPORT ===
     async function exportBackupData() {
       try {
         await loadLibrary();
@@ -1298,7 +1316,6 @@
 
         showCustomAlert("success", "保存完了 📥", `絵カード（${library.length}枚）と全シーン（${scenes.length}個）をバックアップファイルとして保存しました！`);
       } catch (err) {
-        console.error(err);
         showCustomAlert("error", "エラー", "バックアップファイルの作成に失敗しました。");
       }
     }
@@ -1328,7 +1345,6 @@
               if (imported.scenes && Array.isArray(imported.scenes)) {
                 scenes = imported.scenes;
               } else if (imported.morningSteps && imported.eveningSteps) {
-                // Backward compatibility with v3 backup
                 scenes = [
                   { id: 'morning', title: 'あさのじゅんび', steps: imported.morningSteps },
                   { id: 'evening', title: 'かえりのじゅんび', steps: imported.eveningSteps }
@@ -1357,7 +1373,6 @@
           });
 
         } catch (err) {
-          console.error(err);
           showCustomAlert("error", "復元エラー", "バックアップファイルの読み込みに失敗しました。");
         }
       };
@@ -1754,7 +1769,6 @@
       uploadedImageBase64 = "";
     }
 
-    // === CARD EDIT / MODIFY ===
     function openEditCardModal(cardId) {
       const card = library.find(c => c.id === cardId);
       if (!card) return;
