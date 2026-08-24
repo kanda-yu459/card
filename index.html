@@ -62,7 +62,7 @@
 
   <div id="app-container" class="flex flex-col min-h-screen">
     
-    <!-- Top Header -->
+    <!-- Header -->
     <header class="bg-white border-b-4 border-indigo-200 px-6 py-4 flex flex-col xl:flex-row items-center justify-between gap-4 shrink-0 shadow-sm">
       <div class="flex items-center gap-3">
         <div class="bg-indigo-500 text-white p-3 rounded-2xl shadow-md transform rotate-[-2deg]">
@@ -74,30 +74,27 @@
         </div>
       </div>
 
-      <!-- Navigation Tabs -->
+      <!-- Nav: シーンに統合 -->
       <nav class="flex flex-wrap bg-indigo-100 p-1.5 rounded-2xl gap-1 justify-center">
-        <button onclick="switchTab('create')" id="tab-create" class="px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-1.5 bg-white text-indigo-700 shadow-sm">
+        <button onclick="switchTab('create')" id="tab-create" class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-1.5 bg-white text-indigo-700 shadow-sm">
           <i class="fa-solid fa-wand-magic-sparkles"></i> つくる
         </button>
-        <button onclick="switchTab('practice')" id="tab-practice" class="px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-1.5 text-indigo-600 hover:bg-white/50">
+        <button onclick="switchTab('practice')" id="tab-practice" class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-1.5 text-indigo-600 hover:bg-white/50">
           <i class="fa-solid fa-arrows-left-right"></i> ２たく
         </button>
-        <button onclick="switchTab('quiz')" id="tab-quiz" class="px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-1.5 text-indigo-600 hover:bg-white/50">
+        <button onclick="switchTab('quiz')" id="tab-quiz" class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-1.5 text-indigo-600 hover:bg-white/50">
           <i class="fa-solid fa-gamepad"></i> クイズ
         </button>
-        <button onclick="switchTab('morning')" id="tab-morning" class="px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-1.5 text-amber-700 hover:bg-white/50">
-          <i class="fa-solid fa-sun text-amber-500"></i> あさのじゅんび
+        <button onclick="switchTab('scenes')" id="tab-scenes" class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-1.5 text-amber-700 hover:bg-white/50">
+          <i class="fa-solid fa-list-check text-amber-500"></i> シーン（手順）
         </button>
-        <button onclick="switchTab('evening')" id="tab-evening" class="px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-1.5 text-violet-700 hover:bg-white/50">
-          <i class="fa-solid fa-moon text-violet-500"></i> かえりのじゅんび
-        </button>
-        <button onclick="switchTab('settings')" id="tab-settings" class="px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-1.5 text-teal-700 hover:bg-white/50">
+        <button onclick="switchTab('settings')" id="tab-settings" class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-1.5 text-teal-700 hover:bg-white/50">
           <i class="fa-solid fa-gear text-teal-500"></i> せってい
         </button>
       </nav>
     </header>
 
-    <!-- Main Content Area -->
+    <!-- Main Content -->
     <main class="flex-grow p-4 sm:p-6 max-w-7xl mx-auto w-full flex flex-col">
       
       <!-- Audio Banner -->
@@ -113,10 +110,8 @@
 
       <!-- PAGE 1: CREATE & LIBRARY -->
       <section id="page-create" class="space-y-6 flex-grow flex flex-col">
-        <!-- Two Ways of Card Creation -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          
-          <!-- Plan A: AI Sparkle Generator -->
+          <!-- Plan A: AI -->
           <div class="bg-white p-5 rounded-3xl border-4 border-indigo-100 card-shadow flex flex-col justify-between">
             <div>
               <div class="flex items-center justify-between mb-3">
@@ -149,7 +144,7 @@
             </div>
           </div>
 
-          <!-- Plan B: Local File & Canva Image Upload Loader -->
+          <!-- Plan B: Upload -->
           <div class="bg-white p-5 rounded-3xl border-4 border-teal-100 card-shadow flex flex-col justify-between">
             <div>
               <h2 class="text-base sm:text-lg font-black text-slate-700 flex items-center gap-2 mb-3">
@@ -171,7 +166,6 @@
               </div>
             </div>
 
-            <!-- Upload Preview and Submit -->
             <div class="flex items-center justify-between gap-3 border-t border-slate-100 pt-3">
               <div class="flex items-center gap-2">
                 <div id="upload-preview-container" class="hidden w-11 h-11 bg-slate-100 border border-slate-200 rounded-lg overflow-hidden flex items-center justify-center p-0.5">
@@ -184,7 +178,6 @@
               </button>
             </div>
           </div>
-
         </div>
 
         <!-- Quick API Drawer -->
@@ -211,7 +204,7 @@
           </div>
         </div>
 
-        <!-- Library Container -->
+        <!-- Library -->
         <div class="bg-white p-6 rounded-3xl border-4 border-indigo-100 card-shadow flex-grow flex flex-col">
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
             <h2 class="text-lg font-bold text-slate-700 flex items-center gap-2">
@@ -220,7 +213,6 @@
               <span id="library-count" class="bg-indigo-100 text-indigo-700 text-xs px-2.5 py-1 rounded-full font-bold">0枚</span>
             </h2>
             
-            <!-- Direct Backup & Action Buttons -->
             <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
               <button onclick="exportBackupData()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-black px-3 py-2 rounded-xl border border-indigo-200 transition-all flex items-center gap-1.5 shadow-sm">
                 <i class="fa-solid fa-download"></i> バックアップ保存
@@ -235,7 +227,6 @@
             </div>
           </div>
 
-          <!-- Empty Library State -->
           <div id="library-empty" class="flex-grow flex flex-col items-center justify-center py-12 text-slate-400">
             <div class="bg-slate-50 p-6 rounded-full mb-4">
               <i class="fa-regular fa-image text-5xl text-slate-300"></i>
@@ -244,7 +235,6 @@
             <p class="text-xs mt-1">上のフォームから最初の絵カードをつくってみよう！</p>
           </div>
 
-          <!-- Library Grid -->
           <div id="library-grid" class="hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 overflow-y-auto max-h-[450px] p-1"></div>
         </div>
       </section>
@@ -385,78 +375,62 @@
         </div>
       </section>
 
-      <!-- PAGE 4: MORNING PREPARATION ROUTINE -->
-      <section id="page-morning" class="hidden space-y-4 flex-grow flex flex-col">
-        <div class="bg-gradient-to-r from-amber-500 to-orange-400 p-4 rounded-3xl border-4 border-amber-200 card-shadow text-white flex flex-col md:flex-row items-center justify-between gap-4">
-          <div class="flex items-center gap-3">
-            <div class="bg-white/20 p-2 rounded-2xl">
-              <i class="fa-solid fa-sun text-2xl animate-pulse text-amber-100"></i>
+      <!-- PAGE 4: SCENES DYNAMIC ROUTINES (シーン・手順表) -->
+      <section id="page-scenes" class="hidden space-y-4 flex-grow flex flex-col">
+        <!-- Scene Switcher Top Control Bar -->
+        <div class="bg-white p-4 rounded-3xl border-4 border-amber-200 card-shadow flex flex-col md:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-3 w-full md:w-auto">
+            <div class="bg-amber-500 text-white w-10 h-10 rounded-2xl flex items-center justify-center text-lg font-black shadow-sm">
+              <i class="fa-solid fa-clapperboard"></i>
             </div>
-            <div>
-              <h2 class="text-lg font-black tracking-wide">あさのじゅんび (1 〜 7)</h2>
-              <p class="text-[11px] text-amber-100 font-bold">じゅんばんをかえたい時は、みぎのボタンをおしてね！</p>
+            <div class="flex-grow">
+              <span class="text-[10px] font-black text-amber-600 uppercase tracking-wider block">シーンをえらぶ</span>
+              <!-- Scene Dropdown -->
+              <select id="scene-select" onchange="onSceneSelectChange(this.value)" class="bg-amber-50 border-2 border-amber-300 text-amber-900 text-base font-black rounded-xl px-3 py-1.5 focus:outline-none focus:border-amber-500 cursor-pointer w-full sm:w-64">
+                <!-- Dynamically injected scene options -->
+              </select>
             </div>
           </div>
-          <div class="flex items-center gap-3 w-full md:w-auto">
-            <div class="flex-grow md:flex-grow-0 md:w-48 bg-black/15 h-5 rounded-full p-0.5 overflow-hidden relative">
-              <div id="morning-progress" class="bg-amber-300 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
-              <span id="morning-progress-text" class="absolute inset-0 text-[10px] font-black text-center flex items-center justify-center">0 / 7 できた</span>
+
+          <!-- Scene Quick Actions -->
+          <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end">
+            <!-- Progress Tracker -->
+            <div class="flex-grow md:flex-grow-0 w-36 sm:w-44 bg-slate-100 h-6 rounded-full p-0.5 overflow-hidden relative border border-slate-200">
+              <div id="scene-progress" class="bg-amber-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+              <span id="scene-progress-text" class="absolute inset-0 text-[10px] font-black text-slate-700 text-center flex items-center justify-center">0 / 0 できた</span>
             </div>
-            <button onclick="toggleSortMode('morning')" id="btn-sort-morning" class="bg-white text-amber-700 px-4 py-2 rounded-xl text-xs font-black shadow-sm hover:bg-amber-50 transition-all whitespace-nowrap">
-              じゅんばんをかえる ⇅
+            <button onclick="toggleSceneSortMode()" id="btn-sort-scene" class="bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 px-3.5 py-2 rounded-xl text-xs font-black shadow-sm transition-all whitespace-nowrap">
+              じゅんばん ⇅
             </button>
-            <button onclick="resetRoutine('morning')" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl text-xs font-black transition-all whitespace-nowrap">
+            <button onclick="resetCurrentScene()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-xs font-black transition-all whitespace-nowrap">
               やりなおす
+            </button>
+            <button onclick="openNewSceneModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-black shadow transition-all whitespace-nowrap flex items-center gap-1">
+              <i class="fa-solid fa-plus"></i> 新規シーン
             </button>
           </div>
         </div>
 
-        <div id="morning-grid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3 py-2 flex-grow items-stretch"></div>
-      </section>
-
-      <!-- PAGE 5: EVENING PREPARATION ROUTINE -->
-      <section id="page-evening" class="hidden space-y-4 flex-grow flex flex-col">
-        <div class="bg-gradient-to-r from-violet-600 to-indigo-500 p-4 rounded-3xl border-4 border-violet-300 card-shadow text-white flex flex-col md:flex-row items-center justify-between gap-4">
-          <div class="flex items-center gap-3">
-            <div class="bg-white/20 p-2 rounded-2xl">
-              <i class="fa-solid fa-moon text-2xl animate-bounce text-violet-200"></i>
-            </div>
-            <div>
-              <h2 class="text-lg font-black tracking-wide">かえりのじゅんび (1 〜 7)</h2>
-              <p class="text-[11px] text-violet-100 font-bold">スライドやタップでかんたんにチェック＆並び替えができるよ</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-3 w-full md:w-auto">
-            <div class="flex-grow md:flex-grow-0 md:w-48 bg-black/15 h-5 rounded-full p-0.5 overflow-hidden relative">
-              <div id="evening-progress" class="bg-violet-300 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
-              <span id="evening-progress-text" class="absolute inset-0 text-[10px] font-black text-center flex items-center justify-center">0 / 7 できた</span>
-            </div>
-            <button onclick="toggleSortMode('evening')" id="btn-sort-evening" class="bg-white text-violet-700 px-4 py-2 rounded-xl text-xs font-black shadow-sm hover:bg-violet-50 transition-all whitespace-nowrap">
-              じゅんばんをかえる ⇅
-            </button>
-            <button onclick="resetRoutine('evening')" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl text-xs font-black transition-all whitespace-nowrap">
-              やりなおす
-            </button>
-          </div>
+        <!-- Dynamic Grid of Scene Steps -->
+        <div id="scene-grid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-3 py-2 flex-grow items-stretch">
+          <!-- Dynamically populated cards -->
         </div>
-
-        <div id="evening-grid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3 py-2 flex-grow items-stretch"></div>
       </section>
 
-      <!-- PAGE 6: ROUTINE & BACKUP SETTINGS SECTION -->
+      <!-- PAGE 5: SETTINGS & SCENE CONFIGURATION -->
       <section id="page-settings" class="hidden space-y-6 flex-grow flex flex-col">
         
-        <!-- BACKUP & RESTORE DATA SECTION (Top of settings) -->
+        <!-- BACKUP & RESTORE DATA SECTION -->
         <div class="bg-white p-5 rounded-3xl border-4 border-indigo-200 card-shadow">
           <div class="flex items-center gap-2 border-b-2 border-slate-100 pb-3 mb-4">
             <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">
               <i class="fa-solid fa-floppy-disk"></i>
             </span>
-            <h2 class="text-xl font-black text-slate-800">絵カードの保存・バックアップ（復元）</h2>
+            <h2 class="text-xl font-black text-slate-800">絵カードと全シーンのバックアップ・復元</h2>
           </div>
           <p class="text-xs text-slate-500 mb-4 leading-relaxed">
-            作った絵カード（Canva画像含む）や日課の設定を<strong>「1つのバックアップファイル」としてiPadやパソコンに保存</strong>できます。<br>
-            アプリを更新した際や別のiPadに移す時は、保存したファイルを読み込むだけですべて元通りに復元できます。
+            作った絵カード（Canva画像含む）と<strong>すべてのシーン・手順表の設定を「1つのバックアップファイル」として保存</strong>できます。<br>
+            アプリの更新時や別の端末への移行時に読み込むだけで、すべて元通りに復元できます。
           </p>
           
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -475,7 +449,51 @@
           </div>
         </div>
 
-        <!-- API Key Setting Widget -->
+        <!-- SCENE EDIT & MANAGEMENT SECTION -->
+        <div class="bg-white p-5 rounded-3xl border-4 border-teal-100 card-shadow">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b-2 border-slate-100 pb-3 mb-4">
+            <div class="flex items-center gap-2">
+              <span class="bg-teal-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">
+                <i class="fa-solid fa-sliders"></i>
+              </span>
+              <h2 class="text-xl font-black text-slate-800">シーン・手順ステップの編集</h2>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button onclick="deleteCurrentScene()" id="btn-delete-scene" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 px-3.5 py-2 rounded-xl text-xs font-black transition-all">
+                このシーンを削除
+              </button>
+              <button onclick="addNewStepToCurrentScene()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl text-xs font-black shadow-sm transition-all flex items-center gap-1">
+                <i class="fa-solid fa-plus"></i> ステップ追加
+              </button>
+              <button onclick="saveAllSceneSettings()" class="bg-teal-500 hover:bg-teal-600 text-white px-5 py-2 rounded-xl text-xs font-black shadow transition-all">
+                設定を保存 💾
+              </button>
+            </div>
+          </div>
+
+          <!-- Scene Selector in Settings -->
+          <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-3 rounded-2xl mb-4 border border-slate-200">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-black text-slate-600">編集するシーン：</span>
+              <select id="settings-scene-select" onchange="onSettingsSceneSelectChange(this.value)" class="bg-white border-2 border-teal-300 text-teal-900 text-sm font-black rounded-xl px-3 py-1.5 focus:outline-none focus:border-teal-500 cursor-pointer">
+                <!-- Injected options -->
+              </select>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-black text-slate-600">シーン名の変更：</span>
+              <input type="text" id="settings-scene-name-input" class="px-3 py-1.5 bg-white border-2 border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:border-teal-400">
+              <button onclick="renameCurrentScene()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-xl text-xs font-bold transition-all">
+                改名
+              </button>
+            </div>
+          </div>
+
+          <div id="settings-form-container" class="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+            <!-- Dynamic Form steps generated from active scene -->
+          </div>
+        </div>
+
+        <!-- API Key Widget -->
         <div class="bg-white p-5 rounded-3xl border-4 border-indigo-100 card-shadow">
           <div class="flex items-center gap-2 border-b-2 border-slate-100 pb-3 mb-4">
             <span class="bg-indigo-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">
@@ -500,39 +518,31 @@
           </div>
         </div>
 
-        <!-- Routine Config -->
-        <div class="bg-white p-5 rounded-3xl border-4 border-teal-100 card-shadow">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b-2 border-slate-100 pb-3 mb-4">
-            <div class="flex items-center gap-2">
-              <span class="bg-teal-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">
-                <i class="fa-solid fa-gear"></i>
-              </span>
-              <h2 class="text-xl font-black text-slate-800">準備ステップの設定</h2>
-            </div>
-            <div class="flex gap-2">
-              <button onclick="restoreDefaultRoutines()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-xs font-black transition-all">
-                はじめの状態にもどす
-              </button>
-              <button onclick="saveAllSettings()" class="bg-teal-500 hover:bg-teal-600 text-white px-6 py-2 rounded-xl text-sm font-black shadow-md transition-all">
-                設定をほぞんする 💾
-              </button>
-            </div>
-          </div>
-
-          <div class="flex gap-2 bg-slate-100 p-1.5 rounded-2xl w-fit mb-6">
-            <button onclick="switchSettingsTab('morning')" id="btn-set-morning" class="px-5 py-2 rounded-xl text-sm font-bold bg-white text-amber-700 shadow-sm transition-all flex items-center gap-1.5">
-              <i class="fa-solid fa-sun text-amber-500"></i> あさのじゅんび
-            </button>
-            <button onclick="switchSettingsTab('evening')" id="btn-set-evening" class="px-5 py-2 rounded-xl text-sm font-bold text-slate-600 hover:bg-white/50 transition-all flex items-center gap-1.5">
-              <i class="fa-solid fa-moon text-violet-500"></i> かえりのじゅんび
-            </button>
-          </div>
-
-          <div id="settings-form-container" class="space-y-4 max-h-[500px] overflow-y-auto pr-2"></div>
-        </div>
       </section>
 
     </main>
+
+    <!-- NEW SCENE CREATION MODAL (新シーン作成ダイアログ) -->
+    <div id="new-scene-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-[32px] border-4 border-amber-200 max-w-sm w-full p-6 text-center shadow-2xl">
+        <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl mx-auto mb-3 flex items-center justify-center text-2xl">
+          <i class="fa-solid fa-clapperboard"></i>
+        </div>
+        <h3 class="text-lg font-black text-slate-800">あたらしいシーンをつくる</h3>
+        <p class="text-xs text-slate-400 mt-1 mb-4">場面の名前を入れてね（例: きゅうしょく、おでかけ、たいいく）</p>
+        
+        <input type="text" id="new-scene-title-input" placeholder="シーン名を入力" class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-amber-400 text-sm font-bold mb-4">
+        
+        <div class="flex justify-center gap-2">
+          <button onclick="closeNewSceneModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-bold text-xs transition-all">
+            キャンセル
+          </button>
+          <button onclick="submitCreateNewScene()" class="bg-amber-500 hover:bg-amber-600 text-white px-6 py-2.5 rounded-xl font-bold text-xs shadow transition-all">
+            シーンを作成 🌟
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- CARD EDIT MODAL -->
     <div id="edit-card-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -680,7 +690,6 @@
     let db;
     let library = [];
     let currentTab = 'create';
-    let currentSettingsTab = 'morning';
     
     let leftPracticeCard = null;
     let rightPracticeCard = null;
@@ -692,16 +701,17 @@
     let quizTotalAnswered = 0;
     let isQuizAnswered = false;
 
-    let morningState = [false, false, false, false, false, false, false];
-    let eveningState = [false, false, false, false, false, false, false];
+    // === SCENES DATA STRUCTURE (複数のシーンを無制限に管理) ===
+    let scenes = [];
+    let currentSceneId = 'morning';
+    let sceneCheckStates = {}; // { sceneId: [boolean, boolean, ...] }
+    let isSortModeScene = false;
 
-    let isSortModeMorning = false;
-    let isSortModeEvening = false;
     let alertPromiseResolve = null;
     let audioCtx = null;
-
     let uploadedImageBase64 = "";
     let editingCardImageBase64 = "";
+    let activeEditStepIdx = -1;
 
     const fallbackSVGs = {
       apple: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="53" r="35" fill="%23f43f5e"/><path d="M50,18 C52,25 45,30 40,30 C38,22 45,18 50,18 Z" fill="%2322c55e"/><path d="M50,22 L50,10" stroke="%2378350f" stroke-width="4" stroke-linecap="round"/><circle cx="38" cy="45" r="4" fill="%23fff" opacity="0.8"/><circle cx="62" cy="45" r="4" fill="%23fff" opacity="0.8"/><path d="M42,62 Q50,68 58,62" stroke="%23fff" stroke-width="4" stroke-linecap="round" fill="none"/></svg>`,
@@ -719,7 +729,6 @@
       bag: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="25" y="30" width="50" height="50" rx="12" fill="%23a855f7"/><rect x="30" y="45" width="40" height="30" rx="8" fill="%23c084fc"/><path d="M35,30 Q50,15 65,30" stroke="%23a855f7" stroke-width="6" stroke-linecap="round" fill="none"/><circle cx="50" cy="38" r="5" fill="%23facc15"/></svg>`,
       go_out: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="28" y="15" width="44" height="70" rx="6" fill="%23b45309" stroke="%2378350f" stroke-width="4"/><circle cx="38" cy="50" r="4.5" fill="%23facc15"/><rect x="15" y="80" width="70" height="10" fill="%2394a3b8" rx="2"/><path d="M18,52 L26,45 L26,59 Z" fill="%2338bdf8" stroke="%230284c7" stroke-width="2"/></svg>`,
       tearai: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50,15 L50,30" stroke="%2394a3b8" stroke-width="8" stroke-linecap="round"/><path d="M40,30 L60,30" fill="none" stroke="%2364748b" stroke-width="8" stroke-linecap="round"/><path d="M50,30 Q50,55 35,60" fill="none" stroke="%2338bdf8" stroke-width="6" stroke-linecap="round"/><path d="M50,30 Q50,55 65,60" fill="none" stroke="%2338bdf8" stroke-width="6" stroke-linecap="round"/><circle cx="35" cy="72" r="10" fill="%2338bdf8" opacity="0.6"/><circle cx="65" cy="72" r="10" fill="%2338bdf8" opacity="0.6"/><circle cx="50" cy="78" r="12" fill="%2338bdf8" opacity="0.4"/></svg>`,
-      oheyagi: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M20,38 L38,22 L50,30 L62,22 L80,38 L72,55 L62,50 L62,80 L38,80 L38,50 L28,55 Z" fill="%233b82f6"/><path d="M42,22 Q50,15 58,22" stroke="%2360a5fa" stroke-width="4" fill="none"/><circle cx="50" cy="50" r="4" fill="%23facc15"/><circle cx="50" cy="65" r="4" fill="%23facc15"/></svg>`,
       backpack_away: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="15" y="15" width="70" height="70" rx="10" fill="%23f59e0b" stroke="%23b45309" stroke-width="4"/><line x1="15" y1="50" x2="85" y2="50" stroke="%23b45309" stroke-width="4"/><rect x="25" y="58" width="18" height="18" rx="4" fill="%23a855f7"/><rect x="57" y="58" width="18" height="18" rx="4" fill="%233b82f6"/></svg>`,
       syukudai: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="20" y="15" width="60" height="70" rx="6" fill="%23f8fafc" stroke="%23cbd5e1" stroke-width="4"/><line x1="30" y1="30" x2="70" y2="30" stroke="%2394a3b8" stroke-width="4" stroke-linecap="round"/><line x1="30" y1="45" x2="70" y2="45" stroke="%2394a3b8" stroke-width="4" stroke-linecap="round"/><line x1="30" y1="60" x2="55" y2="60" stroke="%2394a3b8" stroke-width="4" stroke-linecap="round"/><path d="M70,60 L85,80 L75,85 L60,65 Z" fill="%23f43f5e"/></svg>`,
       tomorrow_prep: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="20" y="20" width="60" height="64" rx="8" fill="%23ec4899"/><rect x="26" y="26" width="48" height="52" rx="4" fill="%23fff"/><path d="M35,45 L45,55 L65,35" stroke="%2310b981" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`,
@@ -727,29 +736,46 @@
       oyasumi: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="15" y="45" width="70" height="38" rx="6" fill="%233b82f6" stroke="%231d4ed8" stroke-width="4"/><rect x="20" y="28" width="30" height="18" rx="4" fill="%23ffffff" stroke="%23cbd5e1" stroke-width="2"/><path d="M15,45 Q50,48 85,45" stroke="%231d4ed8" stroke-width="4"/><circle cx="68" cy="22" r="10" fill="%23facc15"/><path d="M72,22 A10,10 0 0,1 62,12" stroke="%23eab308" stroke-width="2" fill="none"/></svg>`
     };
 
-    const defaultMorningSteps = [
-      { id: 'm1', word: 'おきる', img: routineSVGs.okiru, desc: 'あさ、おきよう！', enabled: true },
-      { id: 'm2', word: 'トイレ', img: routineSVGs.toilet, desc: 'トイレにいこう！', enabled: true },
-      { id: 'm3', word: 'きがえる', img: routineSVGs.kigaeru, desc: 'ようふくにおきがえ！', enabled: true },
-      { id: 'm4', word: 'ごはん', img: routineSVGs.gohan, desc: 'ごはんをたべよう！', enabled: true },
-      { id: 'm5', word: 'はみがき', img: routineSVGs.hamigaki, desc: 'はをきれいにみがこう！', enabled: true },
-      { id: 'm6', word: 'じゅんび', img: routineSVGs.bag, desc: 'かばんに荷物をいれよう！', enabled: true },
-      { id: 'm7', word: 'いってきます', img: routineSVGs.go_out, desc: 'げんきにでかけよう！', enabled: true }
+    // Default built-in scenes
+    const defaultScenesData = [
+      {
+        id: 'morning',
+        title: 'あさのじゅんび',
+        steps: [
+          { id: 'm1', word: 'おきる', img: routineSVGs.okiru, desc: 'あさ、おきよう！', enabled: true },
+          { id: 'm2', word: 'トイレ', img: routineSVGs.toilet, desc: 'トイレにいこう！', enabled: true },
+          { id: 'm3', word: 'きがえる', img: routineSVGs.kigaeru, desc: 'ようふくにおきがえ！', enabled: true },
+          { id: 'm4', word: 'ごはん', img: routineSVGs.gohan, desc: 'ごはんをたべよう！', enabled: true },
+          { id: 'm5', word: 'はみがき', img: routineSVGs.hamigaki, desc: 'はをきれいにみがこう！', enabled: true },
+          { id: 'm6', word: 'じゅんび', img: routineSVGs.bag, desc: 'かばんに荷物をいれよう！', enabled: true },
+          { id: 'm7', word: 'いってきます', img: routineSVGs.go_out, desc: 'げんきにでかけよう！', enabled: true }
+        ]
+      },
+      {
+        id: 'evening',
+        title: 'かえりのじゅんび',
+        steps: [
+          { id: 'e1', word: 'てあらい', img: routineSVGs.tearai, desc: 'てあらい・うがい！', enabled: true },
+          { id: 'e2', word: 'きがえる', img: routineSVGs.kigaeru, desc: 'おへやぎにきがえよう！', enabled: true },
+          { id: 'e3', word: 'かたづけ', img: routineSVGs.backpack_away, desc: 'かばんをおこう！', enabled: true },
+          { id: 'e4', word: 'しゅくだい', img: routineSVGs.syukudai, desc: 'しゅくだいをしよう！', enabled: true },
+          { id: 'e5', word: 'あしたのじゅんび', img: routineSVGs.tomorrow_prep, desc: 'あしたの用意をしよう！', enabled: true },
+          { id: 'e6', word: 'おもちゃ', img: routineSVGs.kataduke, desc: 'おもちゃを片づけよう！', enabled: true },
+          { id: 'e7', word: 'おやすみ', img: routineSVGs.oyasumi, desc: 'おふとんにはいろう！', enabled: true }
+        ]
+      },
+      {
+        id: 'lunch',
+        title: 'きゅうしょく・ごはん',
+        steps: [
+          { id: 'l1', word: 'てあらい', img: routineSVGs.tearai, desc: '手をきれいにあらう！', enabled: true },
+          { id: 'l2', word: 'じゅんび', img: routineSVGs.bag, desc: 'ランチョンマットをしく！', enabled: true },
+          { id: 'l3', word: 'ごはん', img: routineSVGs.gohan, desc: 'おいしくたべよう！', enabled: true },
+          { id: 'l4', word: 'かたづけ', img: routineSVGs.kataduke, desc: 'しょっきをかたづける！', enabled: true },
+          { id: 'l5', word: 'はみがき', img: routineSVGs.hamigaki, desc: 'はをみがこう！', enabled: true }
+        ]
+      }
     ];
-
-    const defaultEveningSteps = [
-      { id: 'e1', word: 'てあらい', img: routineSVGs.tearai, desc: 'てあらい・うがい！', enabled: true },
-      { id: 'e2', word: 'きがえる', img: routineSVGs.oheyagi, desc: 'おへやぎにきがえよう！', enabled: true },
-      { id: 'e3', word: 'かたづけ', img: routineSVGs.backpack_away, desc: 'かばんをおこう！', enabled: true },
-      { id: 'e4', word: 'しゅくだい', img: routineSVGs.syukudai, desc: 'しゅくだいをしよう！', enabled: true },
-      { id: 'e5', word: 'あしたのじゅんび', img: routineSVGs.tomorrow_prep, desc: 'あしたの用意をしよう！', enabled: true },
-      { id: 'e6', word: 'おもちゃ', img: routineSVGs.kataduke, desc: 'おもちゃを片づけよう！', enabled: true },
-      { id: 'e7', word: 'おやすみ', img: routineSVGs.oyasumi, desc: 'おふとんにはいろう！', enabled: true }
-    ];
-
-    let morningSteps = [];
-    let eveningSteps = [];
-    let activeEditStepIdx = -1;
 
     function initDatabase() {
       return new Promise((resolve, reject) => {
@@ -805,9 +831,9 @@
       });
     }
 
-    function initRoutines() {
-      const storedMorning = localStorage.getItem('ecard_morning_steps_v3');
-      const storedEvening = localStorage.getItem('ecard_evening_steps_v3');
+    // === SCENES INITIALIZATION & STORAGE ===
+    function initScenes() {
+      const storedScenes = localStorage.getItem('ecard_dynamic_scenes_v1');
       const storedApiKey = localStorage.getItem('gemini_api_key');
 
       if (storedApiKey) {
@@ -819,28 +845,440 @@
         updateApiStatusBadge(false);
       }
 
-      morningSteps = storedMorning ? JSON.parse(storedMorning) : JSON.parse(JSON.stringify(defaultMorningSteps));
-      if (morningSteps.length < 7) morningSteps = JSON.parse(JSON.stringify(defaultMorningSteps));
+      if (storedScenes) {
+        try {
+          scenes = JSON.parse(storedScenes);
+        } catch (e) {
+          scenes = JSON.parse(JSON.stringify(defaultScenesData));
+        }
+      } else {
+        scenes = JSON.parse(JSON.stringify(defaultScenesData));
+      }
 
-      eveningSteps = storedEvening ? JSON.parse(storedEvening) : JSON.parse(JSON.stringify(defaultEveningSteps));
-      if (eveningSteps.length < 7) eveningSteps = JSON.parse(JSON.stringify(defaultEveningSteps));
+      if (scenes.length === 0) {
+        scenes = JSON.parse(JSON.stringify(defaultScenesData));
+      }
+
+      currentSceneId = scenes[0].id;
+      initSceneCheckStates();
+      renderSceneDropdowns();
     }
 
-    function saveRoutinesToStorage() {
-      localStorage.setItem('ecard_morning_steps_v3', JSON.stringify(morningSteps));
-      localStorage.setItem('ecard_evening_steps_v3', JSON.stringify(eveningSteps));
+    function saveScenesToStorage() {
+      localStorage.setItem('ecard_dynamic_scenes_v1', JSON.stringify(scenes));
     }
 
-    // === BACKUP EXPORT & IMPORT ===
+    function initSceneCheckStates() {
+      scenes.forEach(scene => {
+        if (!sceneCheckStates[scene.id] || sceneCheckStates[scene.id].length !== scene.steps.length) {
+          sceneCheckStates[scene.id] = new Array(scene.steps.length).fill(false);
+        }
+      });
+    }
+
+    function renderSceneDropdowns() {
+      const select = document.getElementById('scene-select');
+      const setSelect = document.getElementById('settings-scene-select');
+
+      select.innerHTML = scenes.map(s => `
+        <option value="${s.id}" ${s.id === currentSceneId ? 'selected' : ''}>${s.title}</option>
+      `).join('');
+
+      setSelect.innerHTML = scenes.map(s => `
+        <option value="${s.id}" ${s.id === currentSceneId ? 'selected' : ''}>${s.title}</option>
+      `).join('');
+
+      const activeScene = scenes.find(s => s.id === currentSceneId) || scenes[0];
+      document.getElementById('settings-scene-name-input').value = activeScene.title;
+    }
+
+    function onSceneSelectChange(newId) {
+      currentSceneId = newId;
+      isSortModeScene = false;
+      document.getElementById('btn-sort-scene').innerHTML = "じゅんばん ⇅";
+      document.getElementById('btn-sort-scene').className = "bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 px-3.5 py-2 rounded-xl text-xs font-black shadow-sm transition-all whitespace-nowrap";
+      renderSceneDropdowns();
+      renderSceneBoard();
+    }
+
+    function onSettingsSceneSelectChange(newId) {
+      currentSceneId = newId;
+      renderSceneDropdowns();
+      renderSettingsForms();
+    }
+
+    function renderSceneBoard() {
+      const grid = document.getElementById('scene-grid');
+      const activeScene = scenes.find(s => s.id === currentSceneId);
+      if (!activeScene) return;
+
+      const steps = activeScene.steps;
+      const state = sceneCheckStates[activeScene.id] || [];
+
+      const visibleSteps = steps.filter(step => step.enabled !== false);
+      if (visibleSteps.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center py-12 bg-white rounded-3xl border-2 border-slate-100 text-slate-400 w-full"><p class="font-bold">ステップがすべて非表示になっています。</p><p class="text-xs mt-1">「せってい」からステップをONにするか、追加してください。</p></div>`;
+        document.getElementById('scene-progress').style.width = `0%`;
+        document.getElementById('scene-progress-text').innerText = `0 / 0 できた`;
+        return;
+      }
+
+      let completedCount = 0;
+      steps.forEach((step, idx) => {
+        if (step.enabled !== false && state[idx] === true) completedCount++;
+      });
+
+      const percentage = Math.round((completedCount / visibleSteps.length) * 100);
+      document.getElementById('scene-progress').style.width = `${percentage}%`;
+      document.getElementById('scene-progress-text').innerText = `${completedCount} / ${visibleSteps.length} できた`;
+
+      grid.innerHTML = steps.map((step, idx) => {
+        if (step.enabled === false) return '';
+        const isDone = state[idx];
+        const stepNum = steps.filter((s, i) => s.enabled !== false && i < idx).length + 1;
+
+        return `
+          <div id="scene-card-${idx}" onclick="handleSceneStepClick(${idx})" 
+               class="relative bg-white border-4 ${isDone ? 'border-emerald-400 bg-emerald-50/20' : 'border-slate-100'} ${isSortModeScene ? 'border-dashed border-amber-400' : ''} rounded-[24px] p-3 flex flex-col items-center justify-between card-shadow min-h-[260px] md:min-h-[300px] cursor-pointer transition-all duration-300 transform active:scale-95 hover:-translate-y-1 select-none overflow-hidden">
+            
+            <span class="absolute top-2 left-2 w-6 h-6 bg-slate-100 text-slate-600 text-xs font-black rounded-full flex items-center justify-center border border-slate-200">${stepNum}</span>
+
+            ${isSortModeScene ? `
+              <div class="absolute inset-x-0 top-0 bg-amber-50 p-1.5 flex justify-between items-center border-b border-amber-200 z-10">
+                <button onclick="moveSceneStep(${idx}, 'left', event)" ${idx === 0 ? 'disabled class="opacity-30"' : ''} class="bg-amber-500 text-white w-8 h-7 rounded-lg flex items-center justify-center text-xs font-bold">◀</button>
+                <span class="text-[9px] font-black text-amber-700">いれかえ</span>
+                <button onclick="moveSceneStep(${idx}, 'right', event)" ${idx === steps.length - 1 ? 'disabled class="opacity-30"' : ''} class="bg-amber-500 text-white w-8 h-7 rounded-lg flex items-center justify-center text-xs font-bold">▶</button>
+              </div>
+            ` : ''}
+
+            <div class="${isDone && !isSortModeScene ? 'flex' : 'hidden'} absolute inset-0 bg-emerald-500/10 rounded-[18px] pointer-events-none items-center justify-center">
+              <div class="bg-white/90 text-emerald-500 rounded-full w-14 h-14 border-4 border-emerald-400 flex items-center justify-center text-3xl shadow-md animate-bounce"><i class="fa-solid fa-check"></i></div>
+            </div>
+
+            <div class="aspect-square w-[80%] bg-slate-50 rounded-2xl flex items-center justify-center p-2.5 overflow-hidden mt-4 ${isDone ? 'grayscale opacity-40' : ''}">
+              <img class="w-full h-full object-contain pointer-events-none" src="${step.img}" alt="${step.word}">
+            </div>
+
+            <div class="text-center w-full mt-2">
+              <h4 class="font-black text-slate-800 text-sm sm:text-base tracking-wide truncate ${isDone ? 'line-through text-slate-400' : ''}">${step.word}</h4>
+              <p class="text-[10px] text-slate-400 font-bold mt-0.5 leading-tight h-5 overflow-hidden">${step.desc}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function handleSceneStepClick(idx) {
+      if (isSortModeScene) return;
+      const activeScene = scenes.find(s => s.id === currentSceneId);
+      if (!activeScene) return;
+
+      const state = sceneCheckStates[activeScene.id];
+      state[idx] = !state[idx];
+
+      const step = activeScene.steps[idx];
+      const isCompletedNow = state[idx];
+
+      if (isCompletedNow) {
+        playSound('complete');
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(`${step.word}、できたね！えらい！`);
+          utterance.lang = 'ja-JP';
+          window.speechSynthesis.speak(utterance);
+        }
+      } else {
+        playSound('wrong');
+      }
+
+      let allCompleted = true;
+      activeScene.steps.forEach((s, i) => {
+        if (s.enabled !== false && !state[i]) allCompleted = false;
+      });
+
+      renderSceneBoard();
+
+      if (allCompleted && isCompletedNow) {
+        setTimeout(() => {
+          playSound('fanfare');
+          document.getElementById('celebration-overlay').classList.remove('hidden');
+        }, 600);
+      }
+    }
+
+    function resetCurrentScene() {
+      const activeScene = scenes.find(s => s.id === currentSceneId);
+      if (!activeScene) return;
+      sceneCheckStates[activeScene.id] = new Array(activeScene.steps.length).fill(false);
+      playSound('wrong');
+      renderSceneBoard();
+    }
+
+    function toggleSceneSortMode() {
+      isSortModeScene = !isSortModeScene;
+      const btn = document.getElementById('btn-sort-scene');
+      btn.className = isSortModeScene 
+        ? "bg-amber-600 text-white px-3.5 py-2 rounded-xl text-xs font-black shadow-sm transition-all animate-pulse"
+        : "bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 px-3.5 py-2 rounded-xl text-xs font-black shadow-sm transition-all whitespace-nowrap";
+      btn.innerHTML = isSortModeScene ? "完了 ✓" : "じゅんばん ⇅";
+      renderSceneBoard();
+    }
+
+    function moveSceneStep(idx, direction, event) {
+      if (event) event.stopPropagation();
+      const activeScene = scenes.find(s => s.id === currentSceneId);
+      if (!activeScene) return;
+
+      const steps = activeScene.steps;
+      const state = sceneCheckStates[activeScene.id];
+      const targetIdx = direction === 'left' ? idx - 1 : idx + 1;
+      if (targetIdx < 0 || targetIdx >= steps.length) return;
+
+      const tempStep = steps[idx];
+      steps[idx] = steps[targetIdx];
+      steps[targetIdx] = tempStep;
+
+      const tempState = state[idx];
+      state[idx] = state[targetIdx];
+      state[targetIdx] = tempState;
+
+      saveScenesToStorage();
+      playSound('complete');
+      renderSceneBoard();
+    }
+
+    // === NEW SCENE CREATION & MODIFICATION MODAL ===
+    function openNewSceneModal() {
+      document.getElementById('new-scene-title-input').value = "";
+      document.getElementById('new-scene-modal').classList.remove('hidden');
+    }
+
+    function closeNewSceneModal() {
+      document.getElementById('new-scene-modal').classList.add('hidden');
+    }
+
+    function submitCreateNewScene() {
+      const title = document.getElementById('new-scene-title-input').value.trim();
+      if (!title) {
+        showCustomAlert("warning", "入力エラー", "シーンの名前を入れてね！");
+        return;
+      }
+
+      const newId = 'scene_' + Date.now();
+      const newScene = {
+        id: newId,
+        title: title,
+        steps: [
+          { id: 'st1', word: 'じゅんび', img: routineSVGs.bag, desc: 'はじめの用意！', enabled: true },
+          { id: 'st2', word: 'がんばる', img: routineSVGs.okiru, desc: 'しっかりやろう！', enabled: true },
+          { id: 'st3', word: 'かたづけ', img: routineSVGs.kataduke, desc: 'きれいにかたづける！', enabled: true }
+        ]
+      };
+
+      scenes.push(newScene);
+      sceneCheckStates[newId] = [false, false, false];
+      currentSceneId = newId;
+
+      saveScenesToStorage();
+      renderSceneDropdowns();
+      closeNewSceneModal();
+      renderSceneBoard();
+
+      showCustomAlert("success", "シーン作成完了 🌟", `新しいシーン「<strong>${title}</strong>」を作成しました！「せってい」からステップを自由に追加・変更できます。`);
+    }
+
+    function renameCurrentScene() {
+      const newName = document.getElementById('settings-scene-name-input').value.trim();
+      if (!newName) return;
+      const activeScene = scenes.find(s => s.id === currentSceneId);
+      if (!activeScene) return;
+
+      activeScene.title = newName;
+      saveScenesToStorage();
+      renderSceneDropdowns();
+      showCustomAlert("success", "改名完了", `シーンの名前を「${newName}」に変更しました！`);
+    }
+
+    function deleteCurrentScene() {
+      if (scenes.length <= 1) {
+        showCustomAlert("warning", "削除できません", "シーンは最低1つ以上必要です。");
+        return;
+      }
+
+      const activeScene = scenes.find(s => s.id === currentSceneId);
+      showCustomConfirm("danger", "シーンの削除", `シーン「${activeScene.title}」を削除しますか？`, (confirmed) => {
+        if (confirmed) {
+          scenes = scenes.filter(s => s.id !== currentSceneId);
+          delete sceneCheckStates[currentSceneId];
+          currentSceneId = scenes[0].id;
+          saveScenesToStorage();
+          renderSceneDropdowns();
+          renderSettingsForms();
+          renderSceneBoard();
+          showCustomAlert("success", "削除完了", "シーンを削除しました。");
+        }
+      });
+    }
+
+    function addNewStepToCurrentScene() {
+      const activeScene = scenes.find(s => s.id === currentSceneId);
+      if (!activeScene) return;
+
+      const newStepId = 'step_' + Date.now();
+      activeScene.steps.push({
+        id: newStepId,
+        word: 'あたらしい手順',
+        img: routineSVGs.bag,
+        desc: '手順の説明をいれてね！',
+        enabled: true
+      });
+
+      if (!sceneCheckStates[activeScene.id]) sceneCheckStates[activeScene.id] = [];
+      sceneCheckStates[activeScene.id].push(false);
+
+      saveScenesToStorage();
+      renderSettingsForms();
+      showCustomAlert("success", "ステップ追加", "新しいステップを追加しました！下の設定欄から名前やアイコンを変更してください。");
+    }
+
+    function renderSettingsForms() {
+      const container = document.getElementById('settings-form-container');
+      const activeScene = scenes.find(s => s.id === currentSceneId);
+      if (!activeScene) return;
+
+      const steps = activeScene.steps;
+
+      container.innerHTML = steps.map((step, idx) => {
+        const isEnabled = step.enabled !== false;
+        return `
+          <div class="bg-slate-50 p-4 rounded-2xl border-2 border-slate-200 flex flex-col md:flex-row items-center gap-4 transition-all">
+            <div class="flex items-center gap-3 w-full md:w-auto shrink-0 justify-between">
+              <span class="bg-teal-100 text-teal-800 font-black px-3 py-1.5 rounded-lg text-xs">ステップ ${idx + 1}</span>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-slate-500">表示</span>
+                <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                  <input type="checkbox" id="toggle-${idx}" onchange="toggleStepActive(${idx})" ${isEnabled ? 'checked' : ''} class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer right-4 top-0 transition duration-300 outline-none"/>
+                  <label for="toggle-${idx}" class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-300 cursor-pointer"></label>
+                </div>
+              </div>
+            </div>
+
+            <div class="shrink-0 flex flex-col items-center gap-1.5 bg-white p-3 rounded-xl border border-slate-200 shadow-sm w-28 h-28 justify-center cursor-pointer hover:border-teal-400 transition-all" onclick="openIconPicker(${idx})">
+              <div class="w-14 h-14 flex items-center justify-center p-0.5 overflow-hidden rounded-lg bg-slate-50">
+                <img id="settings-preview-img-${idx}" class="w-full h-full object-contain" src="${step.img}" alt="">
+              </div>
+              <span class="text-[10px] font-black text-slate-400">アイコン変更</span>
+            </div>
+
+            <div class="flex-grow w-full space-y-2">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div class="sm:col-span-1">
+                  <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">名前</label>
+                  <input type="text" id="settings-word-${idx}" value="${step.word}" oninput="updateStepData(${idx}, 'word', this.value)" class="w-full px-3 py-2 border-2 border-slate-200 rounded-xl focus:border-teal-400 text-sm font-bold bg-white">
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">説明</label>
+                  <input type="text" id="settings-desc-${idx}" value="${step.desc}" oninput="updateStepData(${idx}, 'desc', this.value)" class="w-full px-3 py-2 border-2 border-slate-200 rounded-xl focus:border-teal-400 text-sm font-semibold bg-white">
+                </div>
+              </div>
+            </div>
+
+            <button onclick="removeStepFromScene(${idx})" title="このステップを削除" class="text-rose-400 hover:text-rose-600 p-2 text-sm self-end md:self-center">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleStepActive(idx) {
+      const activeScene = scenes.find(s => s.id === currentSceneId);
+      if (!activeScene) return;
+      activeScene.steps[idx].enabled = !activeScene.steps[idx].enabled;
+    }
+
+    function updateStepData(idx, field, value) {
+      const activeScene = scenes.find(s => s.id === currentSceneId);
+      if (!activeScene) return;
+      activeScene.steps[idx][field] = value;
+    }
+
+    function removeStepFromScene(idx) {
+      const activeScene = scenes.find(s => s.id === currentSceneId);
+      if (!activeScene) return;
+      if (activeScene.steps.length <= 1) {
+        showCustomAlert("warning", "削除できません", "ステップは最低1つ必要です。");
+        return;
+      }
+      activeScene.steps.splice(idx, 1);
+      sceneCheckStates[activeScene.id].splice(idx, 1);
+      saveScenesToStorage();
+      renderSettingsForms();
+    }
+
+    function openIconPicker(idx) {
+      activeEditStepIdx = idx;
+      const modal = document.getElementById('icon-picker-modal');
+      const presetsContainer = document.getElementById('icon-picker-presets');
+      const customsContainer = document.getElementById('icon-picker-customs');
+      const customsEmpty = document.getElementById('icon-picker-customs-empty');
+
+      presetsContainer.innerHTML = Object.entries(routineSVGs).map(([key, svgData]) => `
+        <div onclick="selectIconForStep('preset', '${key}')" class="bg-slate-50 border-2 border-slate-100 hover:border-teal-400 p-2 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all aspect-square">
+          <img class="w-10 h-10 object-contain pointer-events-none" src="${svgData}" alt="">
+          <span class="text-[9px] font-bold text-slate-400 mt-1 truncate w-full text-center">${key}</span>
+        </div>
+      `).join('');
+
+      if (library.length === 0) {
+        customsContainer.innerHTML = '';
+        customsEmpty.classList.remove('hidden');
+      } else {
+        customsEmpty.classList.add('hidden');
+        customsContainer.innerHTML = library.map(card => `
+          <div onclick="selectIconForStep('custom', '${card.id}')" class="bg-slate-50 border-2 border-slate-100 hover:border-teal-400 p-1.5 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all aspect-square">
+            <img class="w-10 h-10 object-contain rounded pointer-events-none" src="${card.imageUrl}" alt="${card.word}">
+            <span class="text-[9px] font-bold text-slate-400 mt-1 truncate w-full text-center">${card.word}</span>
+          </div>
+        `).join('');
+      }
+      modal.classList.remove('hidden');
+    }
+
+    function closeIconPicker() {
+      document.getElementById('icon-picker-modal').classList.add('hidden');
+      activeEditStepIdx = -1;
+    }
+
+    function selectIconForStep(type, id) {
+      if (activeEditStepIdx === -1) return;
+      const activeScene = scenes.find(s => s.id === currentSceneId);
+      if (!activeScene) return;
+
+      let selectedImgSrc = type === 'preset' ? routineSVGs[id] : library.find(c => c.id === id)?.imageUrl;
+      if (selectedImgSrc) {
+        activeScene.steps[activeEditStepIdx].img = selectedImgSrc;
+        document.getElementById(`settings-preview-img-${activeEditStepIdx}`).src = selectedImgSrc;
+      }
+      closeIconPicker();
+    }
+
+    function saveAllSceneSettings() {
+      saveScenesToStorage();
+      resetCurrentScene();
+      showCustomAlert("success", "設定保存", "シーンの手順設定を保存しました！");
+      renderSettingsForms();
+    }
+
+    // === BACKUP EXPORT & IMPORT (全シーン・ライブラリの完全保存) ===
     async function exportBackupData() {
       try {
         await loadLibrary();
         const backupData = {
-          version: "3.0",
+          version: "4.0",
           exportDate: new Date().toISOString(),
           library: library,
-          morningSteps: morningSteps,
-          eveningSteps: eveningSteps,
+          scenes: scenes,
           geminiApiKey: GEMINI_API_KEY || ""
         };
 
@@ -852,13 +1290,13 @@
         const now = new Date();
         const dateTag = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
         a.href = url;
-        a.download = `ecard_backup_${dateTag}.json`;
+        a.download = `ecard_scenes_backup_${dateTag}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
 
-        showCustomAlert("success", "保存完了 📥", `絵カード（${library.length}枚）と設定をバックアップファイルとしてダウンロード保存しました！`);
+        showCustomAlert("success", "保存完了 📥", `絵カード（${library.length}枚）と全シーン（${scenes.length}個）をバックアップファイルとして保存しました！`);
       } catch (err) {
         console.error(err);
         showCustomAlert("error", "エラー", "バックアップファイルの作成に失敗しました。");
@@ -874,33 +1312,45 @@
         try {
           const imported = JSON.parse(e.target.result);
           if (!imported.library || !Array.isArray(imported.library)) {
-            throw new Error("正しいバックアップ形式ではありません。");
+            throw new Error("正しい形式ではありません。");
           }
 
-          showCustomConfirm("warning", "バックアップの復元", `バックアップから ${imported.library.length} 枚の絵カードと設定を復元します。現在のデータは上書きされますがよろしいですか？`, async (isConfirmed) => {
+          showCustomConfirm("warning", "バックアップの復元", `絵カード（${imported.library.length}枚）とシーン設定を復元します。現在のデータは上書きされますがよろしいですか？`, async (isConfirmed) => {
             if (isConfirmed) {
               toggleLoading(true);
-              updateLoadingStatus("カードデータを復元しています...");
+              updateLoadingStatus("データを復元しています...");
 
               await clearDatabase();
               for (const card of imported.library) {
                 await saveCardToDatabase(card);
               }
 
-              if (imported.morningSteps) morningSteps = imported.morningSteps;
-              if (imported.eveningSteps) eveningSteps = imported.eveningSteps;
-              saveRoutinesToStorage();
+              if (imported.scenes && Array.isArray(imported.scenes)) {
+                scenes = imported.scenes;
+              } else if (imported.morningSteps && imported.eveningSteps) {
+                // Backward compatibility with v3 backup
+                scenes = [
+                  { id: 'morning', title: 'あさのじゅんび', steps: imported.morningSteps },
+                  { id: 'evening', title: 'かえりのじゅんび', steps: imported.eveningSteps }
+                ];
+              }
+
+              currentSceneId = scenes[0].id;
+              initSceneCheckStates();
+              saveScenesToStorage();
 
               if (imported.geminiApiKey) {
                 processAndSetApiKey(imported.geminiApiKey);
               }
 
               await loadLibrary();
+              renderSceneDropdowns();
               renderSettingsForms();
               renderLibraryGrid();
+              renderSceneBoard();
 
               toggleLoading(false);
-              showCustomAlert("success", "復元完了 📤", `${imported.library.length}枚の絵カードと日課の設定を復元しました！`);
+              showCustomAlert("success", "復元完了 📤", `絵カードと全シーンの設定を完全に復元しました！`);
             }
             if (document.getElementById('backup-file-input')) document.getElementById('backup-file-input').value = "";
             if (document.getElementById('backup-file-input-quick')) document.getElementById('backup-file-input-quick').value = "";
@@ -909,13 +1359,12 @@
         } catch (err) {
           console.error(err);
           showCustomAlert("error", "復元エラー", "バックアップファイルの読み込みに失敗しました。");
-          if (document.getElementById('backup-file-input')) document.getElementById('backup-file-input').value = "";
-          if (document.getElementById('backup-file-input-quick')) document.getElementById('backup-file-input-quick').value = "";
         }
       };
       reader.readAsText(file);
     }
 
+    // === STANDARD ROUTINES (API, SOUND, QUIZ, CREATION) ===
     function saveApiKey() {
       const keyVal = document.getElementById('settings-api-key-input').value.trim();
       processAndSetApiKey(keyVal);
@@ -972,7 +1421,7 @@
     }
 
     async function callGeminiText(prompt, key) {
-      const models = ["gemini-2.5-flash-preview-09-2025", "gemini-2.5-flash", "gemini-1.5-flash"];
+      const models = ["gemini-2.5-flash", "gemini-1.5-flash"];
       let lastError = null;
       for (const model of models) {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
@@ -988,23 +1437,16 @@
             if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
               return data.candidates[0].content.parts[0].text.trim();
             }
-          } else if (res.status === 404) {
-            continue;
-          } else {
-            const errJson = await res.json().catch(() => ({}));
-            throw new Error(errJson.error?.message || `HTTP ${res.status}`);
           }
         } catch (err) {
           lastError = err;
-          if (err.message && err.message.includes("404")) continue;
-          throw err;
         }
       }
-      throw lastError || new Error("有効なGeminiモデルが見つかりませんでした。");
+      throw lastError || new Error("Gemini APIと通信できませんでした。");
     }
 
     async function callImagen(prompt, key) {
-      const models = ["imagen-4.0-generate-001", "imagen-3.0-generate-002"];
+      const models = ["imagen-3.0-generate-002", "imagen-4.0-generate-001"];
       let lastError = null;
       for (const model of models) {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:predict?key=${key}`;
@@ -1020,16 +1462,9 @@
             if (data.predictions?.[0]?.bytesBase64Encoded) {
               return data.predictions[0].bytesBase64Encoded;
             }
-          } else if (res.status === 404) {
-            continue;
-          } else {
-            const errJson = await res.json().catch(() => ({}));
-            throw new Error(errJson.error?.message || `HTTP ${res.status}`);
           }
         } catch (err) {
           lastError = err;
-          if (err.message && err.message.includes("404")) continue;
-          throw err;
         }
       }
       throw lastError || new Error("画像生成モデルが利用できませんでした。");
@@ -1390,18 +1825,16 @@
 
     function switchTab(tabId) {
       currentTab = tabId;
-      const tabs = ['create', 'practice', 'quiz', 'morning', 'evening', 'settings'];
+      const tabs = ['create', 'practice', 'quiz', 'scenes', 'settings'];
       tabs.forEach(t => {
         const btn = document.getElementById(`tab-${t}`);
         const isActive = t === tabId;
-        if (t === 'morning') {
-          btn.className = isActive ? "px-4 py-2 rounded-xl text-sm font-bold bg-white text-amber-700 shadow-sm" : "px-4 py-2 rounded-xl text-sm font-bold text-amber-700 hover:bg-white/50";
-        } else if (t === 'evening') {
-          btn.className = isActive ? "px-4 py-2 rounded-xl text-sm font-bold bg-white text-violet-700 shadow-sm" : "px-4 py-2 rounded-xl text-sm font-bold text-violet-700 hover:bg-white/50";
+        if (t === 'scenes') {
+          btn.className = isActive ? "px-5 py-2.5 rounded-xl text-sm font-bold bg-white text-amber-700 shadow-sm flex items-center gap-1.5" : "px-5 py-2.5 rounded-xl text-sm font-bold text-amber-700 hover:bg-white/50 flex items-center gap-1.5";
         } else if (t === 'settings') {
-          btn.className = isActive ? "px-4 py-2 rounded-xl text-sm font-bold bg-white text-teal-700 shadow-sm" : "px-4 py-2 rounded-xl text-sm font-bold text-teal-700 hover:bg-white/50";
+          btn.className = isActive ? "px-5 py-2.5 rounded-xl text-sm font-bold bg-white text-teal-700 shadow-sm flex items-center gap-1.5" : "px-5 py-2.5 rounded-xl text-sm font-bold text-teal-700 hover:bg-white/50 flex items-center gap-1.5";
         } else {
-          btn.className = isActive ? "px-4 py-2 rounded-xl text-sm font-bold bg-white text-indigo-700 shadow-sm" : "px-4 py-2 rounded-xl text-sm font-bold text-indigo-600 hover:bg-white/50";
+          btn.className = isActive ? "px-5 py-2.5 rounded-xl text-sm font-bold bg-white text-indigo-700 shadow-sm flex items-center gap-1.5" : "px-5 py-2.5 rounded-xl text-sm font-bold text-indigo-600 hover:bg-white/50 flex items-center gap-1.5";
         }
         document.getElementById(`page-${t}`).classList.toggle('hidden', !isActive);
       });
@@ -1409,8 +1842,7 @@
       if (tabId === 'create') renderLibraryGrid();
       if (tabId === 'practice') renderPracticeBoard();
       if (tabId === 'quiz') checkQuizEligibility();
-      if (tabId === 'morning') renderRoutineBoard('morning');
-      if (tabId === 'evening') renderRoutineBoard('evening');
+      if (tabId === 'scenes') renderSceneBoard();
       if (tabId === 'settings') renderSettingsForms();
     }
 
@@ -1437,7 +1869,6 @@
 
       grid.innerHTML = library.map(card => `
         <div class="bg-white p-3 rounded-2xl border-2 border-slate-100 hover:border-indigo-200 card-shadow relative group flex flex-col items-center transition-all duration-200">
-          
           <div class="absolute -top-1.5 -right-1.5 flex items-center gap-1 z-10">
             <button onclick="openEditCardModal('${card.id}')" title="修正・編集" class="bg-indigo-500 hover:bg-indigo-600 text-white w-7 h-7 rounded-full flex items-center justify-center shadow-md opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all duration-200">
               <i class="fa-solid fa-pen text-[10px]"></i>
@@ -1693,276 +2124,6 @@
       loadQuizQuestion();
     }
 
-    function toggleSortMode(type) {
-      if (type === 'morning') {
-        isSortModeMorning = !isSortModeMorning;
-        const btn = document.getElementById('btn-sort-morning');
-        btn.className = isSortModeMorning 
-          ? "bg-amber-600 text-white px-4 py-2 rounded-xl text-xs font-black shadow-sm transition-all animate-pulse"
-          : "bg-white text-amber-700 px-4 py-2 rounded-xl text-xs font-black shadow-sm hover:bg-amber-50 transition-all";
-        btn.innerHTML = isSortModeMorning ? "決定 (おわり) ✓" : "じゅんばんをかえる ⇅";
-      } else {
-        isSortModeEvening = !isSortModeEvening;
-        const btn = document.getElementById('btn-sort-evening');
-        btn.className = isSortModeEvening 
-          ? "bg-violet-600 text-white px-4 py-2 rounded-xl text-xs font-black shadow-sm transition-all animate-pulse"
-          : "bg-white text-violet-700 px-4 py-2 rounded-xl text-xs font-black shadow-sm hover:bg-violet-50 transition-all";
-        btn.innerHTML = isSortModeEvening ? "決定 (おわり) ✓" : "じゅんばんをかえる ⇅";
-      }
-      renderRoutineBoard(type);
-    }
-
-    function moveStep(type, idx, direction, event) {
-      if (event) event.stopPropagation();
-      const steps = type === 'morning' ? morningSteps : eveningSteps;
-      const state = type === 'morning' ? morningState : eveningState;
-      const targetIdx = direction === 'left' ? idx - 1 : idx + 1;
-      if (targetIdx < 0 || targetIdx >= steps.length) return;
-
-      const tempStep = steps[idx];
-      steps[idx] = steps[targetIdx];
-      steps[targetIdx] = tempStep;
-
-      const tempState = state[idx];
-      state[idx] = state[targetIdx];
-      state[targetIdx] = tempState;
-
-      saveRoutinesToStorage();
-      playSound('complete');
-      renderRoutineBoard(type);
-    }
-
-    function renderRoutineBoard(type) {
-      const gridId = type === 'morning' ? 'morning-grid' : 'evening-grid';
-      const progressId = type === 'morning' ? 'morning-progress' : 'evening-progress';
-      const progressTextId = type === 'morning' ? 'morning-progress-text' : 'evening-progress-text';
-      const grid = document.getElementById(gridId);
-      const steps = type === 'morning' ? morningSteps : eveningSteps;
-      const state = type === 'morning' ? morningState : eveningState;
-      const isSortMode = type === 'morning' ? isSortModeMorning : isSortModeEvening;
-
-      const visibleSteps = steps.filter(step => step.enabled !== false);
-      if (visibleSteps.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-12 bg-white rounded-3xl border-2 border-slate-100 text-slate-400 w-full"><p class="font-bold">ステップがすべて非表示になっています。</p></div>`;
-        document.getElementById(progressId).style.width = `0%`;
-        document.getElementById(progressTextId).innerText = `0 / 0 できた`;
-        return;
-      }
-
-      let completedCount = 0;
-      steps.forEach((step, idx) => {
-        if (step.enabled !== false && state[idx] === true) completedCount++;
-      });
-
-      const percentage = Math.round((completedCount / visibleSteps.length) * 100);
-      document.getElementById(progressId).style.width = `${percentage}%`;
-      document.getElementById(progressTextId).innerText = `${completedCount} / ${visibleSteps.length} できた`;
-
-      grid.innerHTML = steps.map((step, idx) => {
-        if (step.enabled === false) return '';
-        const isDone = state[idx];
-        const stepNum = steps.filter((s, i) => s.enabled !== false && i < idx).length + 1;
-
-        return `
-          <div id="routine-${type}-${idx}" onclick="handleRoutineClick('${type}', ${idx})" 
-               class="relative bg-white border-4 ${isDone ? 'border-emerald-400 bg-emerald-50/20' : 'border-slate-100'} ${isSortMode ? 'border-dashed border-amber-400' : ''} rounded-[24px] p-3 flex flex-col items-center justify-between card-shadow min-h-[280px] md:min-h-[320px] cursor-pointer transition-all duration-300 transform active:scale-95 hover:-translate-y-1 select-none overflow-hidden">
-            <span class="absolute top-2 left-2 w-6 h-6 bg-slate-100 text-slate-600 text-xs font-black rounded-full flex items-center justify-center border border-slate-200">${stepNum}</span>
-            ${isSortMode ? `
-              <div class="absolute inset-x-0 top-0 bg-amber-50 p-1.5 flex justify-between items-center border-b border-amber-200 z-10">
-                <button onclick="moveStep('${type}', ${idx}, 'left', event)" ${idx === 0 ? 'disabled class="opacity-30"' : ''} class="bg-amber-500 text-white w-9 h-8 rounded-lg flex items-center justify-center text-xs font-bold">◀ 左</button>
-                <span class="text-[10px] font-black text-amber-700">いれかえ</span>
-                <button onclick="moveStep('${type}', ${idx}, 'right', event)" ${idx === steps.length - 1 ? 'disabled class="opacity-30"' : ''} class="bg-amber-500 text-white w-9 h-8 rounded-lg flex items-center justify-center text-xs font-bold">右 ▶</button>
-              </div>
-            ` : ''}
-            <div class="${isDone && !isSortMode ? 'flex' : 'hidden'} absolute inset-0 bg-emerald-500/10 rounded-[18px] pointer-events-none items-center justify-center">
-              <div class="bg-white/90 text-emerald-500 rounded-full w-14 h-14 border-4 border-emerald-400 flex items-center justify-center text-3xl shadow-md animate-bounce"><i class="fa-solid fa-check"></i></div>
-            </div>
-            <div class="aspect-square w-[80%] bg-slate-50 rounded-2xl flex items-center justify-center p-2.5 overflow-hidden mt-4 ${isDone ? 'grayscale opacity-40' : ''}">
-              <img class="w-full h-full object-contain pointer-events-none" src="${step.img}" alt="${step.word}">
-            </div>
-            <div class="text-center w-full mt-2">
-              <h4 class="font-black text-slate-800 text-base tracking-wide truncate ${isDone ? 'line-through text-slate-400' : ''}">${step.word}</h4>
-              <p class="text-[10px] text-slate-400 font-bold mt-0.5 leading-tight h-6 overflow-hidden">${step.desc}</p>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function handleRoutineClick(type, idx) {
-      if (type === 'morning' ? isSortModeMorning : isSortModeEvening) return;
-      const steps = type === 'morning' ? morningSteps : eveningSteps;
-      const state = type === 'morning' ? morningState : eveningState;
-
-      state[idx] = !state[idx];
-      const step = steps[idx];
-      const isCompletedNow = state[idx];
-
-      if (isCompletedNow) {
-        playSound('complete');
-        if ('speechSynthesis' in window) {
-          window.speechSynthesis.cancel();
-          const utterance = new SpeechSynthesisUtterance(`${step.word}、できたね！えらい！`);
-          utterance.lang = 'ja-JP';
-          utterance.rate = 1.0;
-          window.speechSynthesis.speak(utterance);
-        }
-      } else {
-        playSound('wrong');
-      }
-
-      let allCompleted = true;
-      steps.forEach((s, i) => {
-        if (s.enabled !== false && !state[i]) allCompleted = false;
-      });
-
-      renderRoutineBoard(type);
-      if (allCompleted && isCompletedNow) {
-        setTimeout(() => {
-          playSound('fanfare');
-          document.getElementById('celebration-overlay').classList.remove('hidden');
-        }, 600);
-      }
-    }
-
-    function resetRoutine(type) {
-      if (type === 'morning') morningState = [false, false, false, false, false, false, false];
-      else eveningState = [false, false, false, false, false, false, false];
-      playSound('wrong');
-      renderRoutineBoard(type);
-    }
-
-    function closeCelebration() {
-      document.getElementById('celebration-overlay').classList.add('hidden');
-    }
-
-    function switchSettingsTab(tabId) {
-      currentSettingsTab = tabId;
-      document.getElementById('btn-set-morning').className = tabId === 'morning' ? "px-5 py-2 rounded-xl text-sm font-bold bg-white text-amber-700 shadow-sm flex items-center gap-1.5" : "px-5 py-2 rounded-xl text-sm font-bold text-slate-600 hover:bg-white/50 flex items-center gap-1.5";
-      document.getElementById('btn-set-evening').className = tabId === 'evening' ? "px-5 py-2 rounded-xl text-sm font-bold bg-white text-violet-700 shadow-sm flex items-center gap-1.5" : "px-5 py-2 rounded-xl text-sm font-bold text-slate-600 hover:bg-white/50 flex items-center gap-1.5";
-      renderSettingsForms();
-    }
-
-    function renderSettingsForms() {
-      const container = document.getElementById('settings-form-container');
-      const steps = currentSettingsTab === 'morning' ? morningSteps : eveningSteps;
-
-      container.innerHTML = steps.map((step, idx) => {
-        const isEnabled = step.enabled !== false;
-        return `
-          <div class="bg-slate-50 p-4 rounded-2xl border-2 border-slate-200 flex flex-col md:flex-row items-center gap-4 transition-all">
-            <div class="flex items-center gap-3 w-full md:w-auto shrink-0 justify-between">
-              <span class="bg-indigo-100 text-indigo-700 font-black px-3 py-1.5 rounded-lg text-xs">ステップ ${idx + 1}</span>
-              <div class="flex items-center gap-2">
-                <span class="text-xs font-bold text-slate-500">表示</span>
-                <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
-                  <input type="checkbox" id="toggle-${idx}" onchange="toggleStepActive(${idx})" ${isEnabled ? 'checked' : ''} class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer right-4 top-0 transition duration-300 outline-none"/>
-                  <label for="toggle-${idx}" class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-300 cursor-pointer"></label>
-                </div>
-              </div>
-            </div>
-
-            <div class="shrink-0 flex flex-col items-center gap-1.5 bg-white p-3 rounded-xl border border-slate-200 shadow-sm w-28 h-28 justify-center cursor-pointer hover:border-teal-400 transition-all" onclick="openIconPicker(${idx})">
-              <div class="w-14 h-14 flex items-center justify-center p-0.5 overflow-hidden rounded-lg bg-slate-50">
-                <img id="settings-preview-img-${idx}" class="w-full h-full object-contain" src="${step.img}" alt="">
-              </div>
-              <span class="text-[10px] font-black text-slate-400">アイコン変更</span>
-            </div>
-
-            <div class="flex-grow w-full space-y-2">
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                <div class="sm:col-span-1">
-                  <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">名前</label>
-                  <input type="text" id="settings-word-${idx}" value="${step.word}" oninput="updateStepData(${idx}, 'word', this.value)" class="w-full px-3 py-2 border-2 border-slate-200 rounded-xl focus:border-indigo-400 text-sm font-bold bg-white">
-                </div>
-                <div class="sm:col-span-2">
-                  <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">説明</label>
-                  <input type="text" id="settings-desc-${idx}" value="${step.desc}" oninput="updateStepData(${idx}, 'desc', this.value)" class="w-full px-3 py-2 border-2 border-slate-200 rounded-xl focus:border-indigo-400 text-sm font-semibold bg-white">
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function toggleStepActive(idx) {
-      const steps = currentSettingsTab === 'morning' ? morningSteps : eveningSteps;
-      steps[idx].enabled = !steps[idx].enabled;
-    }
-
-    function updateStepData(idx, field, value) {
-      const steps = currentSettingsTab === 'morning' ? morningSteps : eveningSteps;
-      steps[idx][field] = value;
-    }
-
-    function openIconPicker(idx) {
-      activeEditStepIdx = idx;
-      const modal = document.getElementById('icon-picker-modal');
-      const presetsContainer = document.getElementById('icon-picker-presets');
-      const customsContainer = document.getElementById('icon-picker-customs');
-      const customsEmpty = document.getElementById('icon-picker-customs-empty');
-
-      presetsContainer.innerHTML = Object.entries(routineSVGs).map(([key, svgData]) => `
-        <div onclick="selectIconForStep('preset', '${key}')" class="bg-slate-50 border-2 border-slate-100 hover:border-teal-400 p-2 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all aspect-square">
-          <img class="w-10 h-10 object-contain pointer-events-none" src="${svgData}" alt="">
-          <span class="text-[9px] font-bold text-slate-400 mt-1 truncate w-full text-center">${key}</span>
-        </div>
-      `).join('');
-
-      if (library.length === 0) {
-        customsContainer.innerHTML = '';
-        customsEmpty.classList.remove('hidden');
-      } else {
-        customsEmpty.classList.add('hidden');
-        customsContainer.innerHTML = library.map(card => `
-          <div onclick="selectIconForStep('custom', '${card.id}')" class="bg-slate-50 border-2 border-slate-100 hover:border-teal-400 p-1.5 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all aspect-square">
-            <img class="w-10 h-10 object-contain rounded pointer-events-none" src="${card.imageUrl}" alt="${card.word}">
-            <span class="text-[9px] font-bold text-slate-400 mt-1 truncate w-full text-center">${card.word}</span>
-          </div>
-        `).join('');
-      }
-      modal.classList.remove('hidden');
-    }
-
-    function closeIconPicker() {
-      document.getElementById('icon-picker-modal').classList.add('hidden');
-      activeEditStepIdx = -1;
-    }
-
-    function selectIconForStep(type, id) {
-      if (activeEditStepIdx === -1) return;
-      const steps = currentSettingsTab === 'morning' ? morningSteps : eveningSteps;
-      let selectedImgSrc = type === 'preset' ? routineSVGs[id] : library.find(c => c.id === id)?.imageUrl;
-      if (selectedImgSrc) {
-        steps[activeEditStepIdx].img = selectedImgSrc;
-        document.getElementById(`settings-preview-img-${activeEditStepIdx}`).src = selectedImgSrc;
-      }
-      closeIconPicker();
-    }
-
-    function saveAllSettings() {
-      saveRoutinesToStorage();
-      resetRoutine('morning');
-      resetRoutine('evening');
-      showCustomAlert("success", "設定保存", "準備ステップの設定を保存しました！");
-      renderSettingsForms();
-    }
-
-    function restoreDefaultRoutines() {
-      showCustomConfirm("danger", "リセット", "準備の設定を初期状態に戻しますか？", (confirmed) => {
-        if (confirmed) {
-          morningSteps = JSON.parse(JSON.stringify(defaultMorningSteps));
-          eveningSteps = JSON.parse(JSON.stringify(defaultEveningSteps));
-          saveRoutinesToStorage();
-          resetRoutine('morning');
-          resetRoutine('evening');
-          renderSettingsForms();
-          showCustomAlert("success", "元にもどしました", "設定を初期状態にリセットしました。");
-        }
-      });
-    }
-
     function showCustomAlert(type, title, msg, callback = null) {
       const modal = document.getElementById('custom-alert');
       const iconBox = document.getElementById('alert-icon-container');
@@ -2037,7 +2198,7 @@
 
     window.onload = async () => {
       try {
-        initRoutines();
+        initScenes();
         await initDatabase();
         await loadLibrary();
         
