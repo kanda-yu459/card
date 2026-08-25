@@ -728,12 +728,16 @@
       });
     }
 
-    // === DYNAMIC CHOICE FEATURE FUNCTIONS ===
+    // === DYNAMIC CHOICE FEATURE (軽量化・フリーズ防止版) ===
     function initChoiceSystem() {
-      const storedPresets = localStorage.getItem('ecard_choice_presets_v1');
+      const storedPresets = localStorage.getItem('ecard_choice_presets_v2');
       if (storedPresets) {
         try {
-          choicePresets = JSON.parse(storedPresets);
+          const rawPresets = JSON.parse(storedPresets);
+          choicePresets = rawPresets.map(p => ({
+            ...p,
+            cards: p.cards.map(c => resolveChoiceCard(c))
+          }));
         } catch (e) {
           choicePresets = [];
         }
@@ -744,8 +748,53 @@
       renderChoiceBoard();
     }
 
+    function resolveChoiceCard(c) {
+      if (!c) return null;
+      if (c.imageUrl) return c;
+      if (c.type === 'preset' || routineSVGs[c.id] || fallbackSVGs[c.id]) {
+        return {
+          id: c.id,
+          word: c.word,
+          imageUrl: routineSVGs[c.id] || fallbackSVGs[c.id] || '',
+          type: 'preset'
+        };
+      }
+      const found = library.find(item => item.id === c.id);
+      if (found) {
+        return {
+          id: found.id,
+          word: c.word || found.word,
+          imageUrl: found.imageUrl,
+          type: 'custom'
+        };
+      }
+      return {
+        id: c.id,
+        word: c.word,
+        imageUrl: '',
+        type: 'custom'
+      };
+    }
+
     function saveChoicePresetsToStorage() {
-      localStorage.setItem('ecard_choice_presets_v1', JSON.stringify(choicePresets));
+      try {
+        const lightweightPresets = choicePresets.map(p => ({
+          id: p.id,
+          title: p.title,
+          count: p.count,
+          cards: p.cards.map(c => {
+            if (!c) return null;
+            return {
+              id: c.id,
+              word: c.word,
+              type: c.type || (c.id && c.id.startsWith('card_') ? 'custom' : 'preset')
+            };
+          })
+        }));
+        localStorage.setItem('ecard_choice_presets_v2', JSON.stringify(lightweightPresets));
+      } catch (err) {
+        console.error("Choice preset storage error:", err);
+      }
     }
 
     function setChoiceCount(count) {
@@ -828,14 +877,13 @@
         setChoiceCount(found.count);
         currentChoiceCards = [null, null, null, null, null];
         for (let i = 0; i < found.count; i++) {
-          currentChoiceCards[i] = found.cards[i] || null;
+          currentChoiceCards[i] = resolveChoiceCard(found.cards[i]);
         }
         resetChoiceSelection();
       }
     }
 
     function openSaveChoiceModal() {
-      // 最低1枚はカードが設定されているか確認
       const hasAnyCard = currentChoiceCards.slice(0, choiceCount).some(c => c !== null);
       if (!hasAnyCard) {
         showCustomAlert("warning", "カードが未設定です", "保存する前に、少なくとも1枚はカードをセットしてください。");
@@ -852,44 +900,49 @@
     }
 
     function submitSaveChoicePreset() {
-      const name = document.getElementById('choice-preset-name-input').value.trim();
+      const nameInput = document.getElementById('choice-preset-name-input');
+      const name = nameInput ? nameInput.value.trim() : "";
       if (!name) {
         showCustomAlert("warning", "入力エラー", "チョイスの名前を入力してください。");
         return;
       }
 
-      const activeCards = [];
-      for (let i = 0; i < choiceCount; i++) {
-        activeCards.push(currentChoiceCards[i] || null);
-      }
-
-      // 同名または既存プリセットの更新
-      const existingIdx = choicePresets.findIndex(p => p.id === currentChoicePresetId || p.title === name);
-
-      if (existingIdx !== -1) {
-        choicePresets[existingIdx] = {
-          id: choicePresets[existingIdx].id,
-          title: name,
-          count: choiceCount,
-          cards: activeCards
-        };
-        currentChoicePresetId = choicePresets[existingIdx].id;
-      } else {
-        const newPreset = {
-          id: 'choice_' + Date.now(),
-          title: name,
-          count: choiceCount,
-          cards: activeCards
-        };
-        choicePresets.push(newPreset);
-        currentChoicePresetId = newPreset.id;
-      }
-
-      saveChoicePresetsToStorage();
-      renderChoicePresetDropdown();
       closeSaveChoiceModal();
 
-      showCustomAlert("success", "保存完了 💾", `チョイス「<strong>${name}</strong>」を保存しました！プルダウンからいつでも呼び出せます。`);
+      try {
+        const activeCards = [];
+        for (let i = 0; i < choiceCount; i++) {
+          activeCards.push(currentChoiceCards[i] ? { ...currentChoiceCards[i] } : null);
+        }
+
+        const existingIdx = choicePresets.findIndex(p => p.id === currentChoicePresetId || p.title === name);
+
+        if (existingIdx !== -1) {
+          choicePresets[existingIdx] = {
+            id: choicePresets[existingIdx].id,
+            title: name,
+            count: choiceCount,
+            cards: activeCards
+          };
+          currentChoicePresetId = choicePresets[existingIdx].id;
+        } else {
+          const newPreset = {
+            id: 'choice_' + Date.now(),
+            title: name,
+            count: choiceCount,
+            cards: activeCards
+          };
+          choicePresets.push(newPreset);
+          currentChoicePresetId = newPreset.id;
+        }
+
+        saveChoicePresetsToStorage();
+        renderChoicePresetDropdown();
+        showCustomAlert("success", "保存完了 💾", `チョイス「<strong>${name}</strong>」を保存しました！プルダウンからいつでも呼び出せます。`);
+      } catch (e) {
+        console.error("Save choice error:", e);
+        showCustomAlert("error", "エラー", "チョイスの保存に失敗しました。");
+      }
     }
 
     function deleteCurrentChoicePreset() {
@@ -1451,7 +1504,7 @@
       let defaultDesc = 'がんばろう！';
 
       if (type === 'preset') {
-        selectedImgSrc = routineSVGs[id];
+        selectedImgSrc = routineSVGs[id] || fallbackSVGs[id];
         defaultWord = id;
       } else {
         const found = library.find(c => c.id === id);
@@ -1467,9 +1520,10 @@
       // 1. チョイス画面のカード枠変更
       if (iconPickerMode === 'choice_select' && activeChoiceCardSlot !== -1) {
         currentChoiceCards[activeChoiceCardSlot] = {
-          id: 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+          id: id,
           word: defaultWord,
-          imageUrl: selectedImgSrc
+          imageUrl: selectedImgSrc,
+          type: type
         };
         resetChoiceSelection();
       } 
@@ -2233,9 +2287,9 @@
     window.onload = async () => {
       try {
         initScenes();
-        initChoiceSystem();
         await initDatabase();
         await loadLibrary();
+        initChoiceSystem();
         
         if (library.length === 0) {
           const sampleCards = [
@@ -2250,7 +2304,7 @@
           await loadLibrary();
         }
 
-        if (library.length >= 2) {
+        if (library.length >= 2 && !currentChoiceCards[0]) {
           currentChoiceCards[0] = library[0];
           currentChoiceCards[1] = library[1];
           renderChoiceBoard();
