@@ -70,7 +70,7 @@
         </div>
         <div>
           <h1 class="text-2xl font-bold text-indigo-700 tracking-wide">つくろう！えカード</h1>
-          <p class="text-xs text-indigo-400 font-bold">iPadでかんたん視覚支援＆チョイス</p>
+          <p class="text-xs text-indigo-400 font-bold">iPadでかんたん視覚支援＆クイズ</p>
         </div>
       </div>
 
@@ -79,8 +79,11 @@
         <button onclick="switchTab('create')" id="tab-create" class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-1.5 bg-white text-indigo-700 shadow-sm">
           <i class="fa-solid fa-wand-magic-sparkles"></i> つくる
         </button>
-        <button onclick="switchTab('choice')" id="tab-choice" class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-1.5 text-indigo-600 hover:bg-white/50">
-          <i class="fa-solid fa-hand-pointer text-indigo-500"></i> チョイス（2〜5択）
+        <button onclick="switchTab('practice')" id="tab-practice" class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-1.5 text-indigo-600 hover:bg-white/50">
+          <i class="fa-solid fa-arrows-left-right"></i> ２たく
+        </button>
+        <button onclick="switchTab('quiz')" id="tab-quiz" class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-1.5 text-indigo-600 hover:bg-white/50">
+          <i class="fa-solid fa-gamepad"></i> クイズ
         </button>
         <button onclick="switchTab('scenes')" id="tab-scenes" class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-1.5 text-amber-700 hover:bg-white/50">
           <i class="fa-solid fa-list-check text-amber-500"></i> シーン（手順）
@@ -236,59 +239,145 @@
         </div>
       </section>
 
-      <!-- PAGE 2: DYNAMIC CHOICE MODE -->
-      <section id="page-choice" class="hidden space-y-6 flex-grow flex flex-col justify-between">
-        
-        <!-- Choice Top Bar -->
-        <div class="bg-white p-4 rounded-3xl border-4 border-indigo-100 card-shadow flex flex-col lg:flex-row items-center justify-between gap-4">
-          
-          <!-- Left: Preset Switcher & Save -->
-          <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-            <div class="flex items-center gap-2 bg-indigo-50 p-1.5 rounded-2xl border border-indigo-200">
-              <i class="fa-solid fa-bookmark text-indigo-600 ml-2"></i>
-              <select id="choice-preset-select" onchange="loadChoicePreset(this.value)" class="bg-white border border-indigo-300 text-indigo-900 text-xs font-black rounded-xl px-3 py-1.5 focus:outline-none cursor-pointer max-w-[160px] sm:max-w-[200px]">
-              </select>
-            </div>
-            <button onclick="openSaveChoiceModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl text-xs font-black shadow transition-all whitespace-nowrap flex items-center gap-1">
-              <i class="fa-solid fa-floppy-disk"></i> この並びを保存
+      <!-- PAGE 2: TWO-CHOICE PRACTICE (チョイス画面) -->
+      <section id="page-practice" class="hidden space-y-6 flex-grow flex flex-col justify-between">
+        <div class="bg-white p-4 rounded-2xl border-2 border-indigo-100 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+          <p class="text-slate-600 font-bold text-sm sm:text-base">
+            <i class="fa-solid fa-circle-info text-indigo-500 mr-1"></i>
+            カードをえらんで並べよう。タップするともう片方がグレーアウトするよ。
+          </p>
+          <div class="flex gap-2">
+            <button onclick="openCardPicker('left')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-1">
+              <i class="fa-solid fa-left-long"></i> 左を変える
             </button>
-            <button onclick="deleteCurrentChoicePreset()" id="btn-delete-choice-preset" class="text-rose-500 hover:text-rose-700 p-2 text-xs font-black hover:bg-rose-50 rounded-xl transition-all hidden" title="このプリセットを削除">
-              <i class="fa-solid fa-trash-can"></i>
+            <button onclick="openCardPicker('right')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-1">
+              右を変える <i class="fa-solid fa-right-long"></i>
             </button>
-          </div>
-
-          <!-- Right: Number of Options (2〜5) & Edit Gear & Reset Button -->
-          <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-end">
-            <div class="flex bg-slate-100 p-1 rounded-2xl gap-1">
-              <button onclick="setChoiceCount(2)" id="btn-choice-count-2" class="px-3 py-1.5 rounded-xl text-xs font-black transition-all bg-white text-indigo-700 shadow-sm">2択</button>
-              <button onclick="setChoiceCount(3)" id="btn-choice-count-3" class="px-3 py-1.5 rounded-xl text-xs font-black transition-all text-slate-600 hover:bg-white/50">3択</button>
-              <button onclick="setChoiceCount(4)" id="btn-choice-count-4" class="px-3 py-1.5 rounded-xl text-xs font-black transition-all text-slate-600 hover:bg-white/50">4択</button>
-              <button onclick="setChoiceCount(5)" id="btn-choice-count-5" class="px-3 py-1.5 rounded-xl text-xs font-black transition-all text-slate-600 hover:bg-white/50">5択</button>
-            </div>
-
-            <button onclick="toggleChoiceEditMode()" id="btn-choice-edit-mode" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 px-3.5 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 whitespace-nowrap">
-              <i class="fa-solid fa-gear text-slate-500"></i> 変更モード
-            </button>
-
-            <button onclick="resetChoiceSelection()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl text-xs font-black shadow-sm transition-all flex items-center gap-1 whitespace-nowrap">
-              <i class="fa-solid fa-rotate-left"></i> リセット
+            <button onclick="resetPractice()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold transition-all">
+              リセット
             </button>
           </div>
         </div>
 
-        <!-- Choice Cards Board -->
-        <div id="choice-board-container" class="my-auto py-4 flex-grow flex items-center justify-center">
-          <div id="choice-cards-grid" class="grid gap-4 sm:gap-6 w-full max-w-6xl transition-all items-stretch justify-center"></div>
-        </div>
+        <div class="grid grid-cols-2 gap-6 sm:gap-10 my-auto py-4 flex-grow items-center">
+          <div id="practice-card-left" onclick="selectPracticeCard('left')" class="group relative bg-white border-8 border-white card-shadow rounded-[32px] p-6 flex flex-col items-center justify-center aspect-square cursor-pointer transition-all duration-300 active:scale-95 transform hover:-translate-y-1 select-none">
+            <div id="practice-left-empty" class="text-slate-300 flex flex-col items-center gap-3">
+              <i class="fa-solid fa-plus text-5xl"></i>
+              <span class="font-bold text-sm">カードをえらぶ</span>
+            </div>
+            <img id="practice-left-img" class="hidden w-4/5 h-4/5 object-contain rounded-2xl mb-4 pointer-events-none" src="" alt="">
+            <span id="practice-left-label" class="hidden text-3xl sm:text-5xl font-black text-slate-700 tracking-wider"></span>
+            <div id="practice-left-overlay" class="absolute inset-0 bg-slate-900/50 backdrop-grayscale opacity-0 rounded-[24px] pointer-events-none transition-all duration-300 flex items-center justify-center">
+              <i class="fa-solid fa-ban text-white/40 text-7xl"></i>
+            </div>
+          </div>
 
-        <!-- Guide Footer -->
-        <div id="choice-guide-text" class="text-center text-xs font-bold text-slate-400 pb-2">
-          💡 カードをタップすると1つ選んで固定されます。「リセット」を押すともう一度選べます。
+          <div id="practice-card-right" onclick="selectPracticeCard('right')" class="group relative bg-white border-8 border-white card-shadow rounded-[32px] p-6 flex flex-col items-center justify-center aspect-square cursor-pointer transition-all duration-300 active:scale-95 transform hover:-translate-y-1 select-none">
+            <div id="practice-right-empty" class="text-slate-300 flex flex-col items-center gap-3">
+              <i class="fa-solid fa-plus text-5xl"></i>
+              <span class="font-bold text-sm">カードをえらぶ</span>
+            </div>
+            <img id="practice-right-img" class="hidden w-4/5 h-4/5 object-contain rounded-2xl mb-4 pointer-events-none" src="" alt="">
+            <span id="practice-right-label" class="hidden text-3xl sm:text-5xl font-black text-slate-700 tracking-wider"></span>
+            <div id="practice-right-overlay" class="absolute inset-0 bg-slate-900/50 backdrop-grayscale opacity-0 rounded-[24px] pointer-events-none transition-all duration-300 flex items-center justify-center">
+              <i class="fa-solid fa-ban text-white/40 text-7xl"></i>
+            </div>
+          </div>
         </div>
       </section>
 
-      <!-- PAGE 3: SCENES DYNAMIC ROUTINES -->
+      <!-- PAGE 3: QUIZ MODE -->
+      <section id="page-quiz" class="hidden space-y-6 flex-grow flex flex-col">
+        <div class="bg-white p-5 rounded-3xl border-4 border-indigo-100 card-shadow flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <span class="bg-amber-500 text-white w-10 h-10 rounded-2xl flex items-center justify-center text-lg font-black shadow-sm transform rotate-[-3deg]">
+              Q
+            </span>
+            <div>
+              <h3 class="text-lg font-black text-slate-700">どっちかなクイズ！</h3>
+              <p class="text-xs text-slate-400 font-bold">2つの絵カードから、ただしい方を選ぼう！</p>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="startQuiz()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl font-bold transition-all flex items-center gap-2 shadow-sm">
+              <i class="fa-solid fa-play"></i> クイズをスタート
+            </button>
+          </div>
+        </div>
+
+        <div id="quiz-workspace" class="hidden flex-grow flex flex-col items-center justify-center space-y-6 sm:space-y-8">
+          <div class="flex items-center gap-6 bg-indigo-100/50 px-6 py-2.5 rounded-full border border-indigo-200">
+            <span class="text-sm font-bold text-indigo-700">
+              スコア: <span id="quiz-score" class="text-lg font-black text-indigo-800">0</span>
+            </span>
+            <div class="w-px h-4 bg-indigo-300"></div>
+            <span class="text-sm font-bold text-indigo-700">
+              せいかいりつ: <span id="quiz-accuracy" class="text-lg font-black text-indigo-800">0%</span>
+            </span>
+          </div>
+
+          <div class="bg-white px-10 py-6 rounded-3xl border-4 border-amber-300 card-shadow text-center max-w-md w-full relative overflow-hidden transform hover:scale-102 transition-all">
+            <div class="absolute -top-3 -right-3 w-16 h-16 bg-amber-200 rounded-full opacity-40 blur-lg"></div>
+            <p class="text-xs text-amber-500 font-bold uppercase tracking-wider mb-1">おだい</p>
+            <div class="flex items-center justify-center gap-3">
+              <h2 id="quiz-prompt-word" class="text-3xl sm:text-5xl font-black text-slate-800 tracking-wide">？？？</h2>
+              <button onclick="speakPrompt()" class="bg-indigo-100 hover:bg-indigo-200 active:scale-95 text-indigo-700 w-12 h-12 rounded-full flex items-center justify-center transition-all shadow-inner" title="こえできく">
+                <i class="fa-solid fa-volume-high text-lg"></i>
+              </button>
+            </div>
+            <p class="text-sm text-slate-500 font-bold mt-2">はどっちかな？</p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-6 sm:gap-10 max-w-4xl w-full">
+            <div id="quiz-card-left" onclick="submitQuizAnswer('left')" class="group relative bg-white border-8 border-white card-shadow rounded-[32px] p-6 flex flex-col items-center justify-center aspect-square cursor-pointer transition-all duration-300 active:scale-95 select-none">
+              <img id="quiz-left-img" class="w-4/5 h-4/5 object-contain rounded-2xl mb-4 pointer-events-none" src="" alt="">
+              <span id="quiz-left-label" class="text-2xl sm:text-4xl font-black text-slate-700 tracking-wider"></span>
+              <div id="quiz-left-overlay" class="absolute inset-0 bg-slate-900/50 backdrop-grayscale opacity-0 rounded-[24px] pointer-events-none transition-all duration-300 flex items-center justify-center">
+                <i class="fa-solid fa-ban text-white/40 text-7xl"></i>
+              </div>
+              <div id="quiz-left-correct" class="hidden absolute inset-0 bg-emerald-500/10 border-8 border-emerald-400 rounded-[24px] pointer-events-none flex items-center justify-center animate-bounce">
+                <i class="fa-regular fa-circle-check text-emerald-500 text-8xl drop-shadow-md"></i>
+              </div>
+              <div id="quiz-left-wrong" class="hidden absolute inset-0 bg-rose-500/10 border-8 border-rose-400 rounded-[24px] pointer-events-none flex items-center justify-center">
+                <i class="fa-regular fa-circle-xmark text-rose-500 text-8xl drop-shadow-md"></i>
+              </div>
+            </div>
+
+            <div id="quiz-card-right" onclick="submitQuizAnswer('right')" class="group relative bg-white border-8 border-white card-shadow rounded-[32px] p-6 flex flex-col items-center justify-center aspect-square cursor-pointer transition-all duration-300 active:scale-95 select-none">
+              <img id="quiz-right-img" class="w-4/5 h-4/5 object-contain rounded-2xl mb-4 pointer-events-none" src="" alt="">
+              <span id="quiz-right-label" class="text-2xl sm:text-4xl font-black text-slate-700 tracking-wider"></span>
+              <div id="quiz-right-overlay" class="absolute inset-0 bg-slate-900/50 backdrop-grayscale opacity-0 rounded-[24px] pointer-events-none transition-all duration-300 flex items-center justify-center">
+                <i class="fa-solid fa-ban text-white/40 text-7xl"></i>
+              </div>
+              <div id="quiz-right-correct" class="hidden absolute inset-0 bg-emerald-500/10 border-8 border-emerald-400 rounded-[24px] pointer-events-none flex items-center justify-center animate-bounce">
+                <i class="fa-regular fa-circle-check text-emerald-500 text-8xl drop-shadow-md"></i>
+              </div>
+              <div id="quiz-right-wrong" class="hidden absolute inset-0 bg-rose-500/10 border-8 border-rose-400 rounded-[24px] pointer-events-none flex items-center justify-center">
+                <i class="fa-regular fa-circle-xmark text-rose-500 text-8xl drop-shadow-md"></i>
+              </div>
+            </div>
+          </div>
+
+          <button id="quiz-btn-next" onclick="nextQuizQuestion()" class="invisible bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-4 rounded-2xl shadow-md transition-all flex items-center gap-2 text-lg">
+            つぎの問題へ <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+
+        <div id="quiz-no-cards" class="flex-grow flex flex-col items-center justify-center py-12 text-slate-400">
+          <div class="bg-indigo-100 text-indigo-500 p-6 rounded-full mb-4">
+            <i class="fa-solid fa-circle-question text-5xl"></i>
+          </div>
+          <p class="text-lg font-bold">クイズをはじめるには、絵カードが2枚以上必要です</p>
+          <p class="text-sm mt-1 mb-6">「えカードをつくる」タブから、言葉をいれてカードをつくってね！</p>
+          <button onclick="switchTab('create')" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold px-6 py-3 rounded-xl transition-all">
+            カードをつくりにいく
+          </button>
+        </div>
+      </section>
+
+      <!-- PAGE 4: SCENES DYNAMIC ROUTINES (シーン・手順表) -->
       <section id="page-scenes" class="hidden space-y-4 flex-grow flex flex-col">
+        <!-- Scene Top Bar -->
         <div class="bg-white p-4 rounded-3xl border-4 border-amber-200 card-shadow flex flex-col md:flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-3 w-full md:w-auto">
             <div class="bg-amber-500 text-white w-10 h-10 rounded-2xl flex items-center justify-center text-lg font-black shadow-sm">
@@ -301,6 +390,7 @@
             </div>
           </div>
 
+          <!-- Actions -->
           <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end">
             <div class="flex-grow md:flex-grow-0 w-36 sm:w-44 bg-slate-100 h-6 rounded-full p-0.5 overflow-hidden relative border border-slate-200">
               <div id="scene-progress" class="bg-amber-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
@@ -321,22 +411,23 @@
           </div>
         </div>
 
+        <!-- Dynamic Grid -->
         <div id="scene-grid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-3 py-2 flex-grow items-stretch"></div>
       </section>
 
-      <!-- PAGE 4: SETTINGS SECTION -->
+      <!-- PAGE 5: SETTINGS & SCENE CONFIGURATION -->
       <section id="page-settings" class="hidden space-y-6 flex-grow flex flex-col">
         
-        <!-- BACKUP & RESTORE -->
+        <!-- BACKUP & RESTORE DATA SECTION -->
         <div class="bg-white p-5 rounded-3xl border-4 border-indigo-200 card-shadow">
           <div class="flex items-center gap-2 border-b-2 border-slate-100 pb-3 mb-4">
             <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">
               <i class="fa-solid fa-floppy-disk"></i>
             </span>
-            <h2 class="text-xl font-black text-slate-800">絵カード・チョイス・シーンのバックアップ・復元</h2>
+            <h2 class="text-xl font-black text-slate-800">絵カードと全シーンのバックアップ・復元</h2>
           </div>
           <p class="text-xs text-slate-500 mb-4 leading-relaxed">
-            作った絵カード、<strong>チョイスの保存データ、全シーン・手順表の設定をファイルとして保存</strong>できます。<br>
+            作った絵カードと<strong>すべてのシーン・手順表の設定、２たく（チョイス）の状態をファイルとして保存</strong>できます。<br>
             アプリ更新時や別のiPadに移行する際は、保存したファイルを読み込むだけですべて元通りに復元できます。
           </p>
           
@@ -356,7 +447,7 @@
           </div>
         </div>
 
-        <!-- SCENE EDIT & MANAGEMENT -->
+        <!-- SCENE EDIT & MANAGEMENT SECTION -->
         <div class="bg-white p-5 rounded-3xl border-4 border-teal-100 card-shadow">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b-2 border-slate-100 pb-3 mb-4">
             <div class="flex items-center gap-2">
@@ -378,6 +469,7 @@
             </div>
           </div>
 
+          <!-- Scene Selector in Settings -->
           <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-3 rounded-2xl mb-4 border border-slate-200">
             <div class="flex items-center gap-2">
               <span class="text-xs font-black text-slate-600">編集するシーン：</span>
@@ -393,7 +485,9 @@
             </div>
           </div>
 
-          <div id="settings-form-container" class="space-y-4 max-h-[500px] overflow-y-auto pr-2"></div>
+          <div id="settings-form-container" class="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+            <!-- Dynamic Form steps -->
+          </div>
         </div>
 
         <!-- API Key Widget -->
@@ -425,28 +519,6 @@
 
     </main>
 
-    <!-- SAVE CHOICE PRESET MODAL -->
-    <div id="save-choice-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-[32px] border-4 border-indigo-200 max-w-sm w-full p-6 text-center shadow-2xl">
-        <div class="w-14 h-14 bg-indigo-100 text-indigo-600 rounded-2xl mx-auto mb-3 flex items-center justify-center text-2xl">
-          <i class="fa-solid fa-bookmark"></i>
-        </div>
-        <h3 class="text-lg font-black text-slate-800">このチョイスを保存する</h3>
-        <p class="text-xs text-slate-400 mt-1 mb-4">あとですぐ呼び出せるように名前をつけてね（例: おやつ、あそび）</p>
-        
-        <input type="text" id="choice-preset-name-input" placeholder="チョイスの名前を入力" class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-indigo-400 text-sm font-bold mb-4">
-        
-        <div class="flex justify-center gap-2">
-          <button onclick="closeSaveChoiceModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-bold text-xs transition-all">
-            キャンセル
-          </button>
-          <button onclick="submitSaveChoicePreset()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-bold text-xs shadow transition-all">
-            保存する 💾
-          </button>
-        </div>
-      </div>
-    </div>
-
     <!-- NEW SCENE CREATION MODAL -->
     <div id="new-scene-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-[32px] border-4 border-amber-200 max-w-sm w-full p-6 text-center shadow-2xl">
@@ -467,11 +539,11 @@
       </div>
     </div>
 
-    <!-- CARD / ICON PICKER MODAL -->
+    <!-- ICON / CARD PICKER MODAL -->
     <div id="icon-picker-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-[32px] border-4 border-teal-100 max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
         <div class="bg-teal-50 px-6 py-4 border-b border-teal-100 flex items-center justify-between">
-          <h3 id="icon-picker-title" class="text-lg font-black text-teal-800">カードをえらぶ</h3>
+          <h3 id="icon-picker-title" class="text-lg font-black text-teal-800">カード・アイコンをえらぶ</h3>
           <button onclick="closeIconPicker()" class="text-slate-400 hover:text-slate-600">
             <i class="fa-solid fa-xmark text-xl"></i>
           </button>
@@ -537,7 +609,24 @@
       </div>
     </div>
 
-    <!-- Celebration Modal -->
+    <!-- Modals (Picker, Celebration, Loading, Alerts) -->
+    <div id="picker-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-[32px] border-4 border-indigo-100 max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
+        <div class="bg-indigo-50 px-6 py-4 border-b border-indigo-100 flex items-center justify-between">
+          <h3 class="text-lg font-black text-indigo-800">どのカードをならべますか？</h3>
+          <button onclick="closeCardPicker()" class="text-slate-400 hover:text-slate-600">
+            <i class="fa-solid fa-xmark text-xl"></i>
+          </button>
+        </div>
+        <div class="p-6 overflow-y-auto flex-grow">
+          <div id="picker-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
+          <div id="picker-empty" class="hidden text-center py-12 text-slate-400">
+            <p class="font-bold">カードがまだありません</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="celebration-overlay" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
       <div class="bg-white border-8 border-yellow-300 rounded-[40px] max-w-md w-full p-8 text-center shadow-2xl relative overflow-hidden transform scale-95 transition-all">
         <div class="relative z-10 space-y-6">
@@ -557,7 +646,6 @@
       </div>
     </div>
 
-    <!-- Loading Overlay -->
     <div id="loading-overlay" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex flex-col items-center justify-center z-50">
       <div class="bg-white p-8 rounded-[32px] border-4 border-indigo-200 flex flex-col items-center space-y-4 max-w-sm w-full text-center shadow-2xl mx-4">
         <div class="relative w-20 h-20">
@@ -574,7 +662,6 @@
       </div>
     </div>
 
-    <!-- Alert Dialog -->
     <div id="custom-alert" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-[24px] border-4 border-indigo-100 max-w-sm w-full p-6 text-center shadow-2xl">
         <div id="alert-icon-container" class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl"></div>
@@ -599,14 +686,15 @@
     let library = [];
     let currentTab = 'create';
     
-    // === DYNAMIC CHOICE STATES ===
-    let choiceCount = 2; // 2, 3, 4, 5
-    let currentChoiceCards = [null, null, null, null, null];
-    let isChoiceLocked = false;
-    let selectedChoiceIdx = -1;
-    let isChoiceEditMode = false;
-    let choicePresets = [];
-    let currentChoicePresetId = "";
+    let leftPracticeCard = null;
+    let rightPracticeCard = null;
+    let currentPickerTarget = null;
+
+    let quizQuestions = [];
+    let currentQuestionIdx = 0;
+    let quizScore = 0;
+    let quizTotalAnswered = 0;
+    let isQuizAnswered = false;
 
     // SCENES DATA
     let scenes = [];
@@ -619,8 +707,7 @@
     let uploadedImageBase64 = "";
     let editingCardImageBase64 = "";
     let activeEditStepIdx = -1;
-    let iconPickerMode = 'scene_change';
-    let activeChoiceCardSlot = -1;
+    let iconPickerMode = 'change'; // 'change' または 'add'
 
     const fallbackSVGs = {
       apple: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="53" r="35" fill="%23f43f5e"/><path d="M50,18 C52,25 45,30 40,30 C38,22 45,18 50,18 Z" fill="%2322c55e"/><path d="M50,22 L50,10" stroke="%2378350f" stroke-width="4" stroke-linecap="round"/><circle cx="38" cy="45" r="4" fill="%23fff" opacity="0.8"/><circle cx="62" cy="45" r="4" fill="%23fff" opacity="0.8"/><path d="M42,62 Q50,68 58,62" stroke="%23fff" stroke-width="4" stroke-linecap="round" fill="none"/></svg>`,
@@ -728,342 +815,6 @@
       });
     }
 
-    // === DYNAMIC CHOICE FEATURE (軽量化・フリーズ防止版) ===
-    function initChoiceSystem() {
-      const storedPresets = localStorage.getItem('ecard_choice_presets_v2');
-      if (storedPresets) {
-        try {
-          const rawPresets = JSON.parse(storedPresets);
-          choicePresets = rawPresets.map(p => ({
-            ...p,
-            cards: p.cards.map(c => resolveChoiceCard(c))
-          }));
-        } catch (e) {
-          choicePresets = [];
-        }
-      } else {
-        choicePresets = [];
-      }
-      renderChoicePresetDropdown();
-      renderChoiceBoard();
-    }
-
-    function resolveChoiceCard(c) {
-      if (!c) return null;
-      if (c.imageUrl) return c;
-      if (c.type === 'preset' || routineSVGs[c.id] || fallbackSVGs[c.id]) {
-        return {
-          id: c.id,
-          word: c.word,
-          imageUrl: routineSVGs[c.id] || fallbackSVGs[c.id] || '',
-          type: 'preset'
-        };
-      }
-      const found = library.find(item => item.id === c.id);
-      if (found) {
-        return {
-          id: found.id,
-          word: c.word || found.word,
-          imageUrl: found.imageUrl,
-          type: 'custom'
-        };
-      }
-      return {
-        id: c.id,
-        word: c.word,
-        imageUrl: '',
-        type: 'custom'
-      };
-    }
-
-    function saveChoicePresetsToStorage() {
-      try {
-        const lightweightPresets = choicePresets.map(p => ({
-          id: p.id,
-          title: p.title,
-          count: p.count,
-          cards: p.cards.map(c => {
-            if (!c) return null;
-            return {
-              id: c.id,
-              word: c.word,
-              type: c.type || (c.id && c.id.startsWith('card_') ? 'custom' : 'preset')
-            };
-          })
-        }));
-        localStorage.setItem('ecard_choice_presets_v2', JSON.stringify(lightweightPresets));
-      } catch (err) {
-        console.error("Choice preset storage error:", err);
-      }
-    }
-
-    function setChoiceCount(count) {
-      choiceCount = count;
-      [2, 3, 4, 5].forEach(num => {
-        const btn = document.getElementById(`btn-choice-count-${num}`);
-        if (btn) {
-          if (num === count) {
-            btn.className = "px-3 py-1.5 rounded-xl text-xs font-black transition-all bg-white text-indigo-700 shadow-sm";
-          } else {
-            btn.className = "px-3 py-1.5 rounded-xl text-xs font-black transition-all text-slate-600 hover:bg-white/50";
-          }
-        }
-      });
-      resetChoiceSelection();
-    }
-
-    function toggleChoiceEditMode() {
-      isChoiceEditMode = !isChoiceEditMode;
-      const btn = document.getElementById('btn-choice-edit-mode');
-      const guide = document.getElementById('choice-guide-text');
-
-      if (isChoiceEditMode) {
-        btn.className = "bg-amber-500 text-white px-3.5 py-2 rounded-xl text-xs font-black transition-all shadow-sm flex items-center gap-1.5 animate-pulse whitespace-nowrap";
-        btn.innerHTML = `<i class="fa-solid fa-check"></i> 編集おわり ✓`;
-        guide.innerHTML = `✏️ <strong>編集モード中:</strong> カードをタップして変更、または矢印（◀ / ▶）で順番を並べ替えられます。`;
-        guide.className = "text-center text-xs font-black text-amber-600 pb-2";
-      } else {
-        btn.className = "bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 px-3.5 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 whitespace-nowrap";
-        btn.innerHTML = `<i class="fa-solid fa-gear text-slate-500"></i> 変更モード`;
-        guide.innerHTML = `💡 カードをタップすると1つ選んで固定されます。「リセット」を押すともう一度選べます。`;
-        guide.className = "text-center text-xs font-bold text-slate-400 pb-2";
-      }
-      resetChoiceSelection();
-    }
-
-    function moveChoiceCardSlot(fromIdx, direction, event) {
-      if (event) event.stopPropagation();
-      const toIdx = direction === 'left' ? fromIdx - 1 : fromIdx + 1;
-      if (toIdx < 0 || toIdx >= choiceCount) return;
-
-      const temp = currentChoiceCards[fromIdx];
-      currentChoiceCards[fromIdx] = currentChoiceCards[toIdx];
-      currentChoiceCards[toIdx] = temp;
-
-      playSound('complete');
-      renderChoiceBoard();
-    }
-
-    function clearChoiceCardSlot(slotIdx, event) {
-      if (event) event.stopPropagation();
-      currentChoiceCards[slotIdx] = null;
-      renderChoiceBoard();
-    }
-
-    function renderChoicePresetDropdown() {
-      const select = document.getElementById('choice-preset-select');
-      const deleteBtn = document.getElementById('btn-delete-choice-preset');
-
-      let optionsHtml = `<option value="">保存したチョイスを選ぶ</option>`;
-      choicePresets.forEach(preset => {
-        optionsHtml += `<option value="${preset.id}" ${preset.id === currentChoicePresetId ? 'selected' : ''}>${preset.title} (${preset.count}択)</option>`;
-      });
-      select.innerHTML = optionsHtml;
-
-      if (currentChoicePresetId) {
-        deleteBtn.classList.remove('hidden');
-      } else {
-        deleteBtn.classList.add('hidden');
-      }
-    }
-
-    function loadChoicePreset(presetId) {
-      currentChoicePresetId = presetId;
-      renderChoicePresetDropdown();
-
-      if (!presetId) return;
-      const found = choicePresets.find(p => p.id === presetId);
-      if (found) {
-        setChoiceCount(found.count);
-        currentChoiceCards = [null, null, null, null, null];
-        for (let i = 0; i < found.count; i++) {
-          currentChoiceCards[i] = resolveChoiceCard(found.cards[i]);
-        }
-        resetChoiceSelection();
-      }
-    }
-
-    function openSaveChoiceModal() {
-      const hasAnyCard = currentChoiceCards.slice(0, choiceCount).some(c => c !== null);
-      if (!hasAnyCard) {
-        showCustomAlert("warning", "カードが未設定です", "保存する前に、少なくとも1枚はカードをセットしてください。");
-        return;
-      }
-
-      const activePreset = choicePresets.find(p => p.id === currentChoicePresetId);
-      document.getElementById('choice-preset-name-input').value = activePreset ? activePreset.title : "";
-      document.getElementById('save-choice-modal').classList.remove('hidden');
-    }
-
-    function closeSaveChoiceModal() {
-      document.getElementById('save-choice-modal').classList.add('hidden');
-    }
-
-    function submitSaveChoicePreset() {
-      const nameInput = document.getElementById('choice-preset-name-input');
-      const name = nameInput ? nameInput.value.trim() : "";
-      if (!name) {
-        showCustomAlert("warning", "入力エラー", "チョイスの名前を入力してください。");
-        return;
-      }
-
-      closeSaveChoiceModal();
-
-      try {
-        const activeCards = [];
-        for (let i = 0; i < choiceCount; i++) {
-          activeCards.push(currentChoiceCards[i] ? { ...currentChoiceCards[i] } : null);
-        }
-
-        const existingIdx = choicePresets.findIndex(p => p.id === currentChoicePresetId || p.title === name);
-
-        if (existingIdx !== -1) {
-          choicePresets[existingIdx] = {
-            id: choicePresets[existingIdx].id,
-            title: name,
-            count: choiceCount,
-            cards: activeCards
-          };
-          currentChoicePresetId = choicePresets[existingIdx].id;
-        } else {
-          const newPreset = {
-            id: 'choice_' + Date.now(),
-            title: name,
-            count: choiceCount,
-            cards: activeCards
-          };
-          choicePresets.push(newPreset);
-          currentChoicePresetId = newPreset.id;
-        }
-
-        saveChoicePresetsToStorage();
-        renderChoicePresetDropdown();
-        showCustomAlert("success", "保存完了 💾", `チョイス「<strong>${name}</strong>」を保存しました！プルダウンからいつでも呼び出せます。`);
-      } catch (e) {
-        console.error("Save choice error:", e);
-        showCustomAlert("error", "エラー", "チョイスの保存に失敗しました。");
-      }
-    }
-
-    function deleteCurrentChoicePreset() {
-      if (!currentChoicePresetId) return;
-      const found = choicePresets.find(p => p.id === currentChoicePresetId);
-      if (!found) return;
-
-      showCustomConfirm("danger", "チョイス削除", `保存したチョイス「${found.title}」を削除しますか？`, (confirmed) => {
-        if (confirmed) {
-          choicePresets = choicePresets.filter(p => p.id !== currentChoicePresetId);
-          currentChoicePresetId = "";
-          saveChoicePresetsToStorage();
-          renderChoicePresetDropdown();
-          showCustomAlert("success", "削除完了", "チョイスを削除しました。");
-        }
-      });
-    }
-
-    function renderChoiceBoard() {
-      const grid = document.getElementById('choice-cards-grid');
-      
-      let gridColsClass = "grid-cols-2";
-      if (choiceCount === 3) gridColsClass = "grid-cols-3";
-      if (choiceCount === 4) gridColsClass = "grid-cols-2 sm:grid-cols-4";
-      if (choiceCount === 5) gridColsClass = "grid-cols-2 sm:grid-cols-3 md:grid-cols-5";
-      
-      grid.className = `grid gap-4 sm:gap-6 w-full max-w-6xl transition-all items-stretch justify-center ${gridColsClass}`;
-
-      let cardsHtml = "";
-      for (let i = 0; i < choiceCount; i++) {
-        const card = currentChoiceCards[i];
-        const isSelected = selectedChoiceIdx === i;
-        const isDimmed = !isChoiceEditMode && isChoiceLocked && !isSelected;
-
-        cardsHtml += `
-          <div onclick="handleChoiceCardClick(${i})" 
-               class="group relative bg-white border-4 ${isSelected ? 'border-emerald-400 bg-emerald-50/20 selected-bounce' : 'border-slate-100'} ${isChoiceEditMode ? 'border-dashed border-amber-400' : ''} card-shadow rounded-[32px] p-4 sm:p-6 flex flex-col items-center justify-between aspect-square cursor-pointer transition-all duration-300 transform active:scale-95 hover:-translate-y-1 select-none overflow-hidden min-h-[180px]">
-            
-            ${isChoiceEditMode ? `
-              <div class="absolute inset-x-0 top-0 bg-amber-50 p-1.5 flex justify-between items-center border-b border-amber-200 z-10">
-                <button onclick="moveChoiceCardSlot(${i}, 'left', event)" ${i === 0 ? 'disabled class="opacity-30 cursor-not-allowed"' : ''} class="bg-amber-500 text-white w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold">◀</button>
-                <button onclick="clearChoiceCardSlot(${i}, event)" class="bg-rose-500 hover:bg-rose-600 text-white w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shadow" title="枠を空にする">
-                  <i class="fa-solid fa-trash-can"></i>
-                </button>
-                <button onclick="moveChoiceCardSlot(${i}, 'right', event)" ${i === choiceCount - 1 ? 'disabled class="opacity-30 cursor-not-allowed"' : ''} class="bg-amber-500 text-white w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold">▶</button>
-              </div>
-            ` : ''}
-
-            ${card ? `
-              <div class="aspect-square w-[80%] bg-slate-50 rounded-2xl flex items-center justify-center p-2.5 overflow-hidden my-auto pointer-events-none ${isDimmed ? 'grayscale opacity-30' : ''} ${isChoiceEditMode ? 'mt-6' : ''}">
-                <img class="w-full h-full object-contain pointer-events-none" src="${card.imageUrl}" alt="${card.word}">
-              </div>
-              <span class="font-black text-slate-800 text-lg sm:text-2xl tracking-wider text-center truncate w-full ${isDimmed ? 'opacity-30' : ''}">${card.word}</span>
-            ` : `
-              <div class="text-slate-300 flex flex-col items-center justify-center gap-2 my-auto pointer-events-none ${isChoiceEditMode ? 'mt-6' : ''}">
-                <i class="fa-solid fa-plus text-4xl sm:text-5xl"></i>
-                <span class="font-bold text-xs sm:text-sm">カードをえらぶ</span>
-              </div>
-            `}
-
-            <div class="${isDimmed ? 'flex' : 'hidden'} absolute inset-0 bg-slate-900/40 backdrop-grayscale rounded-[28px] pointer-events-none items-center justify-center transition-all duration-300">
-              <i class="fa-solid fa-ban text-white/50 text-5xl"></i>
-            </div>
-
-            <div class="${isSelected && !isChoiceEditMode ? 'flex' : 'hidden'} absolute top-3 right-3 bg-emerald-500 text-white w-10 h-10 rounded-full items-center justify-center text-xl shadow-md pointer-events-none animate-bounce">
-              <i class="fa-solid fa-check"></i>
-            </div>
-
-            <span class="${isChoiceEditMode ? 'hidden' : 'flex'} absolute top-3 left-3 w-6 h-6 bg-slate-100 text-slate-500 text-xs font-black rounded-full items-center justify-center border border-slate-200">
-              ${i + 1}
-            </span>
-          </div>
-        `;
-      }
-
-      grid.innerHTML = cardsHtml;
-    }
-
-    function handleChoiceCardClick(slotIdx) {
-      if (isChoiceEditMode) {
-        openChoiceCardPicker(slotIdx);
-        return;
-      }
-
-      if (!currentChoiceCards[slotIdx]) {
-        openChoiceCardPicker(slotIdx);
-        return;
-      }
-
-      if (isChoiceLocked) return;
-
-      isChoiceLocked = true;
-      selectedChoiceIdx = slotIdx;
-      const selectedCard = currentChoiceCards[slotIdx];
-
-      playSound('complete');
-
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(`${selectedCard.word}、にきめたね！いいね！`);
-        utterance.lang = 'ja-JP';
-        utterance.rate = 1.0;
-        window.speechSynthesis.speak(utterance);
-      }
-
-      renderChoiceBoard();
-    }
-
-    function openChoiceCardPicker(slotIdx) {
-      activeChoiceCardSlot = slotIdx;
-      iconPickerMode = 'choice_select';
-      openIconPicker(-1);
-    }
-
-    function resetChoiceSelection() {
-      isChoiceLocked = false;
-      selectedChoiceIdx = -1;
-      renderChoiceBoard();
-    }
-
-    // === SCENES FUNCTIONS ===
     function initScenes() {
       const storedScenes = localStorage.getItem('ecard_dynamic_scenes_v1');
       const storedApiKey = localStorage.getItem('gemini_api_key');
@@ -1360,12 +1111,12 @@
     }
 
     function openAddCardToSceneModal() {
-      iconPickerMode = 'scene_add';
+      iconPickerMode = 'add';
       openIconPicker(-1);
     }
 
     function addNewStepToCurrentScene() {
-      iconPickerMode = 'scene_add';
+      iconPickerMode = 'add';
       openIconPicker(-1);
     }
 
@@ -1460,7 +1211,7 @@
     }
 
     function openChangeIconPicker(idx) {
-      iconPickerMode = 'scene_change';
+      iconPickerMode = 'change';
       openIconPicker(idx);
     }
 
@@ -1499,12 +1250,15 @@
     }
 
     function selectIconForStep(type, id) {
+      const activeScene = scenes.find(s => s.id === currentSceneId);
+      if (!activeScene) return;
+
       let selectedImgSrc = '';
-      let defaultWord = 'カード';
+      let defaultWord = 'じゅんび';
       let defaultDesc = 'がんばろう！';
 
       if (type === 'preset') {
-        selectedImgSrc = routineSVGs[id] || fallbackSVGs[id];
+        selectedImgSrc = routineSVGs[id];
         defaultWord = id;
       } else {
         const found = library.find(c => c.id === id);
@@ -1517,57 +1271,32 @@
 
       if (!selectedImgSrc) return;
 
-      // 1. チョイス画面のカード枠変更
-      if (iconPickerMode === 'choice_select' && activeChoiceCardSlot !== -1) {
-        currentChoiceCards[activeChoiceCardSlot] = {
-          id: id,
+      if (iconPickerMode === 'add') {
+        const newStep = {
+          id: 'step_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
           word: defaultWord,
-          imageUrl: selectedImgSrc,
-          type: type
+          img: selectedImgSrc,
+          desc: defaultDesc,
+          enabled: true
         };
-        resetChoiceSelection();
-      } 
-      // 2. シーンへのカード追加
-      else if (iconPickerMode === 'scene_add') {
-        const activeScene = scenes.find(s => s.id === currentSceneId);
-        if (activeScene) {
-          const newStep = {
-            id: 'step_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-            word: defaultWord,
-            img: selectedImgSrc,
-            desc: defaultDesc,
-            enabled: true
-          };
-          if (!activeScene.steps) activeScene.steps = [];
-          activeScene.steps.push(newStep);
-          
-          if (!sceneCheckStates[activeScene.id]) sceneCheckStates[activeScene.id] = [];
-          sceneCheckStates[activeScene.id].push(false);
-          saveScenesToStorage();
-        }
-      } 
-      // 3. シーンの既存ステップ画像変更
-      else if (iconPickerMode === 'scene_change' && activeEditStepIdx !== -1) {
-        const activeScene = scenes.find(s => s.id === currentSceneId);
-        if (activeScene && activeScene.steps[activeEditStepIdx]) {
-          activeScene.steps[activeEditStepIdx].img = selectedImgSrc;
-          if (type === 'custom') {
-            activeScene.steps[activeEditStepIdx].word = defaultWord;
-            activeScene.steps[activeEditStepIdx].desc = defaultDesc;
-          }
-          saveScenesToStorage();
+        if (!activeScene.steps) activeScene.steps = [];
+        activeScene.steps.push(newStep);
+        
+        if (!sceneCheckStates[activeScene.id]) sceneCheckStates[activeScene.id] = [];
+        sceneCheckStates[activeScene.id].push(false);
+      } else if (activeEditStepIdx !== -1 && activeScene.steps[activeEditStepIdx]) {
+        activeScene.steps[activeEditStepIdx].img = selectedImgSrc;
+        if (type === 'custom') {
+          activeScene.steps[activeEditStepIdx].word = defaultWord;
+          activeScene.steps[activeEditStepIdx].desc = defaultDesc;
         }
       }
 
+      saveScenesToStorage();
       closeIconPicker();
 
-      if (currentTab === 'choice') {
-        renderChoiceBoard();
-      } else if (currentTab === 'scenes') {
-        renderSceneBoard();
-      } else {
-        renderSettingsForms();
-      }
+      renderSceneBoard();
+      renderSettingsForms();
     }
 
     function saveAllSceneSettings() {
@@ -1577,16 +1306,137 @@
       renderSettingsForms();
     }
 
+    // === PRACTICE CHOICES STORAGE & LOGIC (チョイス保存機能) ===
+    function initPracticeChoices() {
+      const stored = localStorage.getItem('ecard_practice_choices_v1');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          leftPracticeCard = parsed.left || null;
+          rightPracticeCard = parsed.right || null;
+        } catch (e) {}
+      }
+    }
+
+    function savePracticeChoicesToStorage() {
+      localStorage.setItem('ecard_practice_choices_v1', JSON.stringify({
+        left: leftPracticeCard,
+        right: rightPracticeCard
+      }));
+    }
+
+    function renderPracticeBoard() {
+      const leftEmpty = document.getElementById('practice-left-empty');
+      const leftImg = document.getElementById('practice-left-img');
+      const leftLabel = document.getElementById('practice-left-label');
+      const rightEmpty = document.getElementById('practice-right-empty');
+      const rightImg = document.getElementById('practice-right-img');
+      const rightLabel = document.getElementById('practice-right-label');
+
+      if (leftPracticeCard) {
+        leftEmpty.classList.add('hidden');
+        leftImg.src = leftPracticeCard.imageUrl;
+        leftImg.classList.remove('hidden');
+        leftLabel.innerText = leftPracticeCard.word;
+        leftLabel.classList.remove('hidden');
+      } else {
+        leftEmpty.classList.remove('hidden');
+        leftImg.classList.add('hidden');
+        leftLabel.classList.add('hidden');
+      }
+
+      if (rightPracticeCard) {
+        rightEmpty.classList.add('hidden');
+        rightImg.src = rightPracticeCard.imageUrl;
+        rightImg.classList.remove('hidden');
+        rightLabel.innerText = rightPracticeCard.word;
+        rightLabel.classList.remove('hidden');
+      } else {
+        rightEmpty.classList.remove('hidden');
+        rightImg.classList.add('hidden');
+        rightLabel.classList.add('hidden');
+      }
+
+      resetPracticeOverlays();
+    }
+
+    function resetPracticeOverlays() {
+      document.getElementById('practice-left-overlay').style.opacity = '0';
+      document.getElementById('practice-right-overlay').style.opacity = '0';
+      document.getElementById('practice-card-left').classList.remove('selected-bounce');
+      document.getElementById('practice-card-right').classList.remove('selected-bounce');
+    }
+
+    function resetPractice() {
+      resetPracticeOverlays();
+      leftPracticeCard = null;
+      rightPracticeCard = null;
+      savePracticeChoicesToStorage();
+      renderPracticeBoard();
+    }
+
+    function selectPracticeCard(position) {
+      if (position === 'left') {
+        if (!leftPracticeCard) { openCardPicker('left'); return; }
+        document.getElementById('practice-left-overlay').style.opacity = '0';
+        document.getElementById('practice-card-left').classList.add('selected-bounce');
+        if (rightPracticeCard) document.getElementById('practice-right-overlay').style.opacity = '1';
+      } else {
+        if (!rightPracticeCard) { openCardPicker('right'); return; }
+        document.getElementById('practice-right-overlay').style.opacity = '0';
+        document.getElementById('practice-card-right').classList.add('selected-bounce');
+        if (leftPracticeCard) document.getElementById('practice-left-overlay').style.opacity = '1';
+      }
+    }
+
+    function openCardPicker(target) {
+      currentPickerTarget = target;
+      const modal = document.getElementById('picker-modal');
+      const grid = document.getElementById('picker-grid');
+      const emptyMsg = document.getElementById('picker-empty');
+
+      if (library.length === 0) {
+        emptyMsg.classList.remove('hidden');
+        grid.innerHTML = '';
+      } else {
+        emptyMsg.classList.add('hidden');
+        grid.innerHTML = library.map(card => `
+          <div onclick="selectCardFromPicker('${card.id}')" class="bg-white p-3 rounded-2xl border-2 border-slate-100 hover:border-indigo-400 card-shadow cursor-pointer flex flex-col items-center transition-all">
+            <div class="aspect-square w-full bg-slate-50 rounded-xl mb-2 flex items-center justify-center p-1">
+              <img class="w-full h-full object-contain pointer-events-none" src="${card.imageUrl}" alt="${card.word}">
+            </div>
+            <span class="font-bold text-slate-700 text-xs text-center truncate w-full">${card.word}</span>
+          </div>
+        `).join('');
+      }
+      modal.classList.remove('hidden');
+    }
+
+    function closeCardPicker() {
+      document.getElementById('picker-modal').classList.add('hidden');
+    }
+
+    function selectCardFromPicker(cardId) {
+      const selected = library.find(c => c.id === cardId);
+      if (selected) {
+        if (currentPickerTarget === 'left') leftPracticeCard = selected;
+        else rightPracticeCard = selected;
+      }
+      savePracticeChoicesToStorage();
+      closeCardPicker();
+      renderPracticeBoard();
+    }
+
     // === BACKUP EXPORT & IMPORT ===
     async function exportBackupData() {
       try {
         await loadLibrary();
         const backupData = {
-          version: "5.0",
+          version: "4.1",
           exportDate: new Date().toISOString(),
           library: library,
           scenes: scenes,
-          choicePresets: choicePresets,
+          practiceChoices: { left: leftPracticeCard, right: rightPracticeCard },
           geminiApiKey: GEMINI_API_KEY || ""
         };
 
@@ -1598,13 +1448,13 @@
         const now = new Date();
         const dateTag = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
         a.href = url;
-        a.download = `ecard_full_backup_${dateTag}.json`;
+        a.download = `ecard_scenes_backup_${dateTag}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
 
-        showCustomAlert("success", "保存完了 📥", `絵カード、チョイス、全シーンの設定をすべてバックアップ保存しました！`);
+        showCustomAlert("success", "保存完了 📥", `絵カード（${library.length}枚）と全シーン、チョイスの状態をバックアップファイルとして保存しました！`);
       } catch (err) {
         showCustomAlert("error", "エラー", "バックアップファイルの作成に失敗しました。");
       }
@@ -1622,7 +1472,7 @@
             throw new Error("正しい形式ではありません。");
           }
 
-          showCustomConfirm("warning", "バックアップの復元", `絵カード（${imported.library.length}枚）、チョイス、シーン設定を復元します。現在のデータは上書きされますがよろしいですか？`, async (isConfirmed) => {
+          showCustomConfirm("warning", "バックアップの復元", `絵カード（${imported.library.length}枚）とシーン設定を復元します。現在のデータは上書きされますがよろしいですか？`, async (isConfirmed) => {
             if (isConfirmed) {
               toggleLoading(true);
               updateLoadingStatus("データを復元しています...");
@@ -1636,29 +1486,29 @@
                 scenes = imported.scenes;
               }
 
-              if (imported.choicePresets && Array.isArray(imported.choicePresets)) {
-                choicePresets = imported.choicePresets;
+              if (imported.practiceChoices) {
+                leftPracticeCard = imported.practiceChoices.left || null;
+                rightPracticeCard = imported.practiceChoices.right || null;
+                savePracticeChoicesToStorage();
               }
 
-              currentSceneId = scenes[0] ? scenes[0].id : 'morning';
+              currentSceneId = scenes[0].id;
               initSceneCheckStates();
               saveScenesToStorage();
-              saveChoicePresetsToStorage();
 
               if (imported.geminiApiKey) {
                 processAndSetApiKey(imported.geminiApiKey);
               }
 
               await loadLibrary();
-              renderChoicePresetDropdown();
               renderSceneDropdowns();
               renderSettingsForms();
               renderLibraryGrid();
               renderSceneBoard();
-              renderChoiceBoard();
+              renderPracticeBoard();
 
               toggleLoading(false);
-              showCustomAlert("success", "復元完了 📤", `すべての絵カード、チョイス、シーン設定を復元しました！`);
+              showCustomAlert("success", "復元完了 📤", `絵カードと全シーンの設定を完全に復元しました！`);
             }
             if (document.getElementById('backup-file-input')) document.getElementById('backup-file-input').value = "";
             if (document.getElementById('backup-file-input-quick')) document.getElementById('backup-file-input-quick').value = "";
@@ -1671,7 +1521,6 @@
       reader.readAsText(file);
     }
 
-    // === STANDARD API & BASE FUNCTIONS ===
     function saveApiKey() {
       const keyVal = document.getElementById('settings-api-key-input').value.trim();
       processAndSetApiKey(keyVal);
@@ -2113,6 +1962,10 @@
       await saveCardToDatabase(card);
       await loadLibrary();
 
+      if (leftPracticeCard && leftPracticeCard.id === cardId) leftPracticeCard = card;
+      if (rightPracticeCard && rightPracticeCard.id === cardId) rightPracticeCard = card;
+      savePracticeChoicesToStorage();
+
       toggleLoading(false);
       closeEditCardModal();
       showCustomAlert("success", "更新完了！", `カード「<strong>${newWordHiragana}</strong>」を修正・更新しました！`);
@@ -2128,13 +1981,11 @@
 
     function switchTab(tabId) {
       currentTab = tabId;
-      const tabs = ['create', 'choice', 'scenes', 'settings'];
+      const tabs = ['create', 'practice', 'quiz', 'scenes', 'settings'];
       tabs.forEach(t => {
         const btn = document.getElementById(`tab-${t}`);
         const isActive = t === tabId;
-        if (t === 'choice') {
-          btn.className = isActive ? "px-5 py-2.5 rounded-xl text-sm font-bold bg-white text-indigo-700 shadow-sm flex items-center gap-1.5" : "px-5 py-2.5 rounded-xl text-sm font-bold text-indigo-600 hover:bg-white/50 flex items-center gap-1.5";
-        } else if (t === 'scenes') {
+        if (t === 'scenes') {
           btn.className = isActive ? "px-5 py-2.5 rounded-xl text-sm font-bold bg-white text-amber-700 shadow-sm flex items-center gap-1.5" : "px-5 py-2.5 rounded-xl text-sm font-bold text-amber-700 hover:bg-white/50 flex items-center gap-1.5";
         } else if (t === 'settings') {
           btn.className = isActive ? "px-5 py-2.5 rounded-xl text-sm font-bold bg-white text-teal-700 shadow-sm flex items-center gap-1.5" : "px-5 py-2.5 rounded-xl text-sm font-bold text-teal-700 hover:bg-white/50 flex items-center gap-1.5";
@@ -2145,7 +1996,8 @@
       });
 
       if (tabId === 'create') renderLibraryGrid();
-      if (tabId === 'choice') renderChoiceBoard();
+      if (tabId === 'practice') renderPracticeBoard();
+      if (tabId === 'quiz') checkQuizEligibility();
       if (tabId === 'scenes') renderSceneBoard();
       if (tabId === 'settings') renderSettingsForms();
     }
@@ -2196,6 +2048,9 @@
           const transaction = db.transaction(['cards'], 'readwrite');
           const store = transaction.objectStore(['cards']);
           await store.delete(id);
+          if (leftPracticeCard && leftPracticeCard.id === id) leftPracticeCard = null;
+          if (rightPracticeCard && rightPracticeCard.id === id) rightPracticeCard = null;
+          savePracticeChoicesToStorage();
           await loadLibrary();
         }
       });
@@ -2205,11 +2060,126 @@
       showCustomConfirm("danger", "すべて削除", "つくった絵カードをすべて削除します。よろしいですか？", async (isConfirmed) => {
         if (isConfirmed) {
           await clearDatabase();
-          currentChoiceCards = [null, null, null, null, null];
+          leftPracticeCard = null;
+          rightPracticeCard = null;
+          savePracticeChoicesToStorage();
           await loadLibrary();
           showCustomAlert("success", "削除完了", "すべての絵カードを削除しました。");
         }
       });
+    }
+
+    function checkQuizEligibility() {
+      const workspace = document.getElementById('quiz-workspace');
+      const noCardsState = document.getElementById('quiz-no-cards');
+      if (library.length < 2) {
+        workspace.classList.add('hidden');
+        noCardsState.classList.remove('hidden');
+      } else {
+        workspace.classList.remove('hidden');
+        noCardsState.classList.add('hidden');
+        document.getElementById('quiz-score').innerText = quizScore;
+        const accuracy = quizTotalAnswered > 0 ? Math.round((quizScore / quizTotalAnswered) * 100) : 0;
+        document.getElementById('quiz-accuracy').innerText = `${accuracy}%`;
+        if (quizQuestions.length === 0) startQuiz();
+      }
+    }
+
+    function startQuiz() {
+      if (library.length < 2) return;
+      quizScore = 0;
+      quizTotalAnswered = 0;
+      currentQuestionIdx = 0;
+      quizQuestions = [];
+
+      const maxQuestions = Math.min(10, library.length * 2);
+      for (let i = 0; i < maxQuestions; i++) {
+        const correctAnswer = library[Math.floor(Math.random() * library.length)];
+        let wrongAnswer = correctAnswer;
+        while (wrongAnswer.id === correctAnswer.id) {
+          wrongAnswer = library[Math.floor(Math.random() * library.length)];
+        }
+        const isLeftCorrect = Math.random() < 0.5;
+        quizQuestions.push({
+          promptWord: correctAnswer.word,
+          correctId: correctAnswer.id,
+          leftCard: isLeftCorrect ? correctAnswer : wrongAnswer,
+          rightCard: isLeftCorrect ? wrongAnswer : correctAnswer
+        });
+      }
+      loadQuizQuestion();
+    }
+
+    function loadQuizQuestion() {
+      if (quizQuestions.length === 0 || currentQuestionIdx >= quizQuestions.length) {
+        startQuiz();
+        return;
+      }
+      isQuizAnswered = false;
+      const question = quizQuestions[currentQuestionIdx];
+
+      document.getElementById('quiz-btn-next').classList.add('invisible');
+      document.getElementById('quiz-left-overlay').style.opacity = '0';
+      document.getElementById('quiz-right-overlay').style.opacity = '0';
+      document.getElementById('quiz-left-correct').classList.add('hidden');
+      document.getElementById('quiz-left-wrong').classList.add('hidden');
+      document.getElementById('quiz-right-correct').classList.add('hidden');
+      document.getElementById('quiz-right-wrong').classList.add('hidden');
+      document.getElementById('quiz-card-left').classList.remove('selected-bounce');
+      document.getElementById('quiz-card-right').classList.remove('selected-bounce');
+
+      document.getElementById('quiz-prompt-word').innerText = question.promptWord;
+      document.getElementById('quiz-left-img').src = question.leftCard.imageUrl;
+      document.getElementById('quiz-left-label').innerText = question.leftCard.word;
+      document.getElementById('quiz-right-img').src = question.rightCard.imageUrl;
+      document.getElementById('quiz-right-label').innerText = question.rightCard.word;
+      speakPrompt();
+    }
+
+    function speakPrompt() {
+      if ('speechSynthesis' in window) {
+        const word = document.getElementById('quiz-prompt-word').innerText;
+        if (word === "？？？") return;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(`${word}、はどっちかな？`);
+        utterance.lang = 'ja-JP';
+        utterance.rate = 0.9;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function submitQuizAnswer(chosenPos) {
+      if (isQuizAnswered) return;
+      isQuizAnswered = true;
+
+      const question = quizQuestions[currentQuestionIdx];
+      const isLeftSelected = chosenPos === 'left';
+      const chosenCard = isLeftSelected ? question.leftCard : question.rightCard;
+      const alternatePos = isLeftSelected ? 'right' : 'left';
+      const isCorrect = chosenCard.id === question.correctId;
+      quizTotalAnswered++;
+
+      if (isCorrect) {
+        quizScore++;
+        playSound('correct');
+        document.getElementById(`quiz-${chosenPos}-correct`).classList.remove('hidden');
+        document.getElementById(`quiz-card-${chosenPos}`).classList.add('selected-bounce');
+      } else {
+        playSound('wrong');
+        document.getElementById(`quiz-${chosenPos}-wrong`).classList.remove('hidden');
+        document.getElementById(`quiz-${alternatePos}-correct`).classList.remove('hidden');
+      }
+
+      document.getElementById(`quiz-${alternatePos}-overlay`).style.opacity = '1';
+      document.getElementById('quiz-score').innerText = quizScore;
+      const accuracy = Math.round((quizScore / quizTotalAnswered) * 100);
+      document.getElementById('quiz-accuracy').innerText = `${accuracy}%`;
+      document.getElementById('quiz-btn-next').classList.remove('invisible');
+    }
+
+    function nextQuizQuestion() {
+      currentQuestionIdx++;
+      loadQuizQuestion();
     }
 
     function showCustomAlert(type, title, msg, callback = null) {
@@ -2287,9 +2257,9 @@
     window.onload = async () => {
       try {
         initScenes();
+        initPracticeChoices();
         await initDatabase();
         await loadLibrary();
-        initChoiceSystem();
         
         if (library.length === 0) {
           const sampleCards = [
@@ -2304,11 +2274,7 @@
           await loadLibrary();
         }
 
-        if (library.length >= 2 && !currentChoiceCards[0]) {
-          currentChoiceCards[0] = library[0];
-          currentChoiceCards[1] = library[1];
-          renderChoiceBoard();
-        }
+        renderPracticeBoard();
 
         document.body.addEventListener('click', () => {
           if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
