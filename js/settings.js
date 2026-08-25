@@ -28,7 +28,7 @@ function generateProceduralCard(word) {
 
     const grad = ctx.createLinearGradient(0, 0, 0, 512);
     grad.addColorStop(0, chosenGrad[0]);
-    grad.addColorStop(1, chosenGrad[1]);
+    grad.addColorStop(1, chosenGrad);
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, 512, 512);
 
@@ -407,19 +407,23 @@ async function saveCardEdits() {
   showCustomAlert("success", "更新完了！", `カード「<strong>${newWordHiragana}</strong>」を更新しました！`);
 }
 
-// バックアップ・復元
+// === バックアップデータ生成ヘルパー ===
+async function buildBackupDataObject() {
+  await loadLibrary();
+  return {
+    version: "5.5",
+    exportDate: new Date().toISOString(),
+    library: library,
+    scenes: scenes,
+    choiceScenes: choiceScenes,
+    geminiApiKey: GEMINI_API_KEY || ""
+  };
+}
+
+// ローカルファイル エクスポート・インポート
 async function exportBackupData() {
   try {
-    await loadLibrary();
-    const backupData = {
-      version: "5.5",
-      exportDate: new Date().toISOString(),
-      library: library,
-      scenes: scenes,
-      choiceScenes: choiceScenes,
-      geminiApiKey: GEMINI_API_KEY || ""
-    };
-
+    const backupData = await buildBackupDataObject();
     const jsonStr = JSON.stringify(backupData, null, 2);
     const blob = new Blob([jsonStr], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -440,6 +444,50 @@ async function exportBackupData() {
   }
 }
 
+async function restoreFromBackupObject(imported) {
+  if (!imported.library || !Array.isArray(imported.library)) {
+    throw new Error("正しい形式のバックアップデータではありません。");
+  }
+
+  toggleLoading(true);
+  updateLoadingStatus("データを復元しています...");
+
+  await clearDatabase();
+  for (const card of imported.library) {
+    await saveCardToDatabase(card);
+  }
+
+  if (imported.scenes && Array.isArray(imported.scenes)) {
+    scenes = imported.scenes;
+  }
+
+  if (imported.choiceScenes && Array.isArray(imported.choiceScenes)) {
+    choiceScenes = imported.choiceScenes;
+  }
+
+  currentSceneId = (scenes && scenes.length > 0) ? scenes[0].id : "";
+  currentChoiceSceneId = (choiceScenes && choiceScenes.length > 0) ? choiceScenes[0].id : "";
+  selectedChoiceCardIndex = null;
+
+  initSceneCheckStates();
+  saveScenesToStorage();
+  saveChoiceScenesToStorage();
+
+  if (imported.geminiApiKey) {
+    processAndSetApiKey(imported.geminiApiKey);
+  }
+
+  await loadLibrary();
+  renderSceneDropdowns();
+  renderChoiceSceneDropdown();
+  renderSettingsForms();
+  renderLibraryGrid();
+  renderSceneBoard();
+  renderChoiceBoard();
+
+  toggleLoading(false);
+}
+
 async function importBackupData(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -448,50 +496,14 @@ async function importBackupData(event) {
   reader.onload = async function(e) {
     try {
       const imported = JSON.parse(e.target.result);
-      if (!imported.library || !Array.isArray(imported.library)) {
-        throw new Error("正しい形式ではありません。");
-      }
-
       showCustomConfirm("warning", "バックアップの復元", `絵カード（${imported.library.length}枚）と全設定を復元します。現在のデータは上書きされますがよろしいですか？`, async (isConfirmed) => {
         if (isConfirmed) {
-          toggleLoading(true);
-          updateLoadingStatus("データを復元しています...");
-
-          await clearDatabase();
-          for (const card of imported.library) {
-            await saveCardToDatabase(card);
+          try {
+            await restoreFromBackupObject(imported);
+            showCustomAlert("success", "復元完了 📤", `絵カードと全シーン、チョイスの設定を復元しました！`);
+          } catch (err) {
+            showCustomAlert("error", "復元エラー", "バックアップの復元中にエラーが発生しました。");
           }
-
-          if (imported.scenes && Array.isArray(imported.scenes)) {
-            scenes = imported.scenes;
-          }
-
-          if (imported.choiceScenes && Array.isArray(imported.choiceScenes)) {
-            choiceScenes = imported.choiceScenes;
-          }
-
-          currentSceneId = scenes[0].id;
-          currentChoiceSceneId = choiceScenes[0].id;
-          selectedChoiceCardIndex = null;
-
-          initSceneCheckStates();
-          saveScenesToStorage();
-          saveChoiceScenesToStorage();
-
-          if (imported.geminiApiKey) {
-            processAndSetApiKey(imported.geminiApiKey);
-          }
-
-          await loadLibrary();
-          renderSceneDropdowns();
-          renderChoiceSceneDropdown();
-          renderSettingsForms();
-          renderLibraryGrid();
-          renderSceneBoard();
-          renderChoiceBoard();
-
-          toggleLoading(false);
-          showCustomAlert("success", "復元完了 📤", `絵カードと全シーン、チョイスの設定を復元しました！`);
         }
         if (document.getElementById('backup-file-input')) document.getElementById('backup-file-input').value = "";
       });
@@ -501,6 +513,253 @@ async function importBackupData(event) {
     }
   };
   reader.readAsText(file);
+}
+
+// === GitHub クラウド同期・バックアップ管理 ===
+
+function utf8ToBase64(str) {
+  return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) => {
+    return String.fromCharCode('0x' + p1);
+  }));
+}
+
+function base64ToUtf8(base64Str) {
+  const cleaned = base64Str.replace(/\s/g, '');
+  return decodeURIComponent(Array.prototype.map.call(atob(cleaned), (c) => {
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
+}
+
+function initGitHubConfig() {
+  const token = localStorage.getItem('github_pat') || "";
+  const repo = localStorage.getItem('github_repo') || "";
+  const branch = localStorage.getItem('github_branch') || "main";
+  const path = localStorage.getItem('github_path') || "data/ecard_backup.json";
+
+  GITHUB_TOKEN = token;
+  GITHUB_REPO = repo;
+  GITHUB_BRANCH = branch;
+  GITHUB_PATH = path;
+
+  const elToken = document.getElementById('github-token-input');
+  const elRepo = document.getElementById('github-repo-input');
+  const elBranch = document.getElementById('github-branch-input');
+  const elPath = document.getElementById('github-path-input');
+
+  if (elToken) elToken.value = token;
+  if (elRepo) elRepo.value = repo;
+  if (elBranch) elBranch.value = branch;
+  if (elPath) elPath.value = path;
+
+  updateGitHubStatusBadge(!!(token && repo));
+}
+
+function saveGitHubConfig() {
+  const token = document.getElementById('github-token-input').value.trim();
+  const repo = document.getElementById('github-repo-input').value.trim().replace(/^https?:\/\/github\.com\//, '').replace(/\.git$/, '');
+  const branch = document.getElementById('github-branch-input').value.trim() || "main";
+  const path = document.getElementById('github-path-input').value.trim() || "data/ecard_backup.json";
+
+  if (repo && !repo.includes('/')) {
+    showCustomAlert("warning", "リポジトリ指定エラー", "リポジトリ名は「ユーザー名/リポジトリ名」（例: username/ecard-app）の形式で入力してください。");
+    return;
+  }
+
+  GITHUB_TOKEN = token;
+  GITHUB_REPO = repo;
+  GITHUB_BRANCH = branch;
+  GITHUB_PATH = path;
+
+  localStorage.setItem('github_pat', token);
+  localStorage.setItem('github_repo', repo);
+  localStorage.setItem('github_branch', branch);
+  localStorage.setItem('github_path', path);
+
+  updateGitHubStatusBadge(!!(token && repo));
+  showCustomAlert("success", "設定保存完了 💾", "GitHub連携設定を保存しました！");
+}
+
+function updateGitHubStatusBadge(isConnected) {
+  const badge = document.getElementById('github-status-badge');
+  if (!badge) return;
+  if (isConnected) {
+    badge.className = "px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200";
+    badge.innerHTML = '<i class="fa-solid fa-cloud-arrow-up text-emerald-600"></i> GitHub連携中';
+  } else {
+    badge.className = "px-2.5 py-1 rounded-full text-[10px] font-black bg-slate-100 text-slate-600 border border-slate-200";
+    badge.innerHTML = '<i class="fa-solid fa-circle-minus text-slate-400"></i> 未連携';
+  }
+}
+
+async function testGitHubConnection() {
+  const token = document.getElementById('github-token-input').value.trim();
+  const repo = document.getElementById('github-repo-input').value.trim().replace(/^https?:\/\/github\.com\//, '').replace(/\.git$/, '');
+  const spinner = document.getElementById('github-test-spinner');
+
+  if (!token || !repo) {
+    showCustomAlert("warning", "入力エラー", "Personal Access Token (PAT) と リポジトリ名 を入力してください。");
+    return;
+  }
+
+  spinner.classList.remove('hidden');
+  try {
+    const res = await fetch(`https://api.github.com/repos/${repo}`, {
+      headers: {
+        'Accept': 'application/vnd.github.v3+json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      const permissions = data.permissions || {};
+      const canPush = permissions.push !== false;
+      showCustomAlert("success", "接続成功 ⚡", `リポジトリ「<strong>${data.full_name}</strong>」への接続に成功しました！<br><span class="text-xs text-slate-500">書き込み権限: ${canPush ? 'あり (OK)' : 'なし (読み取り専用)'}</span>`);
+    } else if (res.status === 401) {
+      throw new Error("Personal Access Tokenが無効か、期限切れです。");
+    } else if (res.status === 404) {
+      throw new Error(`リポジトリ「${repo}」が見つからないか、トークンにアクセス権がありません。`);
+    } else {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.message || `ステータスコード: ${res.status}`);
+    }
+  } catch (err) {
+    showCustomAlert("error", "GitHub接続エラー", `接続に失敗しました：<br>${err.message}`);
+  } finally {
+    spinner.classList.add('hidden');
+  }
+}
+
+async function saveBackupToGitHub() {
+  const token = document.getElementById('github-token-input').value.trim() || GITHUB_TOKEN;
+  const repo = document.getElementById('github-repo-input').value.trim().replace(/^https?:\/\/github\.com\//, '').replace(/\.git$/, '') || GITHUB_REPO;
+  const branch = document.getElementById('github-branch-input').value.trim() || GITHUB_BRANCH || "main";
+  const path = document.getElementById('github-path-input').value.trim() || GITHUB_PATH || "data/ecard_backup.json";
+
+  if (!token || !repo) {
+    showCustomAlert("warning", "GitHub設定が必要です", "GitHubへのバックアップには、Personal Access Token (PAT) と リポジトリ名 の設定が必要です。");
+    return;
+  }
+
+  toggleLoading(true);
+  updateLoadingStatus("GitHubにバックアップデータを送信しています...");
+
+  try {
+    // 既存ファイルのSHAを取得
+    let existingSha = null;
+    const getRes = await fetch(`https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}`, {
+      headers: {
+        'Accept': 'application/vnd.github.v3+json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (getRes.ok) {
+      const getData = await getRes.json();
+      existingSha = getData.sha;
+    }
+
+    const backupData = await buildBackupDataObject();
+    const jsonStr = JSON.stringify(backupData, null, 2);
+    const base64Content = utf8ToBase64(jsonStr);
+
+    const now = new Date();
+    const timeStr = `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+    const commitMessage = `Update ecard backup data (${timeStr}) [cards: ${backupData.library.length}]`;
+
+    const putBody = {
+      message: commitMessage,
+      content: base64Content,
+      branch: branch
+    };
+    if (existingSha) {
+      putBody.sha = existingSha;
+    }
+
+    const putRes = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/vnd.github.v3+json',
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(putBody)
+    });
+
+    if (!putRes.ok) {
+      const errJson = await putRes.json().catch(() => ({}));
+      throw new Error(errJson.message || `ステータス: ${putRes.status}`);
+    }
+
+    const resultData = await putRes.json();
+    const commitUrl = resultData.commit?.html_url || `https://github.com/${repo}/blob/${branch}/${path}`;
+    
+    showCustomAlert("success", "GitHub保存完了 🚀", `
+      GitHubリポジトリ（<strong>${repo}</strong>）の <code>${path}</code> にバックアップを保存・コミットしました！<br>
+      <a href="${commitUrl}" target="_blank" class="text-xs text-indigo-600 font-black underline mt-2 inline-block">
+        GitHubで確認する <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+      </a>
+    `);
+  } catch (err) {
+    showCustomAlert("error", "GitHub保存失敗", `GitHubへのバックアップ保存に失敗しました：<br>${err.message}`);
+  } finally {
+    toggleLoading(false);
+  }
+}
+
+async function loadBackupFromGitHub() {
+  const token = document.getElementById('github-token-input').value.trim() || GITHUB_TOKEN;
+  const repo = document.getElementById('github-repo-input').value.trim().replace(/^https?:\/\/github\.com\//, '').replace(/\.git$/, '') || GITHUB_REPO;
+  const branch = document.getElementById('github-branch-input').value.trim() || GITHUB_BRANCH || "main";
+  const path = document.getElementById('github-path-input').value.trim() || GITHUB_PATH || "data/ecard_backup.json";
+
+  if (!repo) {
+    showCustomAlert("warning", "設定が必要です", "リポジトリ名を入力してください。");
+    return;
+  }
+
+  showCustomConfirm("warning", "GitHubから復元", `GitHub（${repo}/${path}）から最新データを読み込み、現在のデータを上書き復元します。よろしいですか？`, async (isConfirmed) => {
+    if (!isConfirmed) return;
+
+    toggleLoading(true);
+    updateLoadingStatus("GitHubからバックアップを取得しています...");
+
+    try {
+      const headers = {
+        'Accept': 'application/vnd.github.v3+json'
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}&_t=${Date.now()}`, {
+        headers: headers
+      });
+
+      if (!res.ok) {
+        if (res.status === 404) {
+          throw new Error(`ファイル「${path}」がブランチ「${branch}」に見つかりませんでした。まだ保存されていない可能性があります。`);
+        }
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || `ステータスコード: ${res.status}`);
+      }
+
+      const data = await res.json();
+      if (!data.content) {
+        throw new Error("ファイルの内容が空です。");
+      }
+
+      const jsonStr = base64ToUtf8(data.content);
+      const imported = JSON.parse(jsonStr);
+
+      await restoreFromBackupObject(imported);
+      showCustomAlert("success", "GitHub復元完了 📥", `GitHubから絵カード（${imported.library.length}枚）と全設定を復元しました！`);
+    } catch (err) {
+      showCustomAlert("error", "復元失敗", `GitHubからの復元に失敗しました：<br>${err.message}`);
+    } finally {
+      toggleLoading(false);
+    }
+  });
 }
 
 // APIキー管理
@@ -525,6 +784,7 @@ function processAndSetApiKey(key) {
 
 function updateApiStatusBadge(isActive) {
   const badge = document.getElementById('api-status-badge');
+  if (!badge) return;
   if (isActive) {
     badge.className = "px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200";
     badge.innerHTML = 'Gemini AI連携中';
