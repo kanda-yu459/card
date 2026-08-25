@@ -539,7 +539,7 @@
       </div>
     </div>
 
-    <!-- ICON / CARD PICKER MODAL (カード差し替え・追加用) -->
+    <!-- ICON / CARD PICKER MODAL -->
     <div id="icon-picker-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-[32px] border-4 border-teal-100 max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
         <div class="bg-teal-50 px-6 py-4 border-b border-teal-100 flex items-center justify-between">
@@ -929,11 +929,11 @@
             <!-- Sort Controls / Direct Card Delete on Scene Board -->
             ${isSortModeScene ? `
               <div class="absolute inset-x-0 top-0 bg-amber-50 p-1.5 flex justify-between items-center border-b border-amber-200 z-10">
-                <button onclick="moveSceneStep(${idx}, 'left', event)" ${idx === 0 ? 'disabled class="opacity-30"' : ''} class="bg-amber-500 text-white w-8 h-7 rounded-lg flex items-center justify-center text-xs font-bold">◀</button>
+                <button onclick="moveSceneStep(${idx}, 'left', event)" ${idx === 0 ? 'disabled class="opacity-30"' : ''} class="bg-amber-500 text-white w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold">◀</button>
                 <button onclick="confirmRemoveStepDirectly(${idx}, '${step.word}', event)" class="bg-rose-500 hover:bg-rose-600 text-white w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shadow transition-all" title="このカードをシーンから削除">
                   <i class="fa-solid fa-trash-can"></i>
                 </button>
-                <button onclick="moveSceneStep(${idx}, 'right', event)" ${idx === steps.length - 1 ? 'disabled class="opacity-30"' : ''} class="bg-amber-500 text-white w-8 h-7 rounded-lg flex items-center justify-center text-xs font-bold">▶</button>
+                <button onclick="moveSceneStep(${idx}, 'right', event)" ${idx === steps.length - 1 ? 'disabled class="opacity-30"' : ''} class="bg-amber-500 text-white w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold">▶</button>
               </div>
             ` : ''}
 
@@ -1274,15 +1274,13 @@
 
       if (iconPickerMode === 'add') {
         const newStep = {
-          id: 'step_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+          id: 'step_' + Date.now(),
           word: defaultWord,
           img: selectedImgSrc,
           desc: defaultDesc,
           enabled: true
         };
-        if (!activeScene.steps) activeScene.steps = [];
         activeScene.steps.push(newStep);
-        
         if (!sceneCheckStates[activeScene.id]) sceneCheckStates[activeScene.id] = [];
         sceneCheckStates[activeScene.id].push(false);
       } else if (activeEditStepIdx !== -1 && activeScene.steps[activeEditStepIdx]) {
@@ -1296,8 +1294,11 @@
       saveScenesToStorage();
       closeIconPicker();
 
-      renderSceneBoard();
-      renderSettingsForms();
+      if (currentTab === 'scenes') {
+        renderSceneBoard();
+      } else {
+        renderSettingsForms();
+      }
     }
 
     function saveAllSceneSettings() {
