@@ -35,7 +35,7 @@
     }
     @keyframes card-bounce {
       0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
+      50% { transform: scale(1.06); }
     }
     .selected-bounce {
       animation: card-bounce 0.4s ease-in-out;
@@ -62,7 +62,7 @@
 
   <div id="app-container" class="flex flex-col min-h-screen">
     
-    <!-- Header (3タブ統合) -->
+    <!-- Header -->
     <header class="bg-white border-b-4 border-indigo-200 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0 shadow-sm">
       <div class="flex items-center gap-3">
         <div class="bg-indigo-500 text-white p-3 rounded-2xl shadow-md transform rotate-[-2deg]">
@@ -74,7 +74,7 @@
         </div>
       </div>
 
-      <!-- Navigation Tabs: チョイス・シーン・せってい -->
+      <!-- Navigation Tabs -->
       <nav class="flex flex-wrap bg-indigo-100 p-1.5 rounded-2xl gap-1.5 justify-center">
         <button onclick="switchTab('practice')" id="tab-practice" class="px-6 py-2.5 rounded-xl text-sm font-black transition-all duration-300 flex items-center gap-1.5 bg-white text-indigo-700 shadow-sm">
           <i class="fa-solid fa-arrows-left-right"></i> チョイス
@@ -102,51 +102,51 @@
         </button>
       </div>
 
-      <!-- TAB 1: CHOICE (２たくチョイス画面) -->
-      <section id="page-practice" class="space-y-6 flex-grow flex flex-col justify-between">
-        <div class="bg-white p-4 rounded-2xl border-2 border-indigo-100 flex flex-wrap items-center justify-between gap-3 shadow-sm">
-          <p class="text-slate-600 font-bold text-sm sm:text-base">
-            <i class="fa-solid fa-circle-info text-indigo-500 mr-1"></i>
-            カードをえらんで並べよう。タップすると選んだカードが大きく動くよ。
-          </p>
-          <div class="flex gap-2">
-            <button onclick="openCardPicker('left')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-1">
-              <i class="fa-solid fa-left-long"></i> 左を変える
-            </button>
-            <button onclick="openCardPicker('right')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-1">
-              右を変える <i class="fa-solid fa-right-long"></i>
-            </button>
-            <button onclick="resetPractice()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold transition-all">
-              リセット
-            </button>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-6 sm:gap-10 my-auto py-4 flex-grow items-center">
-          <div id="practice-card-left" onclick="selectPracticeCard('left')" class="group relative bg-white border-8 border-white card-shadow rounded-[32px] p-6 flex flex-col items-center justify-center aspect-square cursor-pointer transition-all duration-300 active:scale-95 transform hover:-translate-y-1 select-none">
-            <div id="practice-left-empty" class="text-slate-300 flex flex-col items-center gap-3">
-              <i class="fa-solid fa-plus text-5xl"></i>
-              <span class="font-bold text-sm">左のカードをえらぶ</span>
+      <!-- TAB 1: CHOICE (シーン対応・2〜5択チョイス画面) -->
+      <section id="page-practice" class="space-y-4 flex-grow flex flex-col justify-between">
+        
+        <!-- Choice Top Control Bar (シーン切替 & 択数選択) -->
+        <div class="bg-white p-4 rounded-3xl border-4 border-indigo-200 card-shadow flex flex-col lg:flex-row items-center justify-between gap-4">
+          
+          <!-- Scene Selector for Choice -->
+          <div class="flex items-center gap-3 w-full lg:w-auto">
+            <div class="bg-indigo-600 text-white w-10 h-10 rounded-2xl flex items-center justify-center text-lg font-black shadow-sm">
+              <i class="fa-solid fa-hand-pointer"></i>
             </div>
-            <img id="practice-left-img" class="hidden w-4/5 h-4/5 object-contain rounded-2xl mb-4 pointer-events-none" src="" alt="">
-            <span id="practice-left-label" class="hidden text-3xl sm:text-5xl font-black text-slate-700 tracking-wider"></span>
-            <div id="practice-left-overlay" class="absolute inset-0 bg-slate-900/50 backdrop-grayscale opacity-0 rounded-[24px] pointer-events-none transition-all duration-300 flex items-center justify-center">
-              <i class="fa-solid fa-ban text-white/40 text-7xl"></i>
+            <div class="flex-grow">
+              <span class="text-[10px] font-black text-indigo-600 uppercase tracking-wider block">チョイスの場面（シーン）</span>
+              <select id="choice-scene-select" onchange="onChoiceSceneSelectChange(this.value)" class="bg-indigo-50 border-2 border-indigo-300 text-indigo-900 text-base font-black rounded-xl px-3 py-1.5 focus:outline-none focus:border-indigo-500 cursor-pointer w-full sm:w-60">
+              </select>
             </div>
           </div>
 
-          <div id="practice-card-right" onclick="selectPracticeCard('right')" class="group relative bg-white border-8 border-white card-shadow rounded-[32px] p-6 flex flex-col items-center justify-center aspect-square cursor-pointer transition-all duration-300 active:scale-95 transform hover:-translate-y-1 select-none">
-            <div id="practice-right-empty" class="text-slate-300 flex flex-col items-center gap-3">
-              <i class="fa-solid fa-plus text-5xl"></i>
-              <span class="font-bold text-sm">右のカードをえらぶ</span>
+          <!-- Choice Options & Controls -->
+          <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-end">
+            
+            <!-- Choice Count Segment Buttons (2択〜5択) -->
+            <div class="flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-200">
+              <span class="text-[10px] font-black text-slate-500 px-2">選択数:</span>
+              <button onclick="setChoiceCount(2)" id="btn-choice-count-2" class="px-3 py-1.5 rounded-xl text-xs font-black transition-all bg-indigo-600 text-white shadow-sm">2択</button>
+              <button onclick="setChoiceCount(3)" id="btn-choice-count-3" class="px-3 py-1.5 rounded-xl text-xs font-black transition-all text-slate-600 hover:bg-white/60">3択</button>
+              <button onclick="setChoiceCount(4)" id="btn-choice-count-4" class="px-3 py-1.5 rounded-xl text-xs font-black transition-all text-slate-600 hover:bg-white/60">4択</button>
+              <button onclick="setChoiceCount(5)" id="btn-choice-count-5" class="px-3 py-1.5 rounded-xl text-xs font-black transition-all text-slate-600 hover:bg-white/60">5択</button>
             </div>
-            <img id="practice-right-img" class="hidden w-4/5 h-4/5 object-contain rounded-2xl mb-4 pointer-events-none" src="" alt="">
-            <span id="practice-right-label" class="hidden text-3xl sm:text-5xl font-black text-slate-700 tracking-wider"></span>
-            <div id="practice-right-overlay" class="absolute inset-0 bg-slate-900/50 backdrop-grayscale opacity-0 rounded-[24px] pointer-events-none transition-all duration-300 flex items-center justify-center">
-              <i class="fa-solid fa-ban text-white/40 text-7xl"></i>
-            </div>
+
+            <button onclick="resetPracticeSelection()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-xs font-black transition-all shadow-sm">
+              えらび直す ↺
+            </button>
+            <button onclick="openNewChoiceSceneModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl text-xs font-black shadow transition-all whitespace-nowrap flex items-center gap-1">
+              <i class="fa-solid fa-plus"></i> 場面を追加
+            </button>
           </div>
+
         </div>
+
+        <!-- Dynamic Choice Cards Board (2〜5択で自動グリッド調整) -->
+        <div id="choice-cards-container" class="my-auto py-2 flex-grow flex items-center justify-center w-full">
+          <!-- Dynamically populated choice cards -->
+        </div>
+
       </section>
 
       <!-- TAB 2: SCENES (シーン・手順表画面) -->
@@ -190,7 +190,7 @@
       <!-- TAB 3: SETTINGS & CREATE (つくる・せってい統合画面) -->
       <section id="page-settings" class="hidden space-y-6 flex-grow flex flex-col">
         
-        <!-- CARD CREATION SECTION (つくる) -->
+        <!-- CARD CREATION SECTION -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <!-- Plan A: AI Generator -->
           <div class="bg-white p-5 rounded-3xl border-4 border-indigo-100 card-shadow flex flex-col justify-between">
@@ -290,10 +290,10 @@
             <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">
               <i class="fa-solid fa-floppy-disk"></i>
             </span>
-            <h2 class="text-xl font-black text-slate-800">絵カード・シーン・チョイスのバックアップ保存</h2>
+            <h2 class="text-xl font-black text-slate-800">絵カード・チョイス・シーンのバックアップ</h2>
           </div>
           <p class="text-xs text-slate-500 mb-4 leading-relaxed">
-            作った絵カードや全シーン、チョイスの状態を<strong>1つのバックアップファイルとしてダウンロード保存</strong>できます。
+            作った絵カードや全シーン、チョイスの全場面設定を<strong>1つのバックアップファイルとして保存</strong>できます。
           </p>
           
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -378,14 +378,34 @@
 
     </main>
 
-    <!-- NEW SCENE MODAL -->
+    <!-- NEW CHOICE SCENE MODAL (チョイス専用シーン新規作成) -->
+    <div id="new-choice-scene-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-[32px] border-4 border-indigo-200 max-w-sm w-full p-6 text-center shadow-2xl">
+        <div class="w-14 h-14 bg-indigo-100 text-indigo-600 rounded-2xl mx-auto mb-3 flex items-center justify-center text-2xl">
+          <i class="fa-solid fa-hand-pointer"></i>
+        </div>
+        <h3 class="text-lg font-black text-slate-800">チョイス場面を追加</h3>
+        <p class="text-xs text-slate-400 mt-1 mb-4">場面の名前を入れてね（例: おやつ、あそび、おでかけ）</p>
+        <input type="text" id="new-choice-scene-title-input" placeholder="場面名を入力" class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-indigo-400 text-sm font-bold mb-4">
+        <div class="flex justify-center gap-2">
+          <button onclick="closeNewChoiceSceneModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-bold text-xs transition-all">
+            キャンセル
+          </button>
+          <button onclick="submitCreateNewChoiceScene()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-bold text-xs shadow transition-all">
+            場面を作成 🌟
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEW ROUTINE SCENE MODAL -->
     <div id="new-scene-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-[32px] border-4 border-amber-200 max-w-sm w-full p-6 text-center shadow-2xl">
         <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl mx-auto mb-3 flex items-center justify-center text-2xl">
           <i class="fa-solid fa-clapperboard"></i>
         </div>
         <h3 class="text-lg font-black text-slate-800">あたらしいシーンをつくる</h3>
-        <p class="text-xs text-slate-400 mt-1 mb-4">場面の名前を入れてね（例: きゅうしょく、おでかけ）</p>
+        <p class="text-xs text-slate-400 mt-1 mb-4">場面の名前を入れてね（例: きゅうしょく、たいいく）</p>
         <input type="text" id="new-scene-title-input" placeholder="シーン名を入力" class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-amber-400 text-sm font-bold mb-4">
         <div class="flex justify-center gap-2">
           <button onclick="closeNewSceneModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-bold text-xs transition-all">
@@ -398,7 +418,7 @@
       </div>
     </div>
 
-    <!-- ICON / CARD PICKER MODAL (シーン用) -->
+    <!-- ICON / CARD PICKER MODAL (シーン・手順用) -->
     <div id="icon-picker-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-[32px] border-4 border-teal-100 max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
         <div class="bg-teal-50 px-6 py-4 border-b border-teal-100 flex items-center justify-between">
@@ -423,7 +443,7 @@
       </div>
     </div>
 
-    <!-- CHOICE CARD PICKER MODAL (２たく専用) -->
+    <!-- CHOICE CARD PICKER MODAL (チョイス選択肢設定用) -->
     <div id="picker-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-[32px] border-4 border-indigo-100 max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
         <div class="bg-indigo-50 px-6 py-4 border-b border-indigo-100 flex items-center justify-between">
@@ -546,14 +566,15 @@
     let GEMINI_API_KEY = "";
     let db;
     let library = [];
-    let currentTab = 'practice'; // 初期画面をチョイスに設定
+    let currentTab = 'practice';
     
-    // CHOICE STATES
-    let leftPracticeCard = null;
-    let rightPracticeCard = null;
-    let currentPickerTarget = null;
+    // === MULTI-SCENE CHOICE STATES (シーン対応・2〜5択管理) ===
+    let choiceScenes = [];
+    let currentChoiceSceneId = 'c_default';
+    let selectedChoiceCardIndex = null; // 現在選択されてフォーカスされているインデックス
+    let currentChoicePickerIndex = null; // 何番目のカードを変更中か (0〜4)
 
-    // SCENES DATA
+    // SCENES DATA (手順表)
     let scenes = [];
     let currentSceneId = 'morning';
     let sceneCheckStates = {};
@@ -588,6 +609,31 @@
       kataduke: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="15" y="45" width="30" height="30" rx="4" fill="%23ef4444"/><rect x="55" y="45" width="30" height="30" rx="4" fill="%233b82f6"/><polygon points="50,15 30,45 70,45" fill="%23eab308"/></svg>`,
       oyasumi: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="15" y="45" width="70" height="38" rx="6" fill="%233b82f6" stroke="%231d4ed8" stroke-width="4"/><rect x="20" y="28" width="30" height="18" rx="4" fill="%23ffffff" stroke="%23cbd5e1" stroke-width="2"/><path d="M15,45 Q50,48 85,45" stroke="%231d4ed8" stroke-width="4"/><circle cx="68" cy="22" r="10" fill="%23facc15"/><path d="M72,22 A10,10 0 0,1 62,12" stroke="%23eab308" stroke-width="2" fill="none"/></svg>`
     };
+
+    // Default choice scene presets
+    const defaultChoiceScenes = [
+      {
+        id: 'c_default',
+        title: 'きょうの活動・おやつ',
+        count: 2,
+        cards: [
+          { id: 's_apple', word: 'りんご', imageUrl: fallbackSVGs.apple },
+          { id: 's_banana', word: 'バナナ', imageUrl: fallbackSVGs.banana },
+          null, null, null
+        ]
+      },
+      {
+        id: 'c_play',
+        title: 'あそび・じかん',
+        count: 3,
+        cards: [
+          { id: 's_car', word: 'くるま', imageUrl: fallbackSVGs.car },
+          { id: 's_dog', word: 'いぬ', imageUrl: fallbackSVGs.dog },
+          { id: 's_apple', word: 'りんご', imageUrl: fallbackSVGs.apple },
+          null, null
+        ]
+      }
+    ];
 
     const defaultScenesData = [
       {
@@ -672,6 +718,233 @@
       });
     }
 
+    // === CHOICE MULTI-SCENE LOGIC ===
+    function initChoiceScenes() {
+      const stored = localStorage.getItem('ecard_choice_scenes_v2');
+      if (stored) {
+        try {
+          choiceScenes = JSON.parse(stored);
+        } catch (e) {
+          choiceScenes = JSON.parse(JSON.stringify(defaultChoiceScenes));
+        }
+      } else {
+        choiceScenes = JSON.parse(JSON.stringify(defaultChoiceScenes));
+      }
+
+      if (!choiceScenes || choiceScenes.length === 0) {
+        choiceScenes = JSON.parse(JSON.stringify(defaultChoiceScenes));
+      }
+
+      currentChoiceSceneId = choiceScenes[0].id;
+      renderChoiceSceneDropdown();
+      renderChoiceBoard();
+    }
+
+    function saveChoiceScenesToStorage() {
+      localStorage.setItem('ecard_choice_scenes_v2', JSON.stringify(choiceScenes));
+    }
+
+    function renderChoiceSceneDropdown() {
+      const select = document.getElementById('choice-scene-select');
+      select.innerHTML = choiceScenes.map(s => `
+        <option value="${s.id}" ${s.id === currentChoiceSceneId ? 'selected' : ''}>${s.title}</option>
+      `).join('');
+    }
+
+    function onChoiceSceneSelectChange(newId) {
+      currentChoiceSceneId = newId;
+      selectedChoiceCardIndex = null;
+      renderChoiceBoard();
+    }
+
+    function getActiveChoiceScene() {
+      return choiceScenes.find(s => s.id === currentChoiceSceneId) || choiceScenes[0];
+    }
+
+    function setChoiceCount(count) {
+      const scene = getActiveChoiceScene();
+      scene.count = count;
+      selectedChoiceCardIndex = null;
+      saveChoiceScenesToStorage();
+      renderChoiceBoard();
+    }
+
+    function renderChoiceBoard() {
+      const scene = getActiveChoiceScene();
+      const count = scene.count || 2;
+      const cards = scene.cards || [];
+
+      // Update segment active buttons
+      [2, 3, 4, 5].forEach(num => {
+        const btn = document.getElementById(`btn-choice-count-${num}`);
+        if (btn) {
+          if (num === count) {
+            btn.className = "px-3 py-1.5 rounded-xl text-xs font-black transition-all bg-indigo-600 text-white shadow-sm";
+          } else {
+            btn.className = "px-3 py-1.5 rounded-xl text-xs font-black transition-all text-slate-600 hover:bg-white/60";
+          }
+        }
+      });
+
+      const container = document.getElementById('choice-cards-container');
+      
+      // Grid columns config based on count
+      let gridClass = "grid gap-4 sm:gap-6 w-full max-w-5xl ";
+      if (count === 2) gridClass += "grid-cols-2 max-w-3xl";
+      else if (count === 3) gridClass += "grid-cols-3 max-w-4xl";
+      else if (count === 4) gridClass += "grid-cols-2 sm:grid-cols-4 max-w-5xl";
+      else if (count === 5) gridClass += "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 max-w-6xl";
+
+      let html = `<div class="${gridClass}">`;
+
+      for (let i = 0; i < count; i++) {
+        const card = cards[i] || null;
+        const isSelected = selectedChoiceCardIndex === i;
+        const isDimmed = selectedChoiceCardIndex !== null && selectedChoiceCardIndex !== i;
+
+        html += `
+          <div id="choice-box-${i}" onclick="selectChoiceCard(${i})" 
+               class="group relative bg-white border-8 ${isSelected ? 'border-indigo-400 bg-indigo-50/20' : 'border-white'} card-shadow rounded-[32px] p-4 sm:p-5 flex flex-col items-center justify-between aspect-square cursor-pointer transition-all duration-300 active:scale-95 transform hover:-translate-y-1 select-none overflow-hidden ${isSelected ? 'selected-bounce' : ''}">
+            
+            <!-- Change card button top-right -->
+            <button onclick="openChoicePickerForIndex(${i}, event)" class="absolute top-2 right-2 bg-indigo-100 hover:bg-indigo-600 text-indigo-700 hover:text-white w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black z-20 shadow transition-all" title="カードを変更">
+              <i class="fa-solid fa-repeat"></i>
+            </button>
+
+            <!-- Card Number Badge -->
+            <span class="absolute top-2 left-2 w-6 h-6 bg-slate-100 text-slate-500 text-[10px] font-black rounded-full flex items-center justify-center border border-slate-200">
+              ${i + 1}
+            </span>
+
+            ${card ? `
+              <div class="w-full h-full flex flex-col items-center justify-between py-1">
+                <div class="aspect-square w-4/5 bg-slate-50 rounded-2xl flex items-center justify-center p-2 mt-2">
+                  <img class="w-full h-full object-contain pointer-events-none" src="${card.imageUrl}" alt="${card.word}">
+                </div>
+                <span class="text-xl sm:text-3xl font-black text-slate-800 tracking-wider text-center truncate w-full mt-2">${card.word}</span>
+              </div>
+            ` : `
+              <div onclick="openChoicePickerForIndex(${i}, event)" class="w-full h-full flex flex-col items-center justify-center text-slate-300 gap-2">
+                <i class="fa-solid fa-plus text-4xl"></i>
+                <span class="font-bold text-xs">カードをえらぶ</span>
+              </div>
+            `}
+
+            <!-- Grayout Dimmer Overlay -->
+            <div class="absolute inset-0 bg-slate-900/40 backdrop-grayscale rounded-[24px] pointer-events-none transition-all duration-300 flex items-center justify-center ${isDimmed ? 'opacity-100' : 'opacity-0'}">
+              <i class="fa-solid fa-ban text-white/40 text-5xl"></i>
+            </div>
+
+          </div>
+        `;
+      }
+
+      html += `</div>`;
+      container.innerHTML = html;
+    }
+
+    function selectChoiceCard(idx) {
+      const scene = getActiveChoiceScene();
+      const card = scene.cards[idx];
+      if (!card) {
+        openChoicePickerForIndex(idx, null);
+        return;
+      }
+
+      selectedChoiceCardIndex = idx;
+      playSound('complete');
+
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(`${card.word}、をえらんだね！`);
+        utterance.lang = 'ja-JP';
+        window.speechSynthesis.speak(utterance);
+      }
+
+      renderChoiceBoard();
+    }
+
+    function resetPracticeSelection() {
+      selectedChoiceCardIndex = null;
+      renderChoiceBoard();
+    }
+
+    async function openChoicePickerForIndex(idx, event) {
+      if (event) event.stopPropagation();
+      currentChoicePickerIndex = idx;
+      await loadLibrary();
+
+      const modal = document.getElementById('picker-modal');
+      const grid = document.getElementById('picker-grid');
+      const emptyMsg = document.getElementById('picker-empty');
+
+      if (library.length === 0) {
+        emptyMsg.classList.remove('hidden');
+        grid.innerHTML = '';
+      } else {
+        emptyMsg.classList.add('hidden');
+        grid.innerHTML = library.map(card => `
+          <div onclick="selectCardForChoiceIndex('${card.id}')" class="bg-white p-3 rounded-2xl border-2 border-slate-100 hover:border-indigo-400 card-shadow cursor-pointer flex flex-col items-center transition-all active:scale-95">
+            <div class="aspect-square w-full bg-slate-50 rounded-xl mb-2 flex items-center justify-center p-1">
+              <img class="w-full h-full object-contain pointer-events-none" src="${card.imageUrl}" alt="${card.word}">
+            </div>
+            <span class="font-bold text-slate-700 text-xs text-center truncate w-full">${card.word}</span>
+          </div>
+        `).join('');
+      }
+      modal.classList.remove('hidden');
+    }
+
+    function selectCardForChoiceIndex(cardId) {
+      const scene = getActiveChoiceScene();
+      const selected = library.find(c => c.id === cardId);
+      if (selected && currentChoicePickerIndex !== null) {
+        if (!scene.cards) scene.cards = [null, null, null, null, null];
+        scene.cards[currentChoicePickerIndex] = selected;
+        saveChoiceScenesToStorage();
+        playSound('complete');
+      }
+      closeCardPicker();
+      renderChoiceBoard();
+    }
+
+    function openNewChoiceSceneModal() {
+      document.getElementById('new-choice-scene-title-input').value = "";
+      document.getElementById('new-choice-scene-modal').classList.remove('hidden');
+    }
+
+    function closeNewChoiceSceneModal() {
+      document.getElementById('new-choice-scene-modal').classList.add('hidden');
+    }
+
+    function submitCreateNewChoiceScene() {
+      const title = document.getElementById('new-choice-scene-title-input').value.trim();
+      if (!title) {
+        showCustomAlert("warning", "入力エラー", "場面の名前を入れてね！");
+        return;
+      }
+
+      const newId = 'c_' + Date.now();
+      const newScene = {
+        id: newId,
+        title: title,
+        count: 2,
+        cards: [null, null, null, null, null]
+      };
+
+      choiceScenes.push(newScene);
+      currentChoiceSceneId = newId;
+      selectedChoiceCardIndex = null;
+
+      saveChoiceScenesToStorage();
+      renderChoiceSceneDropdown();
+      closeNewChoiceSceneModal();
+      renderChoiceBoard();
+
+      showCustomAlert("success", "場面を追加しました 🌟", `「<strong>${title}</strong>」のチョイス場面を作成しました！カードをえらんで配置しましょう。`);
+    }
+
+    // === SCENES ROUTINES (手順表) ===
     function initScenes() {
       const storedScenes = localStorage.getItem('ecard_dynamic_scenes_v1');
       const storedApiKey = localStorage.getItem('gemini_api_key');
@@ -1159,128 +1432,10 @@
       renderSettingsForms();
     }
 
-    // === CHOICE (２たく) PERSISTENCE ===
-    function initPracticeChoices() {
-      const stored = localStorage.getItem('ecard_practice_choices_v1');
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          leftPracticeCard = parsed.left || null;
-          rightPracticeCard = parsed.right || null;
-        } catch (e) {}
-      }
-    }
-
-    function savePracticeChoicesToStorage() {
-      localStorage.setItem('ecard_practice_choices_v1', JSON.stringify({
-        left: leftPracticeCard,
-        right: rightPracticeCard
-      }));
-    }
-
-    function renderPracticeBoard() {
-      const leftEmpty = document.getElementById('practice-left-empty');
-      const leftImg = document.getElementById('practice-left-img');
-      const leftLabel = document.getElementById('practice-left-label');
-      const rightEmpty = document.getElementById('practice-right-empty');
-      const rightImg = document.getElementById('practice-right-img');
-      const rightLabel = document.getElementById('practice-right-label');
-
-      if (leftPracticeCard) {
-        leftEmpty.classList.add('hidden');
-        leftImg.src = leftPracticeCard.imageUrl;
-        leftImg.classList.remove('hidden');
-        leftLabel.innerText = leftPracticeCard.word;
-        leftLabel.classList.remove('hidden');
-      } else {
-        leftEmpty.classList.remove('hidden');
-        leftImg.classList.add('hidden');
-        leftLabel.classList.add('hidden');
-      }
-
-      if (rightPracticeCard) {
-        rightEmpty.classList.add('hidden');
-        rightImg.src = rightPracticeCard.imageUrl;
-        rightImg.classList.remove('hidden');
-        rightLabel.innerText = rightPracticeCard.word;
-        rightLabel.classList.remove('hidden');
-      } else {
-        rightEmpty.classList.remove('hidden');
-        rightImg.classList.add('hidden');
-        rightLabel.classList.add('hidden');
-      }
-
-      resetPracticeOverlays();
-    }
-
-    function resetPracticeOverlays() {
-      document.getElementById('practice-left-overlay').style.opacity = '0';
-      document.getElementById('practice-right-overlay').style.opacity = '0';
-      document.getElementById('practice-card-left').classList.remove('selected-bounce');
-      document.getElementById('practice-card-right').classList.remove('selected-bounce');
-    }
-
-    function resetPractice() {
-      resetPracticeOverlays();
-      leftPracticeCard = null;
-      rightPracticeCard = null;
-      savePracticeChoicesToStorage();
-      renderPracticeBoard();
-    }
-
-    function selectPracticeCard(position) {
-      if (position === 'left') {
-        if (!leftPracticeCard) { openCardPicker('left'); return; }
-        document.getElementById('practice-left-overlay').style.opacity = '0';
-        document.getElementById('practice-card-left').classList.add('selected-bounce');
-        if (rightPracticeCard) document.getElementById('practice-right-overlay').style.opacity = '1';
-      } else {
-        if (!rightPracticeCard) { openCardPicker('right'); return; }
-        document.getElementById('practice-right-overlay').style.opacity = '0';
-        document.getElementById('practice-card-right').classList.add('selected-bounce');
-        if (leftPracticeCard) document.getElementById('practice-left-overlay').style.opacity = '1';
-      }
-    }
-
-    async function openCardPicker(target) {
-      currentPickerTarget = target;
-      await loadLibrary();
-
-      const modal = document.getElementById('picker-modal');
-      const grid = document.getElementById('picker-grid');
-      const emptyMsg = document.getElementById('picker-empty');
-
-      if (library.length === 0) {
-        emptyMsg.classList.remove('hidden');
-        grid.innerHTML = '';
-      } else {
-        emptyMsg.classList.add('hidden');
-        grid.innerHTML = library.map(card => `
-          <div onclick="selectCardFromPicker('${card.id}')" class="bg-white p-3 rounded-2xl border-2 border-slate-100 hover:border-indigo-400 card-shadow cursor-pointer flex flex-col items-center transition-all active:scale-95">
-            <div class="aspect-square w-full bg-slate-50 rounded-xl mb-2 flex items-center justify-center p-1">
-              <img class="w-full h-full object-contain pointer-events-none" src="${card.imageUrl}" alt="${card.word}">
-            </div>
-            <span class="font-bold text-slate-700 text-xs text-center truncate w-full">${card.word}</span>
-          </div>
-        `).join('');
-      }
-      modal.classList.remove('hidden');
-    }
-
+    // === COMMON CARD PICKER MODAL (２たく・チョイス用) ===
     function closeCardPicker() {
       document.getElementById('picker-modal').classList.add('hidden');
-    }
-
-    function selectCardFromPicker(cardId) {
-      const selected = library.find(c => c.id === cardId);
-      if (selected) {
-        if (currentPickerTarget === 'left') leftPracticeCard = selected;
-        else rightPracticeCard = selected;
-      }
-      savePracticeChoicesToStorage();
-      playSound('complete');
-      closeCardPicker();
-      renderPracticeBoard();
+      currentChoicePickerIndex = null;
     }
 
     // === BACKUP EXPORT & IMPORT ===
@@ -1288,11 +1443,11 @@
       try {
         await loadLibrary();
         const backupData = {
-          version: "5.0",
+          version: "5.5",
           exportDate: new Date().toISOString(),
           library: library,
           scenes: scenes,
-          practiceChoices: { left: leftPracticeCard, right: rightPracticeCard },
+          choiceScenes: choiceScenes,
           geminiApiKey: GEMINI_API_KEY || ""
         };
 
@@ -1310,7 +1465,7 @@
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
 
-        showCustomAlert("success", "保存完了 📥", `絵カード（${library.length}枚）、全シーン、チョイスの状態をバックアップ保存しました！`);
+        showCustomAlert("success", "保存完了 📥", `絵カード、チョイスの全場面、手順表シーンをバックアップ保存しました！`);
       } catch (err) {
         showCustomAlert("error", "エラー", "バックアップファイルの作成に失敗しました。");
       }
@@ -1328,7 +1483,7 @@
             throw new Error("正しい形式ではありません。");
           }
 
-          showCustomConfirm("warning", "バックアップの復元", `絵カード（${imported.library.length}枚）と設定を復元します。現在のデータは上書きされますがよろしいですか？`, async (isConfirmed) => {
+          showCustomConfirm("warning", "バックアップの復元", `絵カード（${imported.library.length}枚）と全設定を復元します。現在のデータは上書きされますがよろしいですか？`, async (isConfirmed) => {
             if (isConfirmed) {
               toggleLoading(true);
               updateLoadingStatus("データを復元しています...");
@@ -1342,15 +1497,17 @@
                 scenes = imported.scenes;
               }
 
-              if (imported.practiceChoices) {
-                leftPracticeCard = imported.practiceChoices.left || null;
-                rightPracticeCard = imported.practiceChoices.right || null;
-                savePracticeChoicesToStorage();
+              if (imported.choiceScenes && Array.isArray(imported.choiceScenes)) {
+                choiceScenes = imported.choiceScenes;
               }
 
               currentSceneId = scenes[0].id;
+              currentChoiceSceneId = choiceScenes[0].id;
+              selectedChoiceCardIndex = null;
+
               initSceneCheckStates();
               saveScenesToStorage();
+              saveChoiceScenesToStorage();
 
               if (imported.geminiApiKey) {
                 processAndSetApiKey(imported.geminiApiKey);
@@ -1358,10 +1515,11 @@
 
               await loadLibrary();
               renderSceneDropdowns();
+              renderChoiceSceneDropdown();
               renderSettingsForms();
               renderLibraryGrid();
               renderSceneBoard();
-              renderPracticeBoard();
+              renderChoiceBoard();
 
               toggleLoading(false);
               showCustomAlert("success", "復元完了 📤", `絵カードと全シーン、チョイスの設定を復元しました！`);
@@ -1481,7 +1639,7 @@
       if (audioCtx.state === 'suspended') audioCtx.resume();
       try {
         const now = audioCtx.currentTime;
-        if (type === 'correct') {
+        if (type === 'correct' || type === 'complete') {
           const osc1 = audioCtx.createOscillator();
           const gain1 = audioCtx.createGain();
           osc1.type = 'sine';
@@ -1515,18 +1673,6 @@
           gain.connect(audioCtx.destination);
           osc.start(now);
           osc.stop(now + 0.35);
-        } else if (type === 'complete') {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(880.00, now);
-          osc.frequency.exponentialRampToValueAtTime(1320.00, now + 0.25);
-          gain.gain.setValueAtTime(0.2, now);
-          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-          osc.start(now);
-          osc.stop(now + 0.25);
         } else if (type === 'fanfare') {
           const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
           notes.forEach((freq, idx) => {
@@ -1794,9 +1940,18 @@
       await saveCardToDatabase(card);
       await loadLibrary();
 
-      if (leftPracticeCard && leftPracticeCard.id === cardId) leftPracticeCard = card;
-      if (rightPracticeCard && rightPracticeCard.id === cardId) rightPracticeCard = card;
-      savePracticeChoicesToStorage();
+      // Update in choice scene if present
+      choiceScenes.forEach(s => {
+        if (s.cards) {
+          s.cards.forEach((c, idx) => {
+            if (c && c.id === cardId) {
+              s.cards[idx] = card;
+            }
+          });
+        }
+      });
+      saveChoiceScenesToStorage();
+      renderChoiceBoard();
 
       toggleLoading(false);
       closeEditCardModal();
@@ -1827,7 +1982,7 @@
         document.getElementById(`page-${t}`).classList.toggle('hidden', !isActive);
       });
 
-      if (tabId === 'practice') renderPracticeBoard();
+      if (tabId === 'practice') renderChoiceBoard();
       if (tabId === 'scenes') renderSceneBoard();
       if (tabId === 'settings') {
         renderLibraryGrid();
@@ -1881,10 +2036,18 @@
           const transaction = db.transaction(['cards'], 'readwrite');
           const store = transaction.objectStore(['cards']);
           await store.delete(id);
-          if (leftPracticeCard && leftPracticeCard.id === id) leftPracticeCard = null;
-          if (rightPracticeCard && rightPracticeCard.id === id) rightPracticeCard = null;
-          savePracticeChoicesToStorage();
+          
+          choiceScenes.forEach(s => {
+            if (s.cards) {
+              s.cards.forEach((c, idx) => {
+                if (c && c.id === id) s.cards[idx] = null;
+              });
+            }
+          });
+          saveChoiceScenesToStorage();
+
           await loadLibrary();
+          renderChoiceBoard();
         }
       });
     }
@@ -1893,10 +2056,12 @@
       showCustomConfirm("danger", "すべて削除", "つくった絵カードをすべて削除します。よろしいですか？", async (isConfirmed) => {
         if (isConfirmed) {
           await clearDatabase();
-          leftPracticeCard = null;
-          rightPracticeCard = null;
-          savePracticeChoicesToStorage();
+          choiceScenes.forEach(s => {
+            s.cards = [null, null, null, null, null];
+          });
+          saveChoiceScenesToStorage();
           await loadLibrary();
+          renderChoiceBoard();
           showCustomAlert("success", "削除完了", "すべての絵カードを削除しました。");
         }
       });
@@ -1977,7 +2142,7 @@
     window.onload = async () => {
       try {
         initScenes();
-        initPracticeChoices();
+        initChoiceScenes();
         await initDatabase();
         await loadLibrary();
         
@@ -1994,7 +2159,7 @@
           await loadLibrary();
         }
 
-        renderPracticeBoard();
+        renderChoiceBoard();
 
         document.body.addEventListener('click', () => {
           if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
