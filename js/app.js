@@ -1,8 +1,22 @@
 // === グローバル共通変数 ===
 let GEMINI_API_KEY = "";
+let GITHUB_TOKEN = "";
+let GITHUB_REPO = "";
+let GITHUB_BRANCH = "main";
+let GITHUB_PATH = "data/ecard_backup.json";
+
 let db;
 let library = [];
 let currentTab = 'practice';
+
+let scenes = [];
+let choiceScenes = [];
+let currentSceneId = "";
+let currentChoiceSceneId = "";
+let selectedChoiceCardIndex = null;
+let currentChoicePickerIndex = null;
+let sceneCheckStates = {};
+let isSortModeScene = false;
 
 let alertPromiseResolve = null;
 let audioCtx = null;
@@ -36,6 +50,61 @@ const routineSVGs = {
   kataduke: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="15" y="45" width="30" height="30" rx="4" fill="%23ef4444"/><rect x="55" y="45" width="30" height="30" rx="4" fill="%233b82f6"/><polygon points="50,15 30,45 70,45" fill="%23eab308"/></svg>`,
   oyasumi: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="15" y="45" width="70" height="38" rx="6" fill="%233b82f6" stroke="%231d4ed8" stroke-width="4"/><rect x="20" y="28" width="30" height="18" rx="4" fill="%23ffffff" stroke="%23cbd5e1" stroke-width="2"/><path d="M15,45 Q50,48 85,45" stroke="%231d4ed8" stroke-width="4"/><circle cx="68" cy="22" r="10" fill="%23facc15"/><path d="M72,22 A10,10 0 0,1 62,12" stroke="%23eab308" stroke-width="2" fill="none"/></svg>`
 };
+
+// デフォルト初期データ
+const defaultScenesData = [
+  {
+    id: "scene_morning",
+    title: "あさのじゅんび",
+    steps: [
+      { id: "step_okiru", word: "おきる", img: routineSVGs.okiru, desc: "あさ、おきよう！", enabled: true },
+      { id: "step_toilet", word: "トイレ", img: routineSVGs.toilet, desc: "トイレにいこう！", enabled: true },
+      { id: "step_kigaeru", word: "きがえる", img: routineSVGs.kigaeru, desc: "ふくをきがえよう！", enabled: true },
+      { id: "step_gohan", word: "あさごはん", img: routineSVGs.gohan, desc: "ごはんをたべよう！", enabled: true },
+      { id: "step_hamigaki", word: "はみがき", img: routineSVGs.hamigaki, desc: "はをみがこう！", enabled: true },
+      { id: "step_bag", word: "かばん", img: routineSVGs.bag, desc: "にもつをもとう！", enabled: true },
+      { id: "step_go_out", word: "しゅっぱつ", img: routineSVGs.go_out, desc: "いってきます！", enabled: true }
+    ]
+  },
+  {
+    id: "scene_evening",
+    title: "かえってきてから",
+    steps: [
+      { id: "step_tearai", word: "てあらい・うがい", img: routineSVGs.tearai, desc: "てをあらおう！", enabled: true },
+      { id: "step_backpack_away", word: "かたづけ", img: routineSVGs.backpack_away, desc: "ランドセルをおこう！", enabled: true },
+      { id: "step_syukudai", word: "しゅくだい", img: routineSVGs.syukudai, desc: "しゅくだいをしよう！", enabled: true },
+      { id: "step_tomorrow_prep", word: "あすのじゅんび", img: routineSVGs.tomorrow_prep, desc: "あすのじゅんびをしよう！", enabled: true },
+      { id: "step_oyasumi", word: "おやすみ", img: routineSVGs.oyasumi, desc: "ねるじかん！", enabled: true }
+    ]
+  }
+];
+
+const defaultChoiceScenes = [
+  {
+    id: "choice_snack",
+    title: "おやつ",
+    count: 2,
+    cards: [
+      { id: 's_apple', word: 'りんご', imageUrl: fallbackSVGs.apple },
+      { id: 's_banana', word: 'バナナ', imageUrl: fallbackSVGs.banana },
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    id: "choice_play",
+    title: "あそび",
+    count: 2,
+    cards: [
+      { id: 's_dog', word: 'いぬ', imageUrl: fallbackSVGs.dog },
+      { id: 's_car', word: 'くるま', imageUrl: fallbackSVGs.car },
+      null,
+      null,
+      null
+    ]
+  }
+];
 
 // === IndexedDB 設定 ===
 function initDatabase() {
@@ -314,6 +383,7 @@ window.onload = async () => {
   try {
     initScenes();
     initChoiceScenes();
+    initGitHubConfig();
     await initDatabase();
     await loadLibrary();
     
