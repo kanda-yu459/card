@@ -236,10 +236,10 @@
         </div>
       </section>
 
-      <!-- PAGE 2: DYNAMIC CHOICE MODE (歯車編集モード対応) -->
+      <!-- PAGE 2: DYNAMIC CHOICE MODE -->
       <section id="page-choice" class="hidden space-y-6 flex-grow flex flex-col justify-between">
         
-        <!-- Choice Top Control Bar -->
+        <!-- Choice Top Bar -->
         <div class="bg-white p-4 rounded-3xl border-4 border-indigo-100 card-shadow flex flex-col lg:flex-row items-center justify-between gap-4">
           
           <!-- Left: Preset Switcher & Save -->
@@ -259,7 +259,6 @@
 
           <!-- Right: Number of Options (2〜5) & Edit Gear & Reset Button -->
           <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-end">
-            <!-- Choice Count Segment Buttons -->
             <div class="flex bg-slate-100 p-1 rounded-2xl gap-1">
               <button onclick="setChoiceCount(2)" id="btn-choice-count-2" class="px-3 py-1.5 rounded-xl text-xs font-black transition-all bg-white text-indigo-700 shadow-sm">2択</button>
               <button onclick="setChoiceCount(3)" id="btn-choice-count-3" class="px-3 py-1.5 rounded-xl text-xs font-black transition-all text-slate-600 hover:bg-white/50">3択</button>
@@ -267,30 +266,28 @@
               <button onclick="setChoiceCount(5)" id="btn-choice-count-5" class="px-3 py-1.5 rounded-xl text-xs font-black transition-all text-slate-600 hover:bg-white/50">5択</button>
             </div>
 
-            <!-- Gear Edit Mode Button -->
             <button onclick="toggleChoiceEditMode()" id="btn-choice-edit-mode" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 px-3.5 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 whitespace-nowrap">
               <i class="fa-solid fa-gear text-slate-500"></i> 変更モード
             </button>
 
-            <!-- Reset Button to unlock choice -->
             <button onclick="resetChoiceSelection()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl text-xs font-black shadow-sm transition-all flex items-center gap-1 whitespace-nowrap">
               <i class="fa-solid fa-rotate-left"></i> リセット
             </button>
           </div>
         </div>
 
-        <!-- Dynamic Choice Cards Board (2〜5 Columns) -->
+        <!-- Choice Cards Board -->
         <div id="choice-board-container" class="my-auto py-4 flex-grow flex items-center justify-center">
           <div id="choice-cards-grid" class="grid gap-4 sm:gap-6 w-full max-w-6xl transition-all items-stretch justify-center"></div>
         </div>
 
-        <!-- Guide Footer in Choice Tab -->
+        <!-- Guide Footer -->
         <div id="choice-guide-text" class="text-center text-xs font-bold text-slate-400 pb-2">
           💡 カードをタップすると1つ選んで固定されます。「リセット」を押すともう一度選べます。
         </div>
       </section>
 
-      <!-- PAGE 3: SCENES DYNAMIC ROUTINES (シーン・手順表) -->
+      <!-- PAGE 3: SCENES DYNAMIC ROUTINES -->
       <section id="page-scenes" class="hidden space-y-4 flex-grow flex flex-col">
         <div class="bg-white p-4 rounded-3xl border-4 border-amber-200 card-shadow flex flex-col md:flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-3 w-full md:w-auto">
@@ -327,10 +324,10 @@
         <div id="scene-grid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-3 py-2 flex-grow items-stretch"></div>
       </section>
 
-      <!-- PAGE 4: SETTINGS & SCENE CONFIGURATION -->
+      <!-- PAGE 4: SETTINGS SECTION -->
       <section id="page-settings" class="hidden space-y-6 flex-grow flex flex-col">
         
-        <!-- BACKUP & RESTORE DATA SECTION -->
+        <!-- BACKUP & RESTORE -->
         <div class="bg-white p-5 rounded-3xl border-4 border-indigo-200 card-shadow">
           <div class="flex items-center gap-2 border-b-2 border-slate-100 pb-3 mb-4">
             <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">
@@ -359,7 +356,7 @@
           </div>
         </div>
 
-        <!-- SCENE EDIT & MANAGEMENT SECTION -->
+        <!-- SCENE EDIT & MANAGEMENT -->
         <div class="bg-white p-5 rounded-3xl border-4 border-teal-100 card-shadow">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b-2 border-slate-100 pb-3 mb-4">
             <div class="flex items-center gap-2">
@@ -381,7 +378,6 @@
             </div>
           </div>
 
-          <!-- Scene Selector in Settings -->
           <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-3 rounded-2xl mb-4 border border-slate-200">
             <div class="flex items-center gap-2">
               <span class="text-xs font-black text-slate-600">編集するシーン：</span>
@@ -608,7 +604,7 @@
     let currentChoiceCards = [null, null, null, null, null];
     let isChoiceLocked = false;
     let selectedChoiceIdx = -1;
-    let isChoiceEditMode = false; // 歯車ボタンによる編集モードフラグ
+    let isChoiceEditMode = false;
     let choicePresets = [];
     let currentChoicePresetId = "";
 
@@ -623,7 +619,7 @@
     let uploadedImageBase64 = "";
     let editingCardImageBase64 = "";
     let activeEditStepIdx = -1;
-    let iconPickerMode = 'scene_change'; // 'scene_change', 'scene_add', 'choice_select'
+    let iconPickerMode = 'scene_change';
     let activeChoiceCardSlot = -1;
 
     const fallbackSVGs = {
@@ -756,10 +752,12 @@
       choiceCount = count;
       [2, 3, 4, 5].forEach(num => {
         const btn = document.getElementById(`btn-choice-count-${num}`);
-        if (num === count) {
-          btn.className = "px-3 py-1.5 rounded-xl text-xs font-black transition-all bg-white text-indigo-700 shadow-sm";
-        } else {
-          btn.className = "px-3 py-1.5 rounded-xl text-xs font-black transition-all text-slate-600 hover:bg-white/50";
+        if (btn) {
+          if (num === count) {
+            btn.className = "px-3 py-1.5 rounded-xl text-xs font-black transition-all bg-white text-indigo-700 shadow-sm";
+          } else {
+            btn.className = "px-3 py-1.5 rounded-xl text-xs font-black transition-all text-slate-600 hover:bg-white/50";
+          }
         }
       });
       resetChoiceSelection();
@@ -827,15 +825,25 @@
       if (!presetId) return;
       const found = choicePresets.find(p => p.id === presetId);
       if (found) {
-        choiceCount = found.count;
         setChoiceCount(found.count);
-        currentChoiceCards = [...found.cards];
+        currentChoiceCards = [null, null, null, null, null];
+        for (let i = 0; i < found.count; i++) {
+          currentChoiceCards[i] = found.cards[i] || null;
+        }
         resetChoiceSelection();
       }
     }
 
     function openSaveChoiceModal() {
-      document.getElementById('choice-preset-name-input').value = "";
+      // 最低1枚はカードが設定されているか確認
+      const hasAnyCard = currentChoiceCards.slice(0, choiceCount).some(c => c !== null);
+      if (!hasAnyCard) {
+        showCustomAlert("warning", "カードが未設定です", "保存する前に、少なくとも1枚はカードをセットしてください。");
+        return;
+      }
+
+      const activePreset = choicePresets.find(p => p.id === currentChoicePresetId);
+      document.getElementById('choice-preset-name-input').value = activePreset ? activePreset.title : "";
       document.getElementById('save-choice-modal').classList.remove('hidden');
     }
 
@@ -850,26 +858,45 @@
         return;
       }
 
-      const activeCards = currentChoiceCards.slice(0, choiceCount);
-      const newPreset = {
-        id: 'choice_' + Date.now(),
-        title: name,
-        count: choiceCount,
-        cards: activeCards
-      };
+      const activeCards = [];
+      for (let i = 0; i < choiceCount; i++) {
+        activeCards.push(currentChoiceCards[i] || null);
+      }
 
-      choicePresets.push(newPreset);
-      currentChoicePresetId = newPreset.id;
+      // 同名または既存プリセットの更新
+      const existingIdx = choicePresets.findIndex(p => p.id === currentChoicePresetId || p.title === name);
+
+      if (existingIdx !== -1) {
+        choicePresets[existingIdx] = {
+          id: choicePresets[existingIdx].id,
+          title: name,
+          count: choiceCount,
+          cards: activeCards
+        };
+        currentChoicePresetId = choicePresets[existingIdx].id;
+      } else {
+        const newPreset = {
+          id: 'choice_' + Date.now(),
+          title: name,
+          count: choiceCount,
+          cards: activeCards
+        };
+        choicePresets.push(newPreset);
+        currentChoicePresetId = newPreset.id;
+      }
+
       saveChoicePresetsToStorage();
       renderChoicePresetDropdown();
       closeSaveChoiceModal();
 
-      showCustomAlert("success", "保存完了 💾", `チョイス「<strong>${name}</strong>」を保存しました！いつでもプルダウンから選んで呼び出せます。`);
+      showCustomAlert("success", "保存完了 💾", `チョイス「<strong>${name}</strong>」を保存しました！プルダウンからいつでも呼び出せます。`);
     }
 
     function deleteCurrentChoicePreset() {
       if (!currentChoicePresetId) return;
       const found = choicePresets.find(p => p.id === currentChoicePresetId);
+      if (!found) return;
+
       showCustomConfirm("danger", "チョイス削除", `保存したチョイス「${found.title}」を削除しますか？`, (confirmed) => {
         if (confirmed) {
           choicePresets = choicePresets.filter(p => p.id !== currentChoicePresetId);
@@ -901,7 +928,6 @@
           <div onclick="handleChoiceCardClick(${i})" 
                class="group relative bg-white border-4 ${isSelected ? 'border-emerald-400 bg-emerald-50/20 selected-bounce' : 'border-slate-100'} ${isChoiceEditMode ? 'border-dashed border-amber-400' : ''} card-shadow rounded-[32px] p-4 sm:p-6 flex flex-col items-center justify-between aspect-square cursor-pointer transition-all duration-300 transform active:scale-95 hover:-translate-y-1 select-none overflow-hidden min-h-[180px]">
             
-            <!-- Edit Mode Header Controls: Swap & Clear -->
             ${isChoiceEditMode ? `
               <div class="absolute inset-x-0 top-0 bg-amber-50 p-1.5 flex justify-between items-center border-b border-amber-200 z-10">
                 <button onclick="moveChoiceCardSlot(${i}, 'left', event)" ${i === 0 ? 'disabled class="opacity-30 cursor-not-allowed"' : ''} class="bg-amber-500 text-white w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold">◀</button>
@@ -924,17 +950,14 @@
               </div>
             `}
 
-            <!-- Grayout & Lock Overlay (通常モードのみ) -->
             <div class="${isDimmed ? 'flex' : 'hidden'} absolute inset-0 bg-slate-900/40 backdrop-grayscale rounded-[28px] pointer-events-none items-center justify-center transition-all duration-300">
               <i class="fa-solid fa-ban text-white/50 text-5xl"></i>
             </div>
 
-            <!-- Selected Check Icon (通常モードのみ) -->
             <div class="${isSelected && !isChoiceEditMode ? 'flex' : 'hidden'} absolute top-3 right-3 bg-emerald-500 text-white w-10 h-10 rounded-full items-center justify-center text-xl shadow-md pointer-events-none animate-bounce">
               <i class="fa-solid fa-check"></i>
             </div>
 
-            <!-- Slot Badge Number -->
             <span class="${isChoiceEditMode ? 'hidden' : 'flex'} absolute top-3 left-3 w-6 h-6 bg-slate-100 text-slate-500 text-xs font-black rounded-full items-center justify-center border border-slate-200">
               ${i + 1}
             </span>
@@ -946,22 +969,18 @@
     }
 
     function handleChoiceCardClick(slotIdx) {
-      // 編集モード時：カード枠をタップしたら即座にピッカーを開いて変更
       if (isChoiceEditMode) {
         openChoiceCardPicker(slotIdx);
         return;
       }
 
-      // 通常モード：カードが未設定の場合はピッカーを開く
       if (!currentChoiceCards[slotIdx]) {
         openChoiceCardPicker(slotIdx);
         return;
       }
 
-      // すでに選択固定（ロック）中の場合は何もしない
       if (isChoiceLocked) return;
 
-      // 選択を固定（ロック）
       isChoiceLocked = true;
       selectedChoiceIdx = slotIdx;
       const selectedCard = currentChoiceCards[slotIdx];
@@ -1448,7 +1467,7 @@
       // 1. チョイス画面のカード枠変更
       if (iconPickerMode === 'choice_select' && activeChoiceCardSlot !== -1) {
         currentChoiceCards[activeChoiceCardSlot] = {
-          id: 'c_' + Date.now(),
+          id: 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
           word: defaultWord,
           imageUrl: selectedImgSrc
         };
