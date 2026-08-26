@@ -251,10 +251,13 @@ function renderLibraryGrid() {
 function confirmDeleteCard(id, word) {
   showCustomConfirm("warning", "カードの削除", `「${word}」のカードをけしてもいいですか？`, async (isConfirmed) => {
     if (isConfirmed) {
-      const transaction = db.transaction(['cards'], 'readwrite');
-      const store = transaction.objectStore(['cards']);
-      await store.delete(id);
+      if (db) {
+        const transaction = db.transaction(['cards'], 'readwrite');
+        const store = transaction.objectStore('cards');
+        await store.delete(id);
+      }
       
+      // チョイス場面内のカード参照を解除
       choiceScenes.forEach(s => {
         if (s.cards) {
           s.cards.forEach((c, idx) => {
@@ -262,7 +265,8 @@ function confirmDeleteCard(id, word) {
           });
         }
       });
-      saveChoiceScenesToStorage();
+      await saveChoiceScenesToStorage();
+
       await loadLibrary();
       renderChoiceBoard();
     }
@@ -276,7 +280,7 @@ function confirmResetLibrary() {
       choiceScenes.forEach(s => {
         s.cards = [null, null, null, null, null];
       });
-      saveChoiceScenesToStorage();
+      await saveChoiceScenesToStorage();
       await loadLibrary();
       renderChoiceBoard();
       showCustomAlert("success", "削除完了", "すべての絵カードを削除しました。");
@@ -382,6 +386,9 @@ async function saveCardEdits() {
   toggleLoading(true);
   const newWordHiragana = await convertToHiragana(newWordRaw);
 
+  const oldWord = card.word;
+  const oldImage = card.imageUrl;
+
   card.word = newWordHiragana;
   if (editingCardImageBase64) {
     card.imageUrl = editingCardImageBase64;
@@ -390,6 +397,7 @@ async function saveCardEdits() {
   await saveCardToDatabase(card);
   await loadLibrary();
 
+  // 1. チョイス場面内のカードを更新
   choiceScenes.forEach(s => {
     if (s.cards) {
       s.cards.forEach((c, idx) => {
@@ -399,8 +407,23 @@ async function saveCardEdits() {
       });
     }
   });
-  saveChoiceScenesToStorage();
+  await saveChoiceScenesToStorage();
+
+  // 2. 手順表シーン内のカード（画像や言葉が一致するもの）も更新
+  scenes.forEach(s => {
+    if (s.steps) {
+      s.steps.forEach(st => {
+        if (st.img === oldImage || st.word === oldWord) {
+          st.img = card.imageUrl;
+          st.word = card.word;
+        }
+      });
+    }
+  });
+  await saveScenesToStorage();
+
   renderChoiceBoard();
+  renderSceneBoard();
 
   toggleLoading(false);
   closeEditCardModal();
@@ -470,8 +493,8 @@ async function restoreFromBackupObject(imported) {
   selectedChoiceCardIndex = null;
 
   initSceneCheckStates();
-  saveScenesToStorage();
-  saveChoiceScenesToStorage();
+  await saveScenesToStorage();
+  await saveChoiceScenesToStorage();
 
   if (imported.geminiApiKey) {
     processAndSetApiKey(imported.geminiApiKey);
@@ -773,11 +796,13 @@ function processAndSetApiKey(key) {
   GEMINI_API_KEY = key;
   if (key) {
     localStorage.setItem('gemini_api_key', key);
-    document.getElementById('settings-api-key-input').value = key;
+    const keyInput = document.getElementById('settings-api-key-input');
+    if (keyInput) keyInput.value = key;
     updateApiStatusBadge(true);
   } else {
     localStorage.removeItem('gemini_api_key');
-    document.getElementById('settings-api-key-input').value = "";
+    const keyInput = document.getElementById('settings-api-key-input');
+    if (keyInput) keyInput.value = "";
     updateApiStatusBadge(false);
   }
 }
@@ -824,6 +849,9 @@ async function callGeminiText(prompt, key) {
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
       if (res.ok) {
@@ -865,5 +893,3 @@ async function callImagen(prompt, key) {
 }
 
 function clearInput() {
-  document.getElementById('card-input-word').value = '';
-}
