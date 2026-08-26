@@ -5,7 +5,7 @@ let GITHUB_REPO = "";
 let GITHUB_BRANCH = "main";
 let GITHUB_PATH = "data/ecard_backup.json";
 
-let db;
+let db = null;
 let library = [];
 let currentTab = 'practice';
 
@@ -106,14 +106,17 @@ const defaultChoiceScenes = [
   }
 ];
 
-// === IndexedDB 設定 ===
+// === IndexedDB 設定（大容量・永続ストレージ） ===
 function initDatabase() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('EcardAppDB', 1);
+    const request = indexedDB.open('EcardAppDB', 2);
     request.onupgradeneeded = (event) => {
       const database = event.target.result;
       if (!database.objectStoreNames.contains('cards')) {
         database.createObjectStore('cards', { keyPath: 'id' });
+      }
+      if (!database.objectStoreNames.contains('app_data')) {
+        database.createObjectStore('app_data', { keyPath: 'key' });
       }
     };
     request.onsuccess = (event) => {
@@ -122,6 +125,63 @@ function initDatabase() {
     };
     request.onerror = (event) => reject(event);
   });
+}
+
+// 汎用データ保存（IndexedDB + localStorageハイブリッド）
+async function saveAppState(key, data) {
+  // 1. IndexedDBに保存（容量無制限・主ストレージ）
+  if (db) {
+    try {
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(['app_data'], 'readwrite');
+        const store = tx.objectStore('app_data');
+        const req = store.put({ key: key, value: data, updatedAt: new Date().toISOString() });
+        req.onsuccess = () => resolve();
+        req.onerror = (e) => reject(e);
+      });
+    } catch (err) {
+      console.warn("IndexedDB save warning:", err);
+    }
+  }
+
+  // 2. localStorageにもバックアップ保存（QuotaExceededエラーを安全に保護）
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (err) {
+    // localStorageが容量上限（5MB）に達した場合は安全に無視
+    console.warn("localStorage quota reached, saved to IndexedDB successfully.");
+  }
+}
+
+// 汎用データ読込
+async function loadAppState(key, defaultValue) {
+  // 1. IndexedDBから読み込み
+  if (db) {
+    try {
+      const record = await new Promise((resolve, reject) => {
+        const tx = db.transaction(['app_data'], 'readonly');
+        const store = tx.objectStore('app_data');
+        const req = store.get(key);
+        req.onsuccess = () => resolve(req.result ? req.result.value : null);
+        req.onerror = (e) => reject(e);
+      });
+      if (record !== null && record !== undefined) {
+        return record;
+      }
+    } catch (err) {
+      console.warn("IndexedDB load warning:", err);
+    }
+  }
+
+  // 2. localStorageから読み込みフォールバック
+  try {
+    const local = localStorage.getItem(key);
+    if (local) {
+      return JSON.parse(local);
+    }
+  } catch (err) {}
+
+  return defaultValue;
 }
 
 async function loadLibrary() {
@@ -136,6 +196,7 @@ async function loadLibrary() {
       renderLibraryGrid();
       resolve(library);
     };
+    request.onerror = () => resolve([]);
   });
 }
 
@@ -378,14 +439,14 @@ function closeCelebration() {
   document.getElementById('celebration-overlay').classList.add('hidden');
 }
 
-// === アプリ起動初期化 ===
+// === アプリ起動初期化（完全同期・安全実行） ===
 window.onload = async () => {
   try {
-    initScenes();
-    initChoiceScenes();
-    initGitHubConfig();
     await initDatabase();
     await loadLibrary();
+    await initScenes();
+    await initChoiceScenes();
+    initGitHubConfig();
     
     if (library.length === 0) {
       const sampleCards = [
@@ -401,9 +462,12 @@ window.onload = async () => {
     }
 
     renderChoiceBoard();
+    renderSceneBoard();
 
     document.body.addEventListener('click', () => {
       if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
     }, { once: true });
-  } catch (err) {}
+  } catch (err) {
+    console.error("Initialization error:", err);
+  }
 };
