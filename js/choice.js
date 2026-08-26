@@ -1,32 +1,32 @@
 // === チョイス（選択活動）管理 ===
 
-function initChoiceScenes() {
-  const stored = localStorage.getItem('ecard_choice_scenes_v2');
-  if (stored) {
-    try {
-      choiceScenes = JSON.parse(stored);
-    } catch (e) {
-      choiceScenes = JSON.parse(JSON.stringify(defaultChoiceScenes));
-    }
+async function initChoiceScenes() {
+  const loaded = await loadAppState('ecard_choice_scenes_v2', defaultChoiceScenes);
+  if (loaded && Array.isArray(loaded) && loaded.length > 0) {
+    choiceScenes = loaded;
   } else {
     choiceScenes = JSON.parse(JSON.stringify(defaultChoiceScenes));
+    await saveChoiceScenesToStorage();
   }
 
-  if (!choiceScenes || choiceScenes.length === 0) {
-    choiceScenes = JSON.parse(JSON.stringify(defaultChoiceScenes));
+  const lastId = localStorage.getItem('ecard_last_choice_scene_id');
+  if (lastId && choiceScenes.some(s => s.id === lastId)) {
+    currentChoiceSceneId = lastId;
+  } else {
+    currentChoiceSceneId = choiceScenes[0].id;
   }
 
-  currentChoiceSceneId = choiceScenes[0].id;
   renderChoiceSceneDropdown();
   renderChoiceBoard();
 }
 
-function saveChoiceScenesToStorage() {
-  localStorage.setItem('ecard_choice_scenes_v2', JSON.stringify(choiceScenes));
+async function saveChoiceScenesToStorage() {
+  await saveAppState('ecard_choice_scenes_v2', choiceScenes);
 }
 
 function renderChoiceSceneDropdown() {
   const select = document.getElementById('choice-scene-select');
+  if (!select) return;
   select.innerHTML = choiceScenes.map(s => `
     <option value="${s.id}" ${s.id === currentChoiceSceneId ? 'selected' : ''}>${s.title}</option>
   `).join('');
@@ -35,6 +35,7 @@ function renderChoiceSceneDropdown() {
 function onChoiceSceneSelectChange(newId) {
   currentChoiceSceneId = newId;
   selectedChoiceCardIndex = null;
+  localStorage.setItem('ecard_last_choice_scene_id', newId);
   renderChoiceBoard();
 }
 
@@ -42,20 +43,22 @@ function getActiveChoiceScene() {
   return choiceScenes.find(s => s.id === currentChoiceSceneId) || choiceScenes[0];
 }
 
-function setChoiceCount(count) {
+async function setChoiceCount(count) {
   const scene = getActiveChoiceScene();
+  if (!scene) return;
   scene.count = count;
   selectedChoiceCardIndex = null;
-  saveChoiceScenesToStorage();
+  await saveChoiceScenesToStorage();
   renderChoiceBoard();
 }
 
 function renderChoiceBoard() {
   const scene = getActiveChoiceScene();
+  if (!scene) return;
   const count = scene.count || 2;
   const cards = scene.cards || [];
 
-  [2, 3, 4, 5].forEach(num => {
+ .forEach(num => {
     const btn = document.getElementById(`btn-choice-count-${num}`);
     if (btn) {
       if (num === count) {
@@ -67,6 +70,8 @@ function renderChoiceBoard() {
   });
 
   const container = document.getElementById('choice-cards-container');
+  if (!container) return;
+
   let gridClass = "grid gap-4 sm:gap-6 w-full max-w-5xl ";
   if (count === 2) gridClass += "grid-cols-2 max-w-3xl";
   else if (count === 3) gridClass += "grid-cols-3 max-w-4xl";
@@ -84,9 +89,16 @@ function renderChoiceBoard() {
       <div id="choice-box-${i}" onclick="selectChoiceCard(${i})" 
            class="group relative bg-white border-8 ${isSelected ? 'border-indigo-400 bg-indigo-50/20' : 'border-white'} card-shadow rounded-[32px] p-4 sm:p-5 flex flex-col items-center justify-between aspect-square cursor-pointer transition-all duration-300 active:scale-95 transform hover:-translate-y-1 select-none overflow-hidden ${isSelected ? 'selected-bounce' : ''}">
         
-        <button onclick="openChoicePickerForIndex(${i}, event)" class="absolute top-2 right-2 bg-indigo-100 hover:bg-indigo-600 text-indigo-700 hover:text-white w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black z-20 shadow transition-all" title="カードを変更">
-          <i class="fa-solid fa-repeat"></i>
-        </button>
+        <div class="absolute top-2 right-2 flex items-center gap-1 z-20">
+          ${card ? `
+            <button onclick="clearChoiceCardIndex(${i}, event)" class="bg-rose-100 hover:bg-rose-600 text-rose-600 hover:text-white w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black shadow transition-all" title="カードを外す">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          ` : ''}
+          <button onclick="openChoicePickerForIndex(${i}, event)" class="bg-indigo-100 hover:bg-indigo-600 text-indigo-700 hover:text-white w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black shadow transition-all" title="カードを変更">
+            <i class="fa-solid fa-repeat"></i>
+          </button>
+        </div>
 
         <span class="absolute top-2 left-2 w-6 h-6 bg-slate-100 text-slate-500 text-[10px] font-black rounded-full flex items-center justify-center border border-slate-200">
           ${i + 1}
@@ -120,6 +132,7 @@ function renderChoiceBoard() {
 
 function selectChoiceCard(idx) {
   const scene = getActiveChoiceScene();
+  if (!scene || !scene.cards) return;
   const card = scene.cards[idx];
   if (!card) {
     openChoicePickerForIndex(idx, null);
@@ -170,17 +183,36 @@ async function openChoicePickerForIndex(idx, event) {
   modal.classList.remove('hidden');
 }
 
-function selectCardForChoiceIndex(cardId) {
+async function selectCardForChoiceIndex(cardId) {
   const scene = getActiveChoiceScene();
   const selected = library.find(c => c.id === cardId);
   if (selected && currentChoicePickerIndex !== null) {
     if (!scene.cards) scene.cards = [null, null, null, null, null];
     scene.cards[currentChoicePickerIndex] = selected;
-    saveChoiceScenesToStorage();
+    await saveChoiceScenesToStorage();
     playSound('complete');
   }
   closeCardPicker();
   renderChoiceBoard();
+}
+
+async function clearChoiceCardIndex(idx, event) {
+  if (event) event.stopPropagation();
+  const scene = getActiveChoiceScene();
+  if (scene && scene.cards && scene.cards[idx]) {
+    scene.cards[idx] = null;
+    if (selectedChoiceCardIndex === idx) selectedChoiceCardIndex = null;
+    await saveChoiceScenesToStorage();
+    playSound('wrong');
+    renderChoiceBoard();
+  }
+}
+
+async function removeCurrentPickerCard() {
+  if (currentChoicePickerIndex !== null) {
+    await clearChoiceCardIndex(currentChoicePickerIndex, null);
+    closeCardPicker();
+  }
 }
 
 function closeCardPicker() {
@@ -197,7 +229,7 @@ function closeNewChoiceSceneModal() {
   document.getElementById('new-choice-scene-modal').classList.add('hidden');
 }
 
-function submitCreateNewChoiceScene() {
+async function submitCreateNewChoiceScene() {
   const title = document.getElementById('new-choice-scene-title-input').value.trim();
   if (!title) {
     showCustomAlert("warning", "入力エラー", "場面の名前を入れてね！");
@@ -215,11 +247,63 @@ function submitCreateNewChoiceScene() {
   choiceScenes.push(newScene);
   currentChoiceSceneId = newId;
   selectedChoiceCardIndex = null;
+  localStorage.setItem('ecard_last_choice_scene_id', newId);
 
-  saveChoiceScenesToStorage();
+  await saveChoiceScenesToStorage();
   renderChoiceSceneDropdown();
   closeNewChoiceSceneModal();
   renderChoiceBoard();
 
   showCustomAlert("success", "場面を追加しました 🌟", `「<strong>${title}</strong>」を作成しました！`);
+}
+
+function openManageChoiceScenesModal() {
+  const scene = getActiveChoiceScene();
+  if (!scene) return;
+  document.getElementById('edit-choice-scene-title-input').value = scene.title;
+  document.getElementById('manage-choice-scene-modal').classList.remove('hidden');
+}
+
+function closeManageChoiceScenesModal() {
+  document.getElementById('manage-choice-scene-modal').classList.add('hidden');
+}
+
+async function renameActiveChoiceScene() {
+  const newName = document.getElementById('edit-choice-scene-title-input').value.trim();
+  if (!newName) {
+    showCustomAlert("warning", "入力エラー", "場面の名前を入力してください。");
+    return;
+  }
+
+  const scene = getActiveChoiceScene();
+  if (!scene) return;
+
+  scene.title = newName;
+  await saveChoiceScenesToStorage();
+  renderChoiceSceneDropdown();
+  closeManageChoiceScenesModal();
+  showCustomAlert("success", "名前を変更しました", `場面名を「${newName}」に変更しました！`);
+}
+
+async function deleteActiveChoiceScene() {
+  if (choiceScenes.length <= 1) {
+    showCustomAlert("warning", "削除できません", "チョイスの場面は最低1つ以上必要です。");
+    return;
+  }
+
+  const activeScene = getActiveChoiceScene();
+  showCustomConfirm("danger", "場面の削除", `チョイス場面「${activeScene.title}」を削除しますか？`, async (confirmed) => {
+    if (confirmed) {
+      choiceScenes = choiceScenes.filter(s => s.id !== currentChoiceSceneId);
+      currentChoiceSceneId = choiceScenes[0].id;
+      selectedChoiceCardIndex = null;
+      localStorage.setItem('ecard_last_choice_scene_id', currentChoiceSceneId);
+
+      await saveChoiceScenesToStorage();
+      renderChoiceSceneDropdown();
+      closeManageChoiceScenesModal();
+      renderChoiceBoard();
+      showCustomAlert("success", "削除完了", "チョイス場面を削除しました。");
+    }
+  });
 }
