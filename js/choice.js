@@ -1,19 +1,19 @@
 // === チョイス（選択活動）管理 ===
 
 async function initChoiceScenes() {
-  const loaded = await loadAppState('ecard_choice_scenes_v2', defaultChoiceScenes);
+  const loaded = await loadAppState('ecard_choice_scenes_v2', window.defaultChoiceScenes);
   if (loaded && Array.isArray(loaded) && loaded.length > 0) {
-    choiceScenes = loaded;
+    window.choiceScenes = loaded;
   } else {
-    choiceScenes = JSON.parse(JSON.stringify(defaultChoiceScenes));
+    window.choiceScenes = JSON.parse(JSON.stringify(window.defaultChoiceScenes));
     await saveChoiceScenesToStorage();
   }
 
   const lastId = localStorage.getItem('ecard_last_choice_scene_id');
-  if (lastId && choiceScenes.some(s => s.id === lastId)) {
-    currentChoiceSceneId = lastId;
+  if (lastId && window.choiceScenes.some(s => s.id === lastId)) {
+    window.currentChoiceSceneId = lastId;
   } else {
-    currentChoiceSceneId = choiceScenes[0].id;
+    window.currentChoiceSceneId = window.choiceScenes[0].id;
   }
 
   renderChoiceSceneDropdown();
@@ -21,33 +21,33 @@ async function initChoiceScenes() {
 }
 
 async function saveChoiceScenesToStorage() {
-  await saveAppState('ecard_choice_scenes_v2', choiceScenes);
+  await saveAppState('ecard_choice_scenes_v2', window.choiceScenes);
 }
 
 function renderChoiceSceneDropdown() {
   const select = document.getElementById('choice-scene-select');
   if (!select) return;
-  select.innerHTML = choiceScenes.map(s => `
-    <option value="${s.id}" ${s.id === currentChoiceSceneId ? 'selected' : ''}>${s.title}</option>
+  select.innerHTML = window.choiceScenes.map(s => `
+    <option value="${s.id}" ${s.id === window.currentChoiceSceneId ? 'selected' : ''}>${s.title}</option>
   `).join('');
 }
 
 function onChoiceSceneSelectChange(newId) {
-  currentChoiceSceneId = newId;
-  selectedChoiceCardIndex = null;
+  window.currentChoiceSceneId = newId;
+  window.selectedChoiceCardIndex = null;
   localStorage.setItem('ecard_last_choice_scene_id', newId);
   renderChoiceBoard();
 }
 
 function getActiveChoiceScene() {
-  return choiceScenes.find(s => s.id === currentChoiceSceneId) || choiceScenes[0];
+  return window.choiceScenes.find(s => s.id === window.currentChoiceSceneId) || window.choiceScenes[0];
 }
 
 async function setChoiceCount(count) {
   const scene = getActiveChoiceScene();
   if (!scene) return;
   scene.count = count;
-  selectedChoiceCardIndex = null;
+  window.selectedChoiceCardIndex = null;
   await saveChoiceScenesToStorage();
   renderChoiceBoard();
 }
@@ -82,8 +82,8 @@ function renderChoiceBoard() {
 
   for (let i = 0; i < count; i++) {
     const card = cards[i] || null;
-    const isSelected = selectedChoiceCardIndex === i;
-    const isDimmed = selectedChoiceCardIndex !== null && selectedChoiceCardIndex !== i;
+    const isSelected = window.selectedChoiceCardIndex === i;
+    const isDimmed = window.selectedChoiceCardIndex !== null && window.selectedChoiceCardIndex !== i;
 
     html += `
       <div id="choice-box-${i}" onclick="selectChoiceCard(${i})" 
@@ -139,7 +139,7 @@ function selectChoiceCard(idx) {
     return;
   }
 
-  selectedChoiceCardIndex = idx;
+  window.selectedChoiceCardIndex = idx;
   playSound('complete');
 
   if ('speechSynthesis' in window) {
@@ -153,42 +153,44 @@ function selectChoiceCard(idx) {
 }
 
 function resetPracticeSelection() {
-  selectedChoiceCardIndex = null;
+  window.selectedChoiceCardIndex = null;
   renderChoiceBoard();
 }
 
 async function openChoicePickerForIndex(idx, event) {
   if (event) event.stopPropagation();
-  currentChoicePickerIndex = idx;
+  window.currentChoicePickerIndex = idx;
   await loadLibrary();
 
   const modal = document.getElementById('picker-modal');
   const grid = document.getElementById('picker-grid');
   const emptyMsg = document.getElementById('picker-empty');
 
-  if (library.length === 0) {
-    emptyMsg.classList.remove('hidden');
-    grid.innerHTML = '';
+  if (!window.library || window.library.length === 0) {
+    if (emptyMsg) emptyMsg.classList.remove('hidden');
+    if (grid) grid.innerHTML = '';
   } else {
-    emptyMsg.classList.add('hidden');
-    grid.innerHTML = library.map(card => `
-      <div onclick="selectCardForChoiceIndex('${card.id}')" class="bg-white p-3 rounded-2xl border-2 border-slate-100 hover:border-indigo-400 card-shadow cursor-pointer flex flex-col items-center transition-all active:scale-95">
-        <div class="aspect-square w-full bg-slate-50 rounded-xl mb-2 flex items-center justify-center p-1">
-          <img class="w-full h-full object-contain pointer-events-none" src="${card.imageUrl}" alt="${card.word}">
+    if (emptyMsg) emptyMsg.classList.add('hidden');
+    if (grid) {
+      grid.innerHTML = window.library.map(card => `
+        <div onclick="selectCardForChoiceIndex('${card.id}')" class="bg-white p-3 rounded-2xl border-2 border-slate-100 hover:border-indigo-400 card-shadow cursor-pointer flex flex-col items-center transition-all active:scale-95">
+          <div class="aspect-square w-full bg-slate-50 rounded-xl mb-2 flex items-center justify-center p-1">
+            <img class="w-full h-full object-contain pointer-events-none" src="${card.imageUrl}" alt="${card.word}">
+          </div>
+          <span class="font-bold text-slate-700 text-xs text-center truncate w-full">${card.word}</span>
         </div>
-        <span class="font-bold text-slate-700 text-xs text-center truncate w-full">${card.word}</span>
-      </div>
-    `).join('');
+      `).join('');
+    }
   }
-  modal.classList.remove('hidden');
+  if (modal) modal.classList.remove('hidden');
 }
 
 async function selectCardForChoiceIndex(cardId) {
   const scene = getActiveChoiceScene();
-  const selected = library.find(c => c.id === cardId);
-  if (selected && currentChoicePickerIndex !== null) {
+  const selected = window.library.find(c => c.id === cardId);
+  if (selected && window.currentChoicePickerIndex !== null) {
     if (!scene.cards) scene.cards = [null, null, null, null, null];
-    scene.cards[currentChoicePickerIndex] = selected;
+    scene.cards[window.currentChoicePickerIndex] = selected;
     await saveChoiceScenesToStorage();
     playSound('complete');
   }
@@ -201,7 +203,7 @@ async function clearChoiceCardIndex(idx, event) {
   const scene = getActiveChoiceScene();
   if (scene && scene.cards && scene.cards[idx]) {
     scene.cards[idx] = null;
-    if (selectedChoiceCardIndex === idx) selectedChoiceCardIndex = null;
+    if (window.selectedChoiceCardIndex === idx) window.selectedChoiceCardIndex = null;
     await saveChoiceScenesToStorage();
     playSound('wrong');
     renderChoiceBoard();
@@ -209,28 +211,33 @@ async function clearChoiceCardIndex(idx, event) {
 }
 
 async function removeCurrentPickerCard() {
-  if (currentChoicePickerIndex !== null) {
-    await clearChoiceCardIndex(currentChoicePickerIndex, null);
+  if (window.currentChoicePickerIndex !== null) {
+    await clearChoiceCardIndex(window.currentChoicePickerIndex, null);
     closeCardPicker();
   }
 }
 
 function closeCardPicker() {
-  document.getElementById('picker-modal').classList.add('hidden');
-  currentChoicePickerIndex = null;
+  const modal = document.getElementById('picker-modal');
+  if (modal) modal.classList.add('hidden');
+  window.currentChoicePickerIndex = null;
 }
 
 function openNewChoiceSceneModal() {
-  document.getElementById('new-choice-scene-title-input').value = "";
-  document.getElementById('new-choice-scene-modal').classList.remove('hidden');
+  const input = document.getElementById('new-choice-scene-title-input');
+  if (input) input.value = "";
+  const modal = document.getElementById('new-choice-scene-modal');
+  if (modal) modal.classList.remove('hidden');
 }
 
 function closeNewChoiceSceneModal() {
-  document.getElementById('new-choice-scene-modal').classList.add('hidden');
+  const modal = document.getElementById('new-choice-scene-modal');
+  if (modal) modal.classList.add('hidden');
 }
 
 async function submitCreateNewChoiceScene() {
-  const title = document.getElementById('new-choice-scene-title-input').value.trim();
+  const input = document.getElementById('new-choice-scene-title-input');
+  const title = input ? input.value.trim() : "";
   if (!title) {
     showCustomAlert("warning", "入力エラー", "場面の名前を入れてね！");
     return;
@@ -244,9 +251,9 @@ async function submitCreateNewChoiceScene() {
     cards: [null, null, null, null, null]
   };
 
-  choiceScenes.push(newScene);
-  currentChoiceSceneId = newId;
-  selectedChoiceCardIndex = null;
+  window.choiceScenes.push(newScene);
+  window.currentChoiceSceneId = newId;
+  window.selectedChoiceCardIndex = null;
   localStorage.setItem('ecard_last_choice_scene_id', newId);
 
   await saveChoiceScenesToStorage();
@@ -260,16 +267,20 @@ async function submitCreateNewChoiceScene() {
 function openManageChoiceScenesModal() {
   const scene = getActiveChoiceScene();
   if (!scene) return;
-  document.getElementById('edit-choice-scene-title-input').value = scene.title;
-  document.getElementById('manage-choice-scene-modal').classList.remove('hidden');
+  const input = document.getElementById('edit-choice-scene-title-input');
+  if (input) input.value = scene.title;
+  const modal = document.getElementById('manage-choice-scene-modal');
+  if (modal) modal.classList.remove('hidden');
 }
 
 function closeManageChoiceScenesModal() {
-  document.getElementById('manage-choice-scene-modal').classList.add('hidden');
+  const modal = document.getElementById('manage-choice-scene-modal');
+  if (modal) modal.classList.add('hidden');
 }
 
 async function renameActiveChoiceScene() {
-  const newName = document.getElementById('edit-choice-scene-title-input').value.trim();
+  const input = document.getElementById('edit-choice-scene-title-input');
+  const newName = input ? input.value.trim() : "";
   if (!newName) {
     showCustomAlert("warning", "入力エラー", "場面の名前を入力してください。");
     return;
@@ -286,7 +297,7 @@ async function renameActiveChoiceScene() {
 }
 
 async function deleteActiveChoiceScene() {
-  if (choiceScenes.length <= 1) {
+  if (window.choiceScenes.length <= 1) {
     showCustomAlert("warning", "削除できません", "チョイスの場面は最低1つ以上必要です。");
     return;
   }
@@ -294,10 +305,10 @@ async function deleteActiveChoiceScene() {
   const activeScene = getActiveChoiceScene();
   showCustomConfirm("danger", "場面の削除", `チョイス場面「${activeScene.title}」を削除しますか？`, async (confirmed) => {
     if (confirmed) {
-      choiceScenes = choiceScenes.filter(s => s.id !== currentChoiceSceneId);
-      currentChoiceSceneId = choiceScenes[0].id;
-      selectedChoiceCardIndex = null;
-      localStorage.setItem('ecard_last_choice_scene_id', currentChoiceSceneId);
+      window.choiceScenes = window.choiceScenes.filter(s => s.id !== window.currentChoiceSceneId);
+      window.currentChoiceSceneId = window.choiceScenes[0].id;
+      window.selectedChoiceCardIndex = null;
+      localStorage.setItem('ecard_last_choice_scene_id', window.currentChoiceSceneId);
 
       await saveChoiceScenesToStorage();
       renderChoiceSceneDropdown();
