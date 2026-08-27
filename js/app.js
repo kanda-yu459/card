@@ -1,41 +1,41 @@
-// === グローバル共通変数 ===
-let GEMINI_API_KEY = "";
-let GITHUB_TOKEN = "";
-let GITHUB_REPO = "";
-let GITHUB_BRANCH = "main";
-let GITHUB_PATH = "data/ecard_backup.json";
+// === グローバル共通変数・設定 ===
+window.GEMINI_API_KEY = "";
+window.GITHUB_TOKEN = "";
+window.GITHUB_REPO = "";
+window.GITHUB_BRANCH = "main";
+window.GITHUB_PATH = "data/ecard_backup.json";
 
-let db = null;
-let library = [];
-let currentTab = 'practice';
+window.db = null;
+window.library = [];
+window.currentTab = 'practice';
 
-let scenes = [];
-let choiceScenes = [];
-let currentSceneId = "";
-let currentChoiceSceneId = "";
-let selectedChoiceCardIndex = null;
-let currentChoicePickerIndex = null;
-let sceneCheckStates = {};
-let isSortModeScene = false;
+window.scenes = [];
+window.choiceScenes = [];
+window.currentSceneId = "";
+window.currentChoiceSceneId = "";
+window.selectedChoiceCardIndex = null;
+window.currentChoicePickerIndex = null;
+window.sceneCheckStates = {};
+window.isSortModeScene = false;
 
-let alertPromiseResolve = null;
-let audioCtx = null;
-let uploadedImageBase64 = "";
+window.alertPromiseResolve = null;
+window.audioCtx = null;
+window.uploadedImageBase64 = "";
 
-let editingCardOriginalImage = "";
-let editingCardImageBase64 = "";
-let activeEditStepIdx = -1;
-let iconPickerMode = 'change';
+window.editingCardOriginalImage = "";
+window.editingCardImageBase64 = "";
+window.activeEditStepIdx = -1;
+window.iconPickerMode = 'change';
 
 // プリセットSVGアイコン
-const fallbackSVGs = {
+window.fallbackSVGs = {
   apple: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="53" r="35" fill="%23f43f5e"/><path d="M50,18 C52,25 45,30 40,30 C38,22 45,18 50,18 Z" fill="%2322c55e"/><path d="M50,22 L50,10" stroke="%2378350f" stroke-width="4" stroke-linecap="round"/><circle cx="38" cy="45" r="4" fill="%23fff" opacity="0.8"/><circle cx="62" cy="45" r="4" fill="%23fff" opacity="0.8"/><path d="M42,62 Q50,68 58,62" stroke="%23fff" stroke-width="4" stroke-linecap="round" fill="none"/></svg>`,
   banana: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M20,25 Q40,20 65,40 Q85,60 80,80 Q65,80 45,60 Q25,40 20,25 Z" fill="%23eab308"/><path d="M18,22 L24,28" stroke="%23713f12" stroke-width="6" stroke-linecap="round"/><path d="M78,78 L84,84" stroke="%23451a03" stroke-width="6" stroke-linecap="round"/><path d="M35,35 Q50,32 68,48" stroke="%23ca8a04" stroke-width="3" stroke-linecap="round" fill="none"/></svg>`,
   dog: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="%23fdba74"/><ellipse cx="25" cy="45" rx="8" ry="20" fill="%23ea580c" transform="rotate(15 25 45)"/><ellipse cx="75" cy="45" rx="8" ry="20" fill="%23ea580c" transform="rotate(-15 75 45)"/><circle cx="38" cy="45" r="5" fill="%231e293b"/><circle cx="62" cy="45" r="5" fill="%231e293b"/><ellipse cx="50" cy="56" rx="7" ry="5" fill="%230f172a"/><path d="M44,64 Q50,68 56,64" stroke="%230f172a" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M48,58 L48,64" stroke="%230f172a" stroke-width="2"/><path d="M52,58 L52,64" stroke="%230f172a" stroke-width="2"/></svg>`,
   car: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M15,60 L20,42 Q25,30 45,30 L65,30 Q80,30 85,45 L90,60 Z" fill="%233b82f6"/><rect x="10" y="55" width="80" height="15" rx="5" fill="%231d4ed8"/><circle cx="30" cy="72" r="12" fill="%231e293b"/><circle cx="30" cy="72" r="5" fill="%23cbd5e1"/><circle cx="70" cy="72" r="12" fill="%231e293b"/><circle cx="70" cy="72" r="5" fill="%23cbd5e1"/><rect x="25" y="38" width="18" height="12" rx="2" fill="%23e2e8f0"/><rect x="48" y="38" width="22" height="12" rx="2" fill="%23e2e8f0"/></svg>`
 };
 
-const routineSVGs = {
+window.routineSVGs = {
   okiru: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="26" fill="%23f97316"/><circle cx="50" cy="50" r="18" fill="%23facc15"/><path d="M50,10 L50,22 M50,78 L50,90 M10,50 L22,50 M78,50 L90,50 M22,22 L30,30 M70,70 L78,78 M22,78 L30,70 M70,22 L78,30" stroke="%23eab308" stroke-width="5" stroke-linecap="round"/><path d="M38,48 Q50,40 62,48" stroke="%237c2d12" stroke-width="3" fill="none"/><circle cx="42" cy="54" r="3" fill="%237c2d12"/><circle cx="58" cy="54" r="3" fill="%237c2d12"/><path d="M46,62 Q50,66 54,62" stroke="%237c2d12" stroke-width="2.5" fill="none"/></svg>`,
   toilet: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="30" y="15" width="40" height="20" rx="6" fill="%23cbd5e1"/><rect x="35" y="35" width="30" height="35" rx="8" fill="%23e2e8f0"/><ellipse cx="50" cy="35" rx="18" ry="4" fill="%2394a3b8"/><rect x="25" y="65" width="50" height="15" rx="5" fill="%2364748b"/><path d="M62,25 L62,20" stroke="%231e293b" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="48" r="8" fill="%2338bdf8" opacity="0.6"/></svg>`,
   kigaeru: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M20,38 L38,22 L50,30 L62,22 L80,38 L72,55 L62,50 L62,80 L38,80 L38,50 L28,55 Z" fill="%23ec4899"/><path d="M42,22 Q50,15 58,22" stroke="%23f472b6" stroke-width="4" fill="none"/><circle cx="50" cy="50" r="4" fill="%23fff"/><circle cx="50" cy="65" r="4" fill="%23fff"/></svg>`,
@@ -52,41 +52,41 @@ const routineSVGs = {
 };
 
 // デフォルト初期データ
-const defaultScenesData = [
+window.defaultScenesData = [
   {
     id: "scene_morning",
     title: "あさのじゅんび",
     steps: [
-      { id: "step_okiru", word: "おきる", img: routineSVGs.okiru, desc: "あさ、おきよう！", enabled: true },
-      { id: "step_toilet", word: "トイレ", img: routineSVGs.toilet, desc: "トイレにいこう！", enabled: true },
-      { id: "step_kigaeru", word: "きがえる", img: routineSVGs.kigaeru, desc: "ふくをきがえよう！", enabled: true },
-      { id: "step_gohan", word: "あさごはん", img: routineSVGs.gohan, desc: "ごはんをたべよう！", enabled: true },
-      { id: "step_hamigaki", word: "はみがき", img: routineSVGs.hamigaki, desc: "はをみがこう！", enabled: true },
-      { id: "step_bag", word: "かばん", img: routineSVGs.bag, desc: "にもつをもとう！", enabled: true },
-      { id: "step_go_out", word: "しゅっぱつ", img: routineSVGs.go_out, desc: "いってきます！", enabled: true }
+      { id: "step_okiru", word: "おきる", img: window.routineSVGs.okiru, desc: "あさ、おきよう！", enabled: true },
+      { id: "step_toilet", word: "トイレ", img: window.routineSVGs.toilet, desc: "トイレにいこう！", enabled: true },
+      { id: "step_kigaeru", word: "きがえる", img: window.routineSVGs.kigaeru, desc: "ふくをきがえよう！", enabled: true },
+      { id: "step_gohan", word: "あさごはん", img: window.routineSVGs.gohan, desc: "ごはんをたべよう！", enabled: true },
+      { id: "step_hamigaki", word: "はみがき", img: window.routineSVGs.hamigaki, desc: "はをみがこう！", enabled: true },
+      { id: "step_bag", word: "かばん", img: window.routineSVGs.bag, desc: "にもつをもとう！", enabled: true },
+      { id: "step_go_out", word: "しゅっぱつ", img: window.routineSVGs.go_out, desc: "いってきます！", enabled: true }
     ]
   },
   {
     id: "scene_evening",
     title: "かえってきてから",
     steps: [
-      { id: "step_tearai", word: "てあらい・うがい", img: routineSVGs.tearai, desc: "てをあらおう！", enabled: true },
-      { id: "step_backpack_away", word: "かたづけ", img: routineSVGs.backpack_away, desc: "ランドセルをおこう！", enabled: true },
-      { id: "step_syukudai", word: "しゅくだい", img: routineSVGs.syukudai, desc: "しゅくだいをしよう！", enabled: true },
-      { id: "step_tomorrow_prep", word: "あすのじゅんび", img: routineSVGs.tomorrow_prep, desc: "あすのじゅんびをしよう！", enabled: true },
-      { id: "step_oyasumi", word: "おやすみ", img: routineSVGs.oyasumi, desc: "ねるじかん！", enabled: true }
+      { id: "step_tearai", word: "てあらい・うがい", img: window.routineSVGs.tearai, desc: "てをあらおう！", enabled: true },
+      { id: "step_backpack_away", word: "かたづけ", img: window.routineSVGs.backpack_away, desc: "ランドセルをおこう！", enabled: true },
+      { id: "step_syukudai", word: "しゅくだい", img: window.routineSVGs.syukudai, desc: "しゅくだいをしよう！", enabled: true },
+      { id: "step_tomorrow_prep", word: "あすのじゅんび", img: window.routineSVGs.tomorrow_prep, desc: "あすのじゅんびをしよう！", enabled: true },
+      { id: "step_oyasumi", word: "おやすみ", img: window.routineSVGs.oyasumi, desc: "ねるじかん！", enabled: true }
     ]
   }
 ];
 
-const defaultChoiceScenes = [
+window.defaultChoiceScenes = [
   {
     id: "choice_snack",
     title: "おやつ",
     count: 2,
     cards: [
-      { id: 's_apple', word: 'りんご', imageUrl: fallbackSVGs.apple },
-      { id: 's_banana', word: 'バナナ', imageUrl: fallbackSVGs.banana },
+      { id: 's_apple', word: 'りんご', imageUrl: window.fallbackSVGs.apple },
+      { id: 's_banana', word: 'バナナ', imageUrl: window.fallbackSVGs.banana },
       null,
       null,
       null
@@ -97,8 +97,8 @@ const defaultChoiceScenes = [
     title: "あそび",
     count: 2,
     cards: [
-      { id: 's_dog', word: 'いぬ', imageUrl: fallbackSVGs.dog },
-      { id: 's_car', word: 'くるま', imageUrl: fallbackSVGs.car },
+      { id: 's_dog', word: 'いぬ', imageUrl: window.fallbackSVGs.dog },
+      { id: 's_car', word: 'くるま', imageUrl: window.fallbackSVGs.car },
       null,
       null,
       null
@@ -109,31 +109,38 @@ const defaultChoiceScenes = [
 // === IndexedDB 設定（大容量・永続ストレージ） ===
 function initDatabase() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('EcardAppDB', 2);
-    request.onupgradeneeded = (event) => {
-      const database = event.target.result;
-      if (!database.objectStoreNames.contains('cards')) {
-        database.createObjectStore('cards', { keyPath: 'id' });
-      }
-      if (!database.objectStoreNames.contains('app_data')) {
-        database.createObjectStore('app_data', { keyPath: 'key' });
-      }
-    };
-    request.onsuccess = (event) => {
-      db = event.target.result;
+    try {
+      const request = indexedDB.open('EcardAppDB', 2);
+      request.onupgradeneeded = (event) => {
+        const database = event.target.result;
+        if (!database.objectStoreNames.contains('cards')) {
+          database.createObjectStore('cards', { keyPath: 'id' });
+        }
+        if (!database.objectStoreNames.contains('app_data')) {
+          database.createObjectStore('app_data', { keyPath: 'key' });
+        }
+      };
+      request.onsuccess = (event) => {
+        window.db = event.target.result;
+        resolve();
+      };
+      request.onerror = (event) => {
+        console.warn("IndexedDB open error:", event);
+        resolve(); // フォールバックで処理を継続
+      };
+    } catch (e) {
+      console.warn("IndexedDB not supported or failed:", e);
       resolve();
-    };
-    request.onerror = (event) => reject(event);
+    }
   });
 }
 
 // 汎用データ保存（IndexedDB + localStorageハイブリッド）
 async function saveAppState(key, data) {
-  // 1. IndexedDBに保存（容量無制限・主ストレージ）
-  if (db) {
+  if (window.db) {
     try {
       await new Promise((resolve, reject) => {
-        const tx = db.transaction(['app_data'], 'readwrite');
+        const tx = window.db.transaction(['app_data'], 'readwrite');
         const store = tx.objectStore('app_data');
         const req = store.put({ key: key, value: data, updatedAt: new Date().toISOString() });
         req.onsuccess = () => resolve();
@@ -144,22 +151,19 @@ async function saveAppState(key, data) {
     }
   }
 
-  // 2. localStorageにもバックアップ保存（QuotaExceededエラーを安全に保護）
   try {
     localStorage.setItem(key, JSON.stringify(data));
   } catch (err) {
-    // localStorageが容量上限（5MB）に達した場合は安全に無視
     console.warn("localStorage quota reached, saved to IndexedDB successfully.");
   }
 }
 
 // 汎用データ読込
 async function loadAppState(key, defaultValue) {
-  // 1. IndexedDBから読み込み
-  if (db) {
+  if (window.db) {
     try {
       const record = await new Promise((resolve, reject) => {
-        const tx = db.transaction(['app_data'], 'readonly');
+        const tx = window.db.transaction(['app_data'], 'readonly');
         const store = tx.objectStore('app_data');
         const req = store.get(key);
         req.onsuccess = () => resolve(req.result ? req.result.value : null);
@@ -173,7 +177,6 @@ async function loadAppState(key, defaultValue) {
     }
   }
 
-  // 2. localStorageから読み込みフォールバック
   try {
     const local = localStorage.getItem(key);
     if (local) {
@@ -185,40 +188,52 @@ async function loadAppState(key, defaultValue) {
 }
 
 async function loadLibrary() {
-  if (!db) return [];
+  if (!window.db) return window.library || [];
   return new Promise((resolve) => {
-    const transaction = db.transaction(['cards'], 'readonly');
-    const store = transaction.objectStore('cards');
-    const request = store.getAll();
-    request.onsuccess = () => {
-      library = request.result || [];
-      updateLibraryCount();
-      renderLibraryGrid();
-      resolve(library);
-    };
-    request.onerror = () => resolve([]);
+    try {
+      const transaction = window.db.transaction(['cards'], 'readonly');
+      const store = transaction.objectStore('cards');
+      const request = store.getAll();
+      request.onsuccess = () => {
+        window.library = request.result || [];
+        if (typeof updateLibraryCount === 'function') updateLibraryCount();
+        if (typeof renderLibraryGrid === 'function') renderLibraryGrid();
+        resolve(window.library);
+      };
+      request.onerror = () => resolve([]);
+    } catch (e) {
+      resolve([]);
+    }
   });
 }
 
 async function saveCardToDatabase(card) {
-  if (!db) return;
+  if (!window.db) return;
   return new Promise((resolve, reject) => {
-    const transaction = db.transaction(['cards'], 'readwrite');
-    const store = transaction.objectStore('cards');
-    const request = store.put(card);
-    request.onsuccess = () => resolve();
-    request.onerror = (e) => reject(e);
+    try {
+      const transaction = window.db.transaction(['cards'], 'readwrite');
+      const store = transaction.objectStore('cards');
+      const request = store.put(card);
+      request.onsuccess = () => resolve();
+      request.onerror = (e) => reject(e);
+    } catch (e) {
+      reject(e);
+    }
   });
 }
 
 async function clearDatabase() {
-  if (!db) return;
+  if (!window.db) return;
   return new Promise((resolve, reject) => {
-    const transaction = db.transaction(['cards'], 'readwrite');
-    const store = transaction.objectStore('cards');
-    const request = store.clear();
-    request.onsuccess = () => resolve();
-    request.onerror = (e) => reject(e);
+    try {
+      const transaction = window.db.transaction(['cards'], 'readwrite');
+      const store = transaction.objectStore('cards');
+      const request = store.clear();
+      request.onsuccess = () => resolve();
+      request.onerror = (e) => reject(e);
+    } catch (e) {
+      reject(e);
+    }
   });
 }
 
@@ -265,178 +280,16 @@ function processImageFile(file, maxWidth = 512, maxHeight = 512) {
 
 // === タブ切り替え ===
 function switchTab(tabId) {
-  currentTab = tabId;
+  window.currentTab = tabId;
   const tabs = ['practice', 'scenes', 'settings'];
   tabs.forEach(t => {
     const btn = document.getElementById(`tab-${t}`);
-    const isActive = t === tabId;
-    if (t === 'scenes') {
-      btn.className = isActive ? "px-6 py-2.5 rounded-xl text-sm font-black bg-white text-amber-700 shadow-sm flex items-center gap-1.5" : "px-6 py-2.5 rounded-xl text-sm font-black text-amber-700 hover:bg-white/50 flex items-center gap-1.5";
-    } else if (t === 'settings') {
-      btn.className = isActive ? "px-6 py-2.5 rounded-xl text-sm font-black bg-white text-teal-700 shadow-sm flex items-center gap-1.5" : "px-6 py-2.5 rounded-xl text-sm font-black text-teal-700 hover:bg-white/50 flex items-center gap-1.5";
-    } else {
-      btn.className = isActive ? "px-6 py-2.5 rounded-xl text-sm font-black bg-white text-indigo-700 shadow-sm flex items-center gap-1.5" : "px-6 py-2.5 rounded-xl text-sm font-black text-indigo-600 hover:bg-white/50 flex items-center gap-1.5";
-    }
-    document.getElementById(`page-${t}`).classList.toggle('hidden', !isActive);
-  });
-
-  if (tabId === 'practice') renderChoiceBoard();
-  if (tabId === 'scenes') renderSceneBoard();
-  if (tabId === 'settings') {
-    renderLibraryGrid();
-    renderSettingsForms();
-  }
-}
-
-// === サウンド再生 ===
-function playSound(type) {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-  try {
-    const now = audioCtx.currentTime;
-    if (type === 'correct' || type === 'complete') {
-      const osc1 = audioCtx.createOscillator();
-      const gain1 = audioCtx.createGain();
-      osc1.type = 'sine';
-      osc1.frequency.setValueAtTime(659.25, now);
-      gain1.gain.setValueAtTime(0.3, now);
-      gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-      osc1.connect(gain1);
-      gain1.connect(audioCtx.destination);
-      osc1.start(now);
-      osc1.stop(now + 0.3);
-
-      const osc2 = audioCtx.createOscillator();
-      const gain2 = audioCtx.createGain();
-      osc2.type = 'sine';
-      osc2.frequency.setValueAtTime(783.99, now + 0.12);
-      gain2.gain.setValueAtTime(0.3, now + 0.12);
-      gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-      osc2.connect(gain2);
-      gain2.connect(audioCtx.destination);
-      osc2.start(now + 0.12);
-      osc2.stop(now + 0.5);
-    } else if (type === 'wrong') {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(160, now);
-      osc.frequency.linearRampToValueAtTime(110, now + 0.35);
-      gain.gain.setValueAtTime(0.35, now);
-      gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + 0.35);
-    } else if (type === 'fanfare') {
-      const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
-      notes.forEach((freq, idx) => {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
-        gain.gain.setValueAtTime(0.2, now + idx * 0.08);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.08 + 0.3);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start(now + idx * 0.08);
-        osc.stop(now + idx * 0.08 + 0.3);
-      });
-    }
-  } catch (err) {}
-}
-
-function enableAudio() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  audioCtx.resume().then(() => {
-    document.getElementById('audio-banner').classList.add('hidden');
-    showCustomAlert("info", "準備完了！", "音が出るようになりました。さあ遊ぼう！");
-  });
-}
-
-// === ダイアログ・ローディング ===
-function showCustomAlert(type, title, msg, callback = null) {
-  const modal = document.getElementById('custom-alert');
-  const iconBox = document.getElementById('alert-icon-container');
-  const titleBox = document.getElementById('alert-title');
-  const msgBox = document.getElementById('alert-message');
-  const btnCancel = document.getElementById('alert-btn-cancel');
-
-  iconBox.className = "w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl ";
-  btnCancel.classList.add('hidden');
-  
-  if (type === 'success') {
-    iconBox.classList.add('bg-emerald-100', 'text-emerald-600');
-    iconBox.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
-  } else if (type === 'error') {
-    iconBox.classList.add('bg-rose-100', 'text-rose-600');
-    iconBox.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i>';
-  } else if (type === 'warning') {
-    iconBox.classList.add('bg-amber-100', 'text-amber-600');
-    iconBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
-  } else {
-    iconBox.classList.add('bg-indigo-100', 'text-indigo-600');
-    iconBox.innerHTML = '<i class="fa-solid fa-circle-info"></i>';
-  }
-
-  titleBox.innerText = title;
-  msgBox.innerHTML = msg;
-  modal.classList.remove('hidden');
-  
-  alertPromiseResolve = () => {
-    modal.classList.add('hidden');
-    if (callback) callback();
-  };
-}
-
-function showCustomConfirm(type, title, msg, callback) {
-  const modal = document.getElementById('custom-alert');
-  const iconBox = document.getElementById('alert-icon-container');
-  const titleBox = document.getElementById('alert-title');
-  const msgBox = document.getElementById('alert-message');
-  const btnCancel = document.getElementById('alert-btn-cancel');
-  const btnOk = document.getElementById('alert-btn-ok');
-
-  iconBox.className = "w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl ";
-  btnCancel.classList.remove('hidden');
-
-  if (type === 'danger') {
-    iconBox.classList.add('bg-rose-100', 'text-rose-600');
-    iconBox.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
-    btnOk.className = "bg-rose-500 hover:bg-rose-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow transition-all";
-  } else {
-    iconBox.classList.add('bg-amber-100', 'text-amber-600');
-    iconBox.innerHTML = '<i class="fa-solid fa-circle-question"></i>';
-    btnOk.className = "bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow transition-all";
-  }
-
-  titleBox.innerText = title;
-  msgBox.innerText = msg;
-  modal.classList.remove('hidden');
-
-  alertPromiseResolve = (confirmed) => {
-    modal.classList.add('hidden');
-    callback(confirmed);
-  };
-}
-
-function closeAlert(isOk) {
-  if (alertPromiseResolve) {
-    alertPromiseResolve(isOk);
-    alertPromiseResolve = null;
-  }
-}
-
-function toggleLoading(show) {
-  document.getElementById('loading-overlay').classList.toggle('hidden', !show);
-}
-
-function updateLoadingStatus(text) {
-  document.getElementById('loading-status-text').innerHTML = `${text}<br>ちょっと待ってね！`;
+    const page = document.getElementById(`page-${t}`);     const isActive = t === tabId;     if (btn) {       if (t === 'scenes') {         btn.className = isActive ? "px-6 py-2.5 rounded-xl text-sm font-black bg-white text-amber-700 shadow-sm flex items-center gap-1.5" : "px-6 py-2.5 rounded-xl text-sm font-black text-amber-700 hover:bg-white/50 flex items-center gap-1.5";       } else if (t === 'settings') {         btn.className = isActive ? "px-6 py-2.5 rounded-xl text-sm font-black bg-white text-teal-700 shadow-sm flex items-center gap-1.5" : "px-6 py-2.5 rounded-xl text-sm font-black text-teal-700 hover:bg-white/50 flex items-center gap-1.5";       } else {         btn.className = isActive ? "px-6 py-2.5 rounded-xl text-sm font-black bg-white text-indigo-700 shadow-sm flex items-center gap-1.5" : "px-6 py-2.5 rounded-xl text-sm font-black text-indigo-600 hover:bg-white/50 flex items-center gap-1.5";       }     }     if (page) page.classList.toggle('hidden', !isActive);   });    if (tabId === 'practice' && typeof renderChoiceBoard === 'function') renderChoiceBoard();   if (tabId === 'scenes' && typeof renderSceneBoard === 'function') renderSceneBoard();   if (tabId === 'settings') {     if (typeof renderLibraryGrid === 'function') renderLibraryGrid();     if (typeof renderSettingsForms === 'function') renderSettingsForms();   } }  // === サウンド再生 === function playSound(type) {   if (!window.audioCtx) window.audioCtx = new (window.AudioContext \vert{}\vert{} window.webkitAudioContext)();   if (window.audioCtx.state === 'suspended') window.audioCtx.resume();   try {     const now = window.audioCtx.currentTime;     if (type === 'correct' \vert{}\vert{} type === 'complete') {       const osc1 = window.audioCtx.createOscillator();       const gain1 = window.audioCtx.createGain();       osc1.type = 'sine';       osc1.frequency.setValueAtTime(659.25, now);       gain1.gain.setValueAtTime(0.3, now);       gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.3);       osc1.connect(gain1);       gain1.connect(window.audioCtx.destination);       osc1.start(now);       osc1.stop(now + 0.3);        const osc2 = window.audioCtx.createOscillator();       const gain2 = window.audioCtx.createGain();       osc2.type = 'sine';       osc2.frequency.setValueAtTime(783.99, now + 0.12);       gain2.gain.setValueAtTime(0.3, now + 0.12);       gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.5);       osc2.connect(gain2);       gain2.connect(window.audioCtx.destination);       osc2.start(now + 0.12);       osc2.stop(now + 0.5);     } else if (type === 'wrong') {       const osc = window.audioCtx.createOscillator();       const gain = window.audioCtx.createGain();       osc.type = 'triangle';       osc.frequency.setValueAtTime(160, now);       osc.frequency.linearRampToValueAtTime(110, now + 0.35);       gain.gain.setValueAtTime(0.35, now);       gain.gain.linearRampToValueAtTime(0.01, now + 0.35);       osc.connect(gain);       gain.connect(window.audioCtx.destination);       osc.start(now);       osc.stop(now + 0.35);     } else if (type === 'fanfare') {       const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];       notes.forEach((freq, idx) => {         const osc = window.audioCtx.createOscillator();         const gain = window.audioCtx.createGain();         osc.type = 'triangle';         osc.frequency.setValueAtTime(freq, now + idx * 0.08);         gain.gain.setValueAtTime(0.2, now + idx * 0.08);         gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.08 + 0.3);         osc.connect(gain);         gain.connect(window.audioCtx.destination);         osc.start(now + idx * 0.08);         osc.stop(now + idx * 0.08 + 0.3);       });     }   } catch (err) {} }  function enableAudio() {   if (!window.audioCtx) window.audioCtx = new (window.AudioContext \vert{}\vert{} window.webkitAudioContext)();   window.audioCtx.resume().then(() => {     const banner = document.getElementById('audio-banner');     if (banner) banner.classList.add('hidden');     showCustomAlert("info", "準備完了！", "音が出るようになりました。さあ遊ぼう！");   }); }  // === ダイアログ・ローディング === function showCustomAlert(type, title, msg, callback = null) {   const modal = document.getElementById('custom-alert');   const iconBox = document.getElementById('alert-icon-container');   const titleBox = document.getElementById('alert-title');   const msgBox = document.getElementById('alert-message');   const btnCancel = document.getElementById('alert-btn-cancel');    if (!modal) return;   iconBox.className = "w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl ";   btnCancel.classList.add('hidden');      if (type === 'success') {     iconBox.classList.add('bg-emerald-100', 'text-emerald-600');     iconBox.innerHTML = '<i class="fa-solid fa-circle-check"></i>';   } else if (type === 'error') {     iconBox.classList.add('bg-rose-100', 'text-rose-600');     iconBox.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i>';   } else if (type === 'warning') {     iconBox.classList.add('bg-amber-100', 'text-amber-600');     iconBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';   } else {     iconBox.classList.add('bg-indigo-100', 'text-indigo-600');     iconBox.innerHTML = '<i class="fa-solid fa-circle-info"></i>';   }    titleBox.innerText = title;   msgBox.innerHTML = msg;   modal.classList.remove('hidden');      window.alertPromiseResolve = () => {     modal.classList.add('hidden');     if (callback) callback();   }; }  function showCustomConfirm(type, title, msg, callback) {   const modal = document.getElementById('custom-alert');   const iconBox = document.getElementById('alert-icon-container');   const titleBox = document.getElementById('alert-title');   const msgBox = document.getElementById('alert-message');   const btnCancel = document.getElementById('alert-btn-cancel');   const btnOk = document.getElementById('alert-btn-ok');    if (!modal) return;   iconBox.className = "w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl ";   btnCancel.classList.remove('hidden');    if (type === 'danger') {     iconBox.classList.add('bg-rose-100', 'text-rose-600');     iconBox.innerHTML = '<i class="fa-solid fa-trash-can"></i>';     btnOk.className = "bg-rose-500 hover:bg-rose-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow transition-all";   } else {     iconBox.classList.add('bg-amber-100', 'text-amber-600');     iconBox.innerHTML = '<i class="fa-solid fa-circle-question"></i>';     btnOk.className = "bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow transition-all";   }    titleBox.innerText = title;   msgBox.innerText = msg;   modal.classList.remove('hidden');    window.alertPromiseResolve = (confirmed) => {     modal.classList.add('hidden');     callback(confirmed);   }; }  function closeAlert(isOk) {   if (window.alertPromiseResolve) {     window.alertPromiseResolve(isOk);     window.alertPromiseResolve = null;   } }  function toggleLoading(show) {   const el = document.getElementById('loading-overlay');   if (el) el.classList.toggle('hidden', !show); }  function updateLoadingStatus(text) {   const el = document.getElementById('loading-status-text');   if (el) el.innerHTML = `${text}<br>ちょっと待ってね！`;
 }
 
 function closeCelebration() {
-  document.getElementById('celebration-overlay').classList.add('hidden');
+  const el = document.getElementById('celebration-overlay');
+  if (el) el.classList.add('hidden');
 }
 
 // === アプリ起動初期化（完全同期・安全実行） ===
@@ -444,16 +297,16 @@ window.onload = async () => {
   try {
     await initDatabase();
     await loadLibrary();
-    await initScenes();
-    await initChoiceScenes();
-    initGitHubConfig();
+    if (typeof initScenes === 'function') await initScenes();
+    if (typeof initChoiceScenes === 'function') await initChoiceScenes();
+    if (typeof initGitHubConfig === 'function') initGitHubConfig();
     
-    if (library.length === 0) {
+    if (window.library.length === 0) {
       const sampleCards = [
-        { id: 's_apple', word: 'りんご', imageUrl: fallbackSVGs.apple },
-        { id: 's_banana', word: 'バナナ', imageUrl: fallbackSVGs.banana },
-        { id: 's_dog', word: 'いぬ', imageUrl: fallbackSVGs.dog },
-        { id: 's_car', word: 'くるま', imageUrl: fallbackSVGs.car }
+        { id: 's_apple', word: 'りんご', imageUrl: window.fallbackSVGs.apple },
+        { id: 's_banana', word: 'バナナ', imageUrl: window.fallbackSVGs.banana },
+        { id: 's_dog', word: 'いぬ', imageUrl: window.fallbackSVGs.dog },
+        { id: 's_car', word: 'くるま', imageUrl: window.fallbackSVGs.car }
       ];
       for (let sample of sampleCards) {
         await saveCardToDatabase(sample);
@@ -461,11 +314,11 @@ window.onload = async () => {
       await loadLibrary();
     }
 
-    renderChoiceBoard();
-    renderSceneBoard();
+    if (typeof renderChoiceBoard === 'function') renderChoiceBoard();
+    if (typeof renderSceneBoard === 'function') renderSceneBoard();
 
     document.body.addEventListener('click', () => {
-      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+      if (window.audioCtx && window.audioCtx.state === 'suspended') window.audioCtx.resume();
     }, { once: true });
   } catch (err) {
     console.error("Initialization error:", err);
