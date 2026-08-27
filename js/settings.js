@@ -2,11 +2,11 @@
 
 // AIひらがな変換
 async function convertToHiragana(wordText) {
-  if (GEMINI_API_KEY && GEMINI_API_KEY !== "YOUR_API_KEY") {
+  if (window.GEMINI_API_KEY && window.GEMINI_API_KEY !== "YOUR_API_KEY") {
     const textPrompt = `日本語「${wordText}」をすべて「ひらがな」に変換してください。漢字・カタカナ・アルファベットは子供向けひらがなにし、余計な説明や記号を含めず変換後の文字列のみを1行で出力してください。`;
     try {
-      const apiResponse = await callGeminiText(textPrompt, GEMINI_API_KEY);
-      return apiResponse.replace(/[\r\n\s\.\,\、\.「」\、\。"'`]/g, "");
+      const apiResponse = await callGeminiText(textPrompt, window.GEMINI_API_KEY);
+      return apiResponse.replace(/[\r\n\s\.\,\、\。「」"'`]/g, "");
     } catch (e) {}
   }
   return wordText.replace(/[\u30a1-\u30f6]/g, m => String.fromCharCode(m.charCodeAt(0) - 0x60));
@@ -74,7 +74,7 @@ function generateProceduralCard(word) {
 // Plan A: AIカード生成
 async function generateCard() {
   const wordInput = document.getElementById('card-input-word');
-  const word = wordInput.value.trim();
+  const word = wordInput ? wordInput.value.trim() : "";
   if (!word) {
     showCustomAlert("warning", "入力エラー", "絵カードにしたい言葉を入力してね！");
     return;
@@ -84,10 +84,10 @@ async function generateCard() {
   updateLoadingStatus("AIがお言葉をチェックしています...");
   const hiraganaWord = await convertToHiragana(word);
 
-  const existing = library.find(item => item.word === hiraganaWord);
+  const existing = window.library.find(item => item.word === hiraganaWord);
   if (existing) {
     showCustomAlert("info", "すでにあります！", `「${hiraganaWord}」のカードはすでに作ってあるため、再利用します。`, () => {
-      wordInput.value = '';
+      if (wordInput) wordInput.value = '';
     });
     toggleLoading(false);
     return;
@@ -99,10 +99,10 @@ async function generateCard() {
     let imageUrl = '';
     let isFallbackToDemo = false;
 
-    if (GEMINI_API_KEY && GEMINI_API_KEY !== "YOUR_API_KEY") {
+    if (window.GEMINI_API_KEY && window.GEMINI_API_KEY !== "YOUR_API_KEY") {
       try {
         const stylizedPrompt = `flat vector icon of a cute sweet ${word}, high quality design, minimal detail, colorful children cartoon illustration style, solid clean white background, single isolated object, bright colors, friendly, no text, no characters, no words`;
-        const base64Encoded = await callImagen(stylizedPrompt, GEMINI_API_KEY);
+        const base64Encoded = await callImagen(stylizedPrompt, window.GEMINI_API_KEY);
         imageUrl = `data:image/png;base64,${base64Encoded}`;
       } catch (imagenErr) {
         isFallbackToDemo = true;
@@ -128,7 +128,7 @@ async function generateCard() {
       } else {
         showCustomAlert("success", "できたよ！", `「${hiraganaWord}」のえカードができました！`);
       }
-      wordInput.value = '';
+      if (wordInput) wordInput.value = '';
     }
   } catch (error) {
     showCustomAlert("error", "エラーが発生しました", "作成できませんでした。もう一度お試しください。");
@@ -140,8 +140,10 @@ async function generateCard() {
 // Plan B: 画像ファイル登録
 function triggerUploadFileInput() {
   const fileInput = document.getElementById('upload-card-file');
-  fileInput.value = "";
-  fileInput.click();
+  if (fileInput) {
+    fileInput.value = "";
+    fileInput.click();
+  }
 }
 
 async function previewUploadImage(event) {
@@ -152,14 +154,22 @@ async function previewUploadImage(event) {
     toggleLoading(true);
     updateLoadingStatus("画像を読み込んでいます...");
     const optimizedBase64 = await processImageFile(file, 512, 512);
-    uploadedImageBase64 = optimizedBase64;
+    window.uploadedImageBase64 = optimizedBase64;
     
-    document.getElementById('upload-preview-img').src = uploadedImageBase64;
-    document.getElementById('upload-preview-container').classList.remove('hidden');
-    document.getElementById('upload-file-label-text').innerText = file.name.length > 12 ? file.name.substr(0,10) + "..." : file.name;
-    document.getElementById('upload-status-subtext').innerText = "画像を選択中";
-    document.getElementById('upload-status-subtext').className = "text-[10px] text-teal-600 font-black";
-    document.getElementById('btn-reselect-upload').classList.remove('hidden');
+    const previewImg = document.getElementById('upload-preview-img');
+    const previewCont = document.getElementById('upload-preview-container');
+    const labelText = document.getElementById('upload-file-label-text');
+    const statusText = document.getElementById('upload-status-subtext');
+    const reselectBtn = document.getElementById('btn-reselect-upload');
+
+    if (previewImg) previewImg.src = window.uploadedImageBase64;
+    if (previewCont) previewCont.classList.remove('hidden');
+    if (labelText) labelText.innerText = file.name.length > 12 ? file.name.substr(0,10) + "..." : file.name;
+    if (statusText) {
+      statusText.innerText = "画像を選択中";
+      statusText.className = "text-[10px] text-teal-600 font-black";
+    }
+    if (reselectBtn) reselectBtn.classList.remove('hidden');
     playSound('complete');
   } catch (err) {
     showCustomAlert("error", "画像エラー", "画像の読み込みに失敗しました。");
@@ -170,8 +180,8 @@ async function previewUploadImage(event) {
 
 async function createUploadedCard() {
   const wordInput = document.getElementById('upload-card-word');
-  const word = wordInput.value.trim();
-  if (!word || !uploadedImageBase64) {
+  const word = wordInput ? wordInput.value.trim() : "";
+  if (!word || !window.uploadedImageBase64) {
     showCustomAlert("warning", "入力エラー", "言葉と画像ファイルの両方を指定してね！");
     return;
   }
@@ -183,7 +193,7 @@ async function createUploadedCard() {
     const newCard = {
       id: 'card_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
       word: hiraganaWord,
-      imageUrl: uploadedImageBase64,
+      imageUrl: window.uploadedImageBase64,
       createdAt: new Date().toISOString()
     };
     await saveCardToDatabase(newCard);
@@ -198,21 +208,31 @@ async function createUploadedCard() {
 }
 
 function resetUploadForm() {
-  document.getElementById('upload-card-word').value = "";
-  document.getElementById('upload-card-file').value = "";
-  document.getElementById('upload-preview-img').src = "";
-  document.getElementById('upload-preview-container').classList.add('hidden');
-  document.getElementById('upload-file-label-text').innerText = "画像ファイルを選択";
-  document.getElementById('upload-status-subtext').innerText = "画像未選択";
-  document.getElementById('upload-status-subtext').className = "text-[10px] text-slate-400 font-bold";
-  document.getElementById('btn-reselect-upload').classList.add('hidden');
-  uploadedImageBase64 = "";
+  const wordInput = document.getElementById('upload-card-word');
+  const fileInput = document.getElementById('upload-card-file');
+  const previewImg = document.getElementById('upload-preview-img');
+  const previewCont = document.getElementById('upload-preview-container');
+  const labelText = document.getElementById('upload-file-label-text');
+  const statusText = document.getElementById('upload-status-subtext');
+  const reselectBtn = document.getElementById('btn-reselect-upload');
+
+  if (wordInput) wordInput.value = "";
+  if (fileInput) fileInput.value = "";
+  if (previewImg) previewImg.src = "";
+  if (previewCont) previewCont.classList.add('hidden');
+  if (labelText) labelText.innerText = "画像ファイルを選択";
+  if (statusText) {
+    statusText.innerText = "画像未選択";
+    statusText.className = "text-[10px] text-slate-400 font-bold";
+  }
+  if (reselectBtn) reselectBtn.classList.add('hidden');
+  window.uploadedImageBase64 = "";
 }
 
 // ライブラリ管理
 function updateLibraryCount() {
   const el = document.getElementById('library-count');
-  if (el) el.innerText = `${library.length}枚`;
+  if (el) el.innerText = `${window.library.length}枚`;
 }
 
 function renderLibraryGrid() {
@@ -220,7 +240,7 @@ function renderLibraryGrid() {
   const emptyState = document.getElementById('library-empty');
   if (!grid || !emptyState) return;
 
-  if (library.length === 0) {
+  if (!window.library || window.library.length === 0) {
     grid.classList.add('hidden');
     emptyState.classList.remove('hidden');
     return;
@@ -229,7 +249,7 @@ function renderLibraryGrid() {
   grid.classList.remove('hidden');
   emptyState.classList.add('hidden');
 
-  grid.innerHTML = library.map(card => `
+  grid.innerHTML = window.library.map(card => `
     <div class="bg-white p-3 rounded-2xl border-2 border-slate-100 hover:border-indigo-200 card-shadow relative group flex flex-col items-center transition-all duration-200">
       <div class="absolute -top-1.5 -right-1.5 flex items-center gap-1 z-10">
         <button onclick="openEditCardModal('${card.id}')" title="修正・編集" class="bg-indigo-500 hover:bg-indigo-600 text-white w-7 h-7 rounded-full flex items-center justify-center shadow-md opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all duration-200">
@@ -251,14 +271,14 @@ function renderLibraryGrid() {
 function confirmDeleteCard(id, word) {
   showCustomConfirm("warning", "カードの削除", `「${word}」のカードをけしてもいいですか？`, async (isConfirmed) => {
     if (isConfirmed) {
-      if (db) {
-        const transaction = db.transaction(['cards'], 'readwrite');
+      if (window.db) {
+        const transaction = window.db.transaction(['cards'], 'readwrite');
         const store = transaction.objectStore('cards');
         await store.delete(id);
       }
       
       // チョイス場面内のカード参照を解除
-      choiceScenes.forEach(s => {
+      window.choiceScenes.forEach(s => {
         if (s.cards) {
           s.cards.forEach((c, idx) => {
             if (c && c.id === id) s.cards[idx] = null;
@@ -277,7 +297,7 @@ function confirmResetLibrary() {
   showCustomConfirm("danger", "すべて削除", "つくった絵カードをすべて削除します。よろしいですか？", async (isConfirmed) => {
     if (isConfirmed) {
       await clearDatabase();
-      choiceScenes.forEach(s => {
+      window.choiceScenes.forEach(s => {
         s.cards = [null, null, null, null, null];
       });
       await saveChoiceScenesToStorage();
@@ -290,30 +310,39 @@ function confirmResetLibrary() {
 
 // カード修正・選び直し
 function openEditCardModal(cardId) {
-  const card = library.find(c => c.id === cardId);
+  const card = window.library.find(c => c.id === cardId);
   if (!card) return;
 
-  document.getElementById('edit-card-id').value = card.id;
-  document.getElementById('edit-word-input').value = card.word;
-  document.getElementById('edit-preview-img').src = card.imageUrl;
-  document.getElementById('edit-file-input').value = "";
-  
-  editingCardOriginalImage = card.imageUrl;
-  editingCardImageBase64 = card.imageUrl;
+  const idInput = document.getElementById('edit-card-id');
+  const wordInput = document.getElementById('edit-word-input');
+  const previewImg = document.getElementById('edit-preview-img');
+  const fileInput = document.getElementById('edit-file-input');
+  const modal = document.getElementById('edit-card-modal');
 
-  document.getElementById('edit-card-modal').classList.remove('hidden');
+  if (idInput) idInput.value = card.id;
+  if (wordInput) wordInput.value = card.word;
+  if (previewImg) previewImg.src = card.imageUrl;
+  if (fileInput) fileInput.value = "";
+  
+  window.editingCardOriginalImage = card.imageUrl;
+  window.editingCardImageBase64 = card.imageUrl;
+
+  if (modal) modal.classList.remove('hidden');
 }
 
 function closeEditCardModal() {
-  document.getElementById('edit-card-modal').classList.add('hidden');
-  editingCardImageBase64 = "";
-  editingCardOriginalImage = "";
+  const modal = document.getElementById('edit-card-modal');
+  if (modal) modal.classList.add('hidden');
+  window.editingCardImageBase64 = "";
+  window.editingCardOriginalImage = "";
 }
 
 function triggerEditFileInput() {
   const fileInput = document.getElementById('edit-file-input');
-  fileInput.value = "";
-  fileInput.click();
+  if (fileInput) {
+    fileInput.value = "";
+    fileInput.click();
+  }
 }
 
 async function previewEditImage(event) {
@@ -324,8 +353,9 @@ async function previewEditImage(event) {
     toggleLoading(true);
     updateLoadingStatus("画像を読み込んでいます...");
     const optimizedBase64 = await processImageFile(file, 512, 512);
-    editingCardImageBase64 = optimizedBase64;
-    document.getElementById('edit-preview-img').src = optimizedBase64;
+    window.editingCardImageBase64 = optimizedBase64;
+    const previewImg = document.getElementById('edit-preview-img');
+    if (previewImg) previewImg.src = optimizedBase64;
     playSound('complete');
   } catch (err) {
     showCustomAlert("error", "画像エラー", "画像の読み込みに失敗しました。別の画像をお試しください。");
@@ -336,51 +366,59 @@ async function previewEditImage(event) {
 
 function openPresetSelectForEdit() {
   const container = document.getElementById('edit-presets-container');
-  const allPresets = { ...fallbackSVGs, ...routineSVGs };
+  const allPresets = { ...window.fallbackSVGs, ...window.routineSVGs };
 
-  container.innerHTML = Object.entries(allPresets).map(([key, svg]) => `
-    <div onclick="selectPresetForCardEdit('${key}')" class="bg-slate-50 border-2 border-slate-100 hover:border-amber-400 p-2 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all aspect-square active:scale-95 shadow-sm">
-      <img class="w-12 h-12 object-contain pointer-events-none" src="${svg}" alt="">
-      <span class="text-[10px] font-black text-slate-500 mt-1 truncate w-full text-center">${key}</span>
-    </div>
-  `).join('');
+  if (container) {
+    container.innerHTML = Object.entries(allPresets).map(([key, svg]) => `
+      <div onclick="selectPresetForCardEdit('${key}')" class="bg-slate-50 border-2 border-slate-100 hover:border-amber-400 p-2 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all aspect-square active:scale-95 shadow-sm">
+        <img class="w-12 h-12 object-contain pointer-events-none" src="${svg}" alt="">
+        <span class="text-[10px] font-black text-slate-500 mt-1 truncate w-full text-center">${key}</span>
+      </div>
+    `).join('');
+  }
 
-  document.getElementById('edit-preset-modal').classList.remove('hidden');
+  const modal = document.getElementById('edit-preset-modal');
+  if (modal) modal.classList.remove('hidden');
 }
 
 function closeEditPresetModal() {
-  document.getElementById('edit-preset-modal').classList.add('hidden');
+  const modal = document.getElementById('edit-preset-modal');
+  if (modal) modal.classList.add('hidden');
 }
 
 function selectPresetForCardEdit(key) {
-  const allPresets = { ...fallbackSVGs, ...routineSVGs };
+  const allPresets = { ...window.fallbackSVGs, ...window.routineSVGs };
   const selectedSvg = allPresets[key];
   if (selectedSvg) {
-    editingCardImageBase64 = selectedSvg;
-    document.getElementById('edit-preview-img').src = selectedSvg;
+    window.editingCardImageBase64 = selectedSvg;
+    const previewImg = document.getElementById('edit-preview-img');
+    if (previewImg) previewImg.src = selectedSvg;
     playSound('complete');
   }
   closeEditPresetModal();
 }
 
 function resetEditImageToOriginal() {
-  if (editingCardOriginalImage) {
-    editingCardImageBase64 = editingCardOriginalImage;
-    document.getElementById('edit-preview-img').src = editingCardOriginalImage;
+  if (window.editingCardOriginalImage) {
+    window.editingCardImageBase64 = window.editingCardOriginalImage;
+    const previewImg = document.getElementById('edit-preview-img');
+    if (previewImg) previewImg.src = window.editingCardOriginalImage;
     playSound('complete');
   }
 }
 
 async function saveCardEdits() {
-  const cardId = document.getElementById('edit-card-id').value;
-  const newWordRaw = document.getElementById('edit-word-input').value.trim();
+  const idInput = document.getElementById('edit-card-id');
+  const wordInput = document.getElementById('edit-word-input');
+  const cardId = idInput ? idInput.value : "";
+  const newWordRaw = wordInput ? wordInput.value.trim() : "";
 
   if (!newWordRaw) {
     showCustomAlert("warning", "入力エラー", "カードの名前を入力してね！");
     return;
   }
 
-  const card = library.find(c => c.id === cardId);
+  const card = window.library.find(c => c.id === cardId);
   if (!card) return;
 
   toggleLoading(true);
@@ -390,15 +428,15 @@ async function saveCardEdits() {
   const oldImage = card.imageUrl;
 
   card.word = newWordHiragana;
-  if (editingCardImageBase64) {
-    card.imageUrl = editingCardImageBase64;
+  if (window.editingCardImageBase64) {
+    card.imageUrl = window.editingCardImageBase64;
   }
 
   await saveCardToDatabase(card);
   await loadLibrary();
 
   // 1. チョイス場面内のカードを更新
-  choiceScenes.forEach(s => {
+  window.choiceScenes.forEach(s => {
     if (s.cards) {
       s.cards.forEach((c, idx) => {
         if (c && c.id === cardId) {
@@ -410,7 +448,7 @@ async function saveCardEdits() {
   await saveChoiceScenesToStorage();
 
   // 2. 手順表シーン内のカード（画像や言葉が一致するもの）も更新
-  scenes.forEach(s => {
+  window.scenes.forEach(s => {
     if (s.steps) {
       s.steps.forEach(st => {
         if (st.img === oldImage || st.word === oldWord) {
@@ -436,10 +474,10 @@ async function buildBackupDataObject() {
   return {
     version: "5.5",
     exportDate: new Date().toISOString(),
-    library: library,
-    scenes: scenes,
-    choiceScenes: choiceScenes,
-    geminiApiKey: GEMINI_API_KEY || ""
+    library: window.library,
+    scenes: window.scenes,
+    choiceScenes: window.choiceScenes,
+    geminiApiKey: window.GEMINI_API_KEY || ""
   };
 }
 
@@ -481,16 +519,16 @@ async function restoreFromBackupObject(imported) {
   }
 
   if (imported.scenes && Array.isArray(imported.scenes)) {
-    scenes = imported.scenes;
+    window.scenes = imported.scenes;
   }
 
   if (imported.choiceScenes && Array.isArray(imported.choiceScenes)) {
-    choiceScenes = imported.choiceScenes;
+    window.choiceScenes = imported.choiceScenes;
   }
 
-  currentSceneId = (scenes && scenes.length > 0) ? scenes[0].id : "";
-  currentChoiceSceneId = (choiceScenes && choiceScenes.length > 0) ? choiceScenes[0].id : "";
-  selectedChoiceCardIndex = null;
+  window.currentSceneId = (window.scenes && window.scenes.length > 0) ? window.scenes[0].id : "";
+  window.currentChoiceSceneId = (window.choiceScenes && window.choiceScenes.length > 0) ? window.choiceScenes[0].id : "";
+  window.selectedChoiceCardIndex = null;
 
   initSceneCheckStates();
   await saveScenesToStorage();
@@ -528,7 +566,8 @@ async function importBackupData(event) {
             showCustomAlert("error", "復元エラー", "バックアップの復元中にエラーが発生しました。");
           }
         }
-        if (document.getElementById('backup-file-input')) document.getElementById('backup-file-input').value = "";
+        const fileInp = document.getElementById('backup-file-input');
+        if (fileInp) fileInp.value = "";
       });
 
     } catch (err) {
@@ -559,10 +598,10 @@ function initGitHubConfig() {
   const branch = localStorage.getItem('github_branch') || "main";
   const path = localStorage.getItem('github_path') || "data/ecard_backup.json";
 
-  GITHUB_TOKEN = token;
-  GITHUB_REPO = repo;
-  GITHUB_BRANCH = branch;
-  GITHUB_PATH = path;
+  window.GITHUB_TOKEN = token;
+  window.GITHUB_REPO = repo;
+  window.GITHUB_BRANCH = branch;
+  window.GITHUB_PATH = path;
 
   const elToken = document.getElementById('github-token-input');
   const elRepo = document.getElementById('github-repo-input');
@@ -578,20 +617,25 @@ function initGitHubConfig() {
 }
 
 function saveGitHubConfig() {
-  const token = document.getElementById('github-token-input').value.trim();
-  const repo = document.getElementById('github-repo-input').value.trim().replace(/^https?:\/\/github\.com\//, '').replace(/\.git$/, '');
-  const branch = document.getElementById('github-branch-input').value.trim() || "main";
-  const path = document.getElementById('github-path-input').value.trim() || "data/ecard_backup.json";
+  const elToken = document.getElementById('github-token-input');
+  const elRepo = document.getElementById('github-repo-input');
+  const elBranch = document.getElementById('github-branch-input');
+  const elPath = document.getElementById('github-path-input');
+
+  const token = elToken ? elToken.value.trim() : "";
+  const repo = elRepo ? elRepo.value.trim().replace(/^https?:\/\/github\.com\//, '').replace(/\.git$/, '') : "";
+  const branch = (elBranch && elBranch.value.trim()) ? elBranch.value.trim() : "main";
+  const path = (elPath && elPath.value.trim()) ? elPath.value.trim() : "data/ecard_backup.json";
 
   if (repo && !repo.includes('/')) {
     showCustomAlert("warning", "リポジトリ指定エラー", "リポジトリ名は「ユーザー名/リポジトリ名」（例: username/ecard-app）の形式で入力してください。");
     return;
   }
 
-  GITHUB_TOKEN = token;
-  GITHUB_REPO = repo;
-  GITHUB_BRANCH = branch;
-  GITHUB_PATH = path;
+  window.GITHUB_TOKEN = token;
+  window.GITHUB_REPO = repo;
+  window.GITHUB_BRANCH = branch;
+  window.GITHUB_PATH = path;
 
   localStorage.setItem('github_pat', token);
   localStorage.setItem('github_repo', repo);
@@ -615,8 +659,10 @@ function updateGitHubStatusBadge(isConnected) {
 }
 
 async function testGitHubConnection() {
-  const token = document.getElementById('github-token-input').value.trim();
-  const repo = document.getElementById('github-repo-input').value.trim().replace(/^https?:\/\/github\.com\//, '').replace(/\.git$/, '');
+  const elToken = document.getElementById('github-token-input');
+  const elRepo = document.getElementById('github-repo-input');
+  const token = elToken ? elToken.value.trim() : "";
+  const repo = elRepo ? elRepo.value.trim().replace(/^https?:\/\/github\.com\//, '').replace(/\.git$/, '') : "";
   const spinner = document.getElementById('github-test-spinner');
 
   if (!token || !repo) {
@@ -624,7 +670,7 @@ async function testGitHubConnection() {
     return;
   }
 
-  spinner.classList.remove('hidden');
+  if (spinner) spinner.classList.remove('hidden');
   try {
     const res = await fetch(`https://api.github.com/repos/${repo}`, {
       headers: {
@@ -649,15 +695,20 @@ async function testGitHubConnection() {
   } catch (err) {
     showCustomAlert("error", "GitHub接続エラー", `接続に失敗しました：<br>${err.message}`);
   } finally {
-    spinner.classList.add('hidden');
+    if (spinner) spinner.classList.add('hidden');
   }
 }
 
 async function saveBackupToGitHub() {
-  const token = document.getElementById('github-token-input').value.trim() || GITHUB_TOKEN;
-  const repo = document.getElementById('github-repo-input').value.trim().replace(/^https?:\/\/github\.com\//, '').replace(/\.git$/, '') || GITHUB_REPO;
-  const branch = document.getElementById('github-branch-input').value.trim() || GITHUB_BRANCH || "main";
-  const path = document.getElementById('github-path-input').value.trim() || GITHUB_PATH || "data/ecard_backup.json";
+  const elToken = document.getElementById('github-token-input');
+  const elRepo = document.getElementById('github-repo-input');
+  const elBranch = document.getElementById('github-branch-input');
+  const elPath = document.getElementById('github-path-input');
+
+  const token = (elToken && elToken.value.trim()) ? elToken.value.trim() : window.GITHUB_TOKEN;
+  const repo = (elRepo && elRepo.value.trim()) ? elRepo.value.trim().replace(/^https?:\/\/github\.com\//, '').replace(/\.git$/, '') : window.GITHUB_REPO;
+  const branch = (elBranch && elBranch.value.trim()) ? elBranch.value.trim() : (window.GITHUB_BRANCH || "main");
+  const path = (elPath && elPath.value.trim()) ? elPath.value.trim() : (window.GITHUB_PATH || "data/ecard_backup.json");
 
   if (!token || !repo) {
     showCustomAlert("warning", "GitHub設定が必要です", "GitHubへのバックアップには、Personal Access Token (PAT) と リポジトリ名 の設定が必要です。");
@@ -668,7 +719,6 @@ async function saveBackupToGitHub() {
   updateLoadingStatus("GitHubにバックアップデータを送信しています...");
 
   try {
-    // 既存ファイルのSHAを取得
     let existingSha = null;
     const getRes = await fetch(`https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}`, {
       headers: {
@@ -731,10 +781,15 @@ async function saveBackupToGitHub() {
 }
 
 async function loadBackupFromGitHub() {
-  const token = document.getElementById('github-token-input').value.trim() || GITHUB_TOKEN;
-  const repo = document.getElementById('github-repo-input').value.trim().replace(/^https?:\/\/github\.com\//, '').replace(/\.git$/, '') || GITHUB_REPO;
-  const branch = document.getElementById('github-branch-input').value.trim() || GITHUB_BRANCH || "main";
-  const path = document.getElementById('github-path-input').value.trim() || GITHUB_PATH || "data/ecard_backup.json";
+  const elToken = document.getElementById('github-token-input');
+  const elRepo = document.getElementById('github-repo-input');
+  const elBranch = document.getElementById('github-branch-input');
+  const elPath = document.getElementById('github-path-input');
+
+  const token = (elToken && elToken.value.trim()) ? elToken.value.trim() : window.GITHUB_TOKEN;
+  const repo = (elRepo && elRepo.value.trim()) ? elRepo.value.trim().replace(/^https?:\/\/github\.com\//, '').replace(/\.git$/, '') : window.GITHUB_REPO;
+  const branch = (elBranch && elBranch.value.trim()) ? elBranch.value.trim() : (window.GITHUB_BRANCH || "main");
+  const path = (elPath && elPath.value.trim()) ? elPath.value.trim() : (window.GITHUB_PATH || "data/ecard_backup.json");
 
   if (!repo) {
     showCustomAlert("warning", "設定が必要です", "リポジトリ名を入力してください。");
@@ -787,13 +842,14 @@ async function loadBackupFromGitHub() {
 
 // APIキー管理
 function saveApiKey() {
-  const keyVal = document.getElementById('settings-api-key-input').value.trim();
+  const el = document.getElementById('settings-api-key-input');
+  const keyVal = el ? el.value.trim() : "";
   processAndSetApiKey(keyVal);
   showCustomAlert("success", "APIキー保存完了", "新しいAPIキーを設定しました！");
 }
 
 function processAndSetApiKey(key) {
-  GEMINI_API_KEY = key;
+  window.GEMINI_API_KEY = key;
   if (key) {
     localStorage.setItem('gemini_api_key', key);
     const keyInput = document.getElementById('settings-api-key-input');
@@ -820,13 +876,14 @@ function updateApiStatusBadge(isActive) {
 }
 
 async function testGeneralApiKey() {
-  const input = document.getElementById('settings-api-key-input').value.trim();
+  const el = document.getElementById('settings-api-key-input');
+  const input = el ? el.value.trim() : "";
   const spinner = document.getElementById('general-test-spinner');
   if (!input) {
     showCustomAlert("warning", "テスト失敗", "確認したいAPIキーを入力してください。");
     return;
   }
-  spinner.classList.remove('hidden');
+  if (spinner) spinner.classList.remove('hidden');
   try {
     const testRes = await callGeminiText("Say 'OK' in 1 word.", input);
     if (testRes) {
@@ -835,7 +892,7 @@ async function testGeneralApiKey() {
   } catch (err) {
     showCustomAlert("error", "接続テスト失敗", `キーが無効、または通信エラーです。<br>${err.message}`);
   } finally {
-    spinner.classList.add('hidden');
+    if (spinner) spinner.classList.add('hidden');
   }
 }
 
@@ -847,9 +904,6 @@ async function callGeminiText(prompt, key) {
     const payload = { contents: [{ parts: [{ text: prompt }] }] };
     try {
       const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -893,3 +947,9 @@ async function callImagen(prompt, key) {
 }
 
 function clearInput() {
+  const el = document.getElementById('card-input-word');
+  if (el) el.value = '';
+}
+```const el = document.getElementById('card-input-word');
+  if (el) el.value = '';
+}
