@@ -352,8 +352,8 @@ function renderSettingsForms() {
         </div>
 
         <button onclick="confirmRemoveStepFromSettings(${idx}, '${step.word}')" title="このステップを削除" class="text-rose-500 hover:text-rose-700 p-2 text-base self-end md:self-center transition-all">
-          <i class="fa-solid fa-trash-can"></i>
-        </button>
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
       </div>
     `;
   }).join('');
