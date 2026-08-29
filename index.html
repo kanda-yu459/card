@@ -48,14 +48,6 @@
     .star-animation {
       animation: star-spin 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     }
-    .toggle-checkbox:checked {
-      right: 0;
-      border-color: #6366f1;
-      background-color: #4f46e5;
-    }
-    .toggle-checkbox:checked + .toggle-label {
-      background-color: #a5b4fc;
-    }
   </style>
 </head>
 <body class="bg-indigo-50 text-slate-800">
@@ -74,7 +66,7 @@
         </div>
       </div>
 
-      <!-- Navigation Tabs: チョイス・シーン・せってい -->
+      <!-- Navigation Tabs -->
       <nav class="flex flex-wrap bg-indigo-100 p-1.5 rounded-2xl gap-1.5 justify-center">
         <button onclick="switchTab('practice')" id="tab-practice" class="px-6 py-2.5 rounded-xl text-sm font-black transition-all duration-300 flex items-center gap-1.5 bg-white text-indigo-700 shadow-sm">
           <i class="fa-solid fa-arrows-left-right"></i> チョイス
@@ -102,13 +94,10 @@
         </button>
       </div>
 
-      <!-- TAB 1: CHOICE (理想形ワークフロー搭載) -->
+      <!-- TAB 1: CHOICE -->
       <section id="page-practice" class="space-y-4 flex-grow flex flex-col justify-between">
         
-        <!-- Choice Top Control Bar -->
         <div class="bg-white p-4 rounded-3xl border-4 border-indigo-200 card-shadow flex flex-col lg:flex-row items-center justify-between gap-4">
-          
-          <!-- Scene Selector & Title Input -->
           <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
             <div class="flex items-center gap-2">
               <span class="text-xs font-black text-indigo-700 whitespace-nowrap">場面：</span>
@@ -121,10 +110,7 @@
             </div>
           </div>
 
-          <!-- Choice Count & Actions -->
           <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-end">
-            
-            <!-- 2〜5択 切り替えボタン -->
             <div class="flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-200">
               <span class="text-[10px] font-black text-slate-500 px-1.5">選択数:</span>
               <button onclick="setChoiceCount(2)" id="btn-choice-count-2" class="px-3 py-1.5 rounded-xl text-xs font-black transition-all bg-indigo-600 text-white shadow-sm">2択</button>
@@ -133,7 +119,6 @@
               <button onclick="setChoiceCount(5)" id="btn-choice-count-5" class="px-3 py-1.5 rounded-xl text-xs font-black transition-all text-slate-600 hover:bg-white/60">5択</button>
             </div>
 
-            <!-- Save & New & Delete Buttons -->
             <button onclick="saveCurrentChoiceScene()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-black shadow transition-all whitespace-nowrap flex items-center gap-1">
               <i class="fa-solid fa-floppy-disk"></i> この場面を保存
             </button>
@@ -147,16 +132,14 @@
               <i class="fa-solid fa-rotate-right"></i>
             </button>
           </div>
-
         </div>
 
-        <!-- Dynamic Choice Cards Box Grid -->
         <div id="choice-cards-container" class="my-auto py-2 flex-grow flex items-center justify-center w-full min-h-[320px]">
         </div>
 
       </section>
 
-      <!-- TAB 2: SCENES (手順表画面) -->
+      <!-- TAB 2: SCENES -->
       <section id="page-scenes" class="hidden space-y-4 flex-grow flex flex-col">
         <div class="bg-white p-4 rounded-3xl border-4 border-amber-200 card-shadow flex flex-col md:flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-3 w-full md:w-auto">
@@ -196,8 +179,8 @@
       <!-- TAB 3: SETTINGS & CREATE -->
       <section id="page-settings" class="hidden space-y-6 flex-grow flex flex-col">
         
-        <!-- CARD CREATION SECTION -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Plan A: AI -->
           <div class="bg-white p-5 rounded-3xl border-4 border-indigo-100 card-shadow flex flex-col justify-between">
             <div>
               <div class="flex items-center justify-between mb-3">
@@ -227,6 +210,7 @@
             </div>
           </div>
 
+          <!-- Plan B: Upload -->
           <div class="bg-white p-5 rounded-3xl border-4 border-teal-100 card-shadow flex flex-col justify-between">
             <div>
               <h2 class="text-base sm:text-lg font-black text-slate-700 flex items-center gap-2 mb-3">
@@ -265,7 +249,7 @@
           </div>
         </div>
 
-        <!-- LIBRARY MANAGER SECTION -->
+        <!-- Library -->
         <div class="bg-white p-6 rounded-3xl border-4 border-indigo-100 card-shadow">
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
             <h2 class="text-lg font-bold text-slate-700 flex items-center gap-2">
@@ -291,7 +275,7 @@
           <div id="library-grid" class="hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 overflow-y-auto max-h-[350px] p-1"></div>
         </div>
 
-        <!-- BACKUP & RESTORE -->
+        <!-- Backup -->
         <div class="bg-white p-5 rounded-3xl border-4 border-indigo-200 card-shadow">
           <div class="flex items-center gap-2 border-b-2 border-slate-100 pb-3 mb-4">
             <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">
@@ -319,7 +303,7 @@
           </div>
         </div>
 
-        <!-- SCENE EDIT -->
+        <!-- Scene Edit in Settings -->
         <div class="bg-white p-5 rounded-3xl border-4 border-teal-100 card-shadow">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b-2 border-slate-100 pb-3 mb-4">
             <div class="flex items-center gap-2">
@@ -356,7 +340,7 @@
           <div id="settings-form-container" class="space-y-4 max-h-[500px] overflow-y-auto pr-2"></div>
         </div>
 
-        <!-- API Key Widget -->
+        <!-- API Key -->
         <div class="bg-white p-5 rounded-3xl border-4 border-indigo-100 card-shadow">
           <div class="flex items-center gap-2 border-b-2 border-slate-100 pb-3 mb-4">
             <span class="bg-indigo-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">
@@ -817,7 +801,6 @@
         choiceScenes = JSON.parse(JSON.stringify(defaultChoiceScenes));
       }
 
-      // データ構造の自動補正
       choiceScenes.forEach((scene, sIdx) => {
         if (!scene.id) scene.id = 'c_' + Date.now() + '_' + sIdx;
         if (!scene.title) scene.title = 'チョイス ' + (sIdx + 1);
@@ -903,7 +886,6 @@
       const count = scene.count || 2;
       const cards = scene.cards || [];
 
-      // 択数ボタンのアクティブ表示
       [2, 3, 4, 5].forEach(num => {
         const btn = document.getElementById(`btn-choice-count-${num}`);
         if (btn) {
@@ -915,7 +897,6 @@
         }
       });
 
-      // グリッドレイアウト
       let gridClass = "grid gap-4 sm:gap-6 w-full mx-auto ";
       if (count === 2) gridClass += "grid-cols-2 max-w-3xl";
       else if (count === 3) gridClass += "grid-cols-3 max-w-4xl";
@@ -1822,212 +1803,6 @@
       showCustomAlert("success", "更新完了！", `カード「<strong>${newWordHiragana}</strong>」を更新しました！`);
     }
 
-    // === PLAN A & B カード作成 ===
-    async function convertToHiragana(wordText) {
-      if (GEMINI_API_KEY && GEMINI_API_KEY !== "YOUR_API_KEY") {
-        const textPrompt = `日本語「${wordText}」をすべて「ひらがな」に変換してください。漢字・カタカナ・アルファベットは子供向けひらがなにし、余計な説明や記号を含めず変換後の文字列のみを1行で出力してください。`;
-        try {
-          const apiResponse = await callGeminiText(textPrompt, GEMINI_API_KEY);
-          return apiResponse.replace(/[\\r\\n\\s\\.\\,\\、\\.「」\\、\\。"'`]/g, "");
-        } catch (e) {}
-      }
-      return wordText.replace(/[\\u30a1-\\u30f6]/g, m => String.fromCharCode(m.charCodeAt(0) - 0x60));
-    }
-
-    function generateProceduralCard(word) {
-      return new Promise((resolve) => {
-        const canvas = document.createElement('canvas');
-        canvas.width = 512;
-        canvas.height = 512;
-        const ctx = canvas.getContext('2d');
-
-        const gradients = [
-          ['#ffeef2', '#ffd1dc'], ['#eef2ff', '#c7d2fe'],
-          ['#ecfdf5', '#a7f3d0'], ['#fffbeb', '#fde68a'], ['#faf5ff', '#e9d5ff']
-        ];
-        const chosenGrad = gradients[Math.floor(Math.random() * gradients.length)];
-
-        const grad = ctx.createLinearGradient(0, 0, 0, 512);
-        grad.addColorStop(0, chosenGrad[0]);
-        grad.addColorStop(1, chosenGrad[1]);
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, 512, 512);
-
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 16;
-        ctx.strokeRect(24, 24, 464, 464);
-
-        const childEmojis = {
-          'ねこ': '🐱', 'いぬ': '🐶', 'うさぎ': '🐰', 'ぱんだ': '🐼', 'くま': '🐻', 'とり': '🐦', 'さかな': '🐟', 'かえる': '🐸', 'ぞう': '🐘', 'らいおん': '🦁', 'きりん': '🦒', 'ひつじ': '🐑', 'きつね': '🦊',
-          'くるま': '🚗', 'でんしゃ': '🚃', 'しんかんせん': '🚄', 'ひこうき': '✈️', 'ふね': '🚢', 'じてんしゃ': '🚲', 'ぱとかー': '🚓', 'きゅうきゅうしゃ': '🚑', 'しょうぼうしゃ': '🚒',
-          'りんご': '🍎', 'ばなな': '🍌', 'バナナ': '🍌', 'いちご': '🍓', 'すいか': '🍉', 'めろん': '🍈', 'ぶどう': '🍇', 'みかん': '🍊', 'ぱん': '🍞', 'けーき': '🍰', 'おにぎり': '🍙', 'すし': '🍣',
-          'はな': '🌸', 'たいよう': '☀️', 'つき': '🌙', 'ほし': '⭐', 'にじ': '🌈', 'ぼーる': '⚽', 'ほん': '📖', 'かばん': '🎒', 'とけい': '⏰', 'おもちゃ': '🧸', 'うた': '🎵', 'てれび': '📺'
-        };
-
-        let targetEmoji = '🎁';
-        for (let key in childEmojis) {
-          if (word.includes(key)) {
-            targetEmoji = childEmojis[key];
-            break;
-          }
-        }
-
-        ctx.font = '36px Arial';
-        ctx.fillStyle = '#ffffff';
-        ctx.fillText('✨', 80, 120);
-        ctx.fillText('⭐', 400, 110);
-        ctx.fillText('✨', 410, 410);
-        ctx.fillText('⭐', 90, 420);
-
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.font = '220px Arial';
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.08)';
-        ctx.shadowBlur = 15;
-        ctx.shadowOffsetX = 4;
-        ctx.shadowOffsetY = 10;
-        ctx.fillText(targetEmoji, 256, 256);
-
-        resolve(canvas.toDataURL('image/png'));
-      });
-    }
-
-    async function generateCard() {
-      const wordInput = document.getElementById('card-input-word');
-      const word = wordInput.value.trim();
-      if (!word) {
-        showCustomAlert("warning", "入力エラー", "絵カードにしたい言葉を入力してね！");
-        return;
-      }
-
-      toggleLoading(true);
-      updateLoadingStatus("AIがお言葉をチェックしています...");
-      const hiraganaWord = await convertToHiragana(word);
-
-      const existing = library.find(item => item.word === hiraganaWord);
-      if (existing) {
-        showCustomAlert("info", "すでにあります！", `「${hiraganaWord}」のカードはすでに作ってあるため、再利用します。`, () => {
-          wordInput.value = '';
-        });
-        toggleLoading(false);
-        return;
-      }
-
-      updateLoadingStatus("AIがかわいいイラストを描いています...");
-
-      try {
-        let imageUrl = '';
-        let isFallbackToDemo = false;
-
-        if (GEMINI_API_KEY && GEMINI_API_KEY !== "YOUR_API_KEY") {
-          try {
-            const stylizedPrompt = `flat vector icon of a cute sweet ${word}, high quality design, minimal detail, colorful children cartoon illustration style, solid clean white background, single isolated object, bright colors, friendly, no text, no characters, no words`;
-            const base64Encoded = await callImagen(stylizedPrompt, GEMINI_API_KEY);
-            imageUrl = `data:image/png;base64,${base64Encoded}`;
-          } catch (imagenErr) {
-            isFallbackToDemo = true;
-            imageUrl = await generateProceduralCard(hiraganaWord);
-          }
-        } else {
-          await new Promise(resolve => setTimeout(resolve, 600));
-          imageUrl = await generateProceduralCard(hiraganaWord);
-        }
-
-        if (imageUrl) {
-          const newCard = {
-            id: 'card_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-            word: hiraganaWord,
-            imageUrl: imageUrl,
-            createdAt: new Date().toISOString()
-          };
-          await saveCardToDatabase(newCard);
-          await loadLibrary();
-
-          if (isFallbackToDemo) {
-            showCustomAlert("warning", "デモ画像で作りました 💡", `画像生成（有料プラン）制限のため、アプリ内のかわいいイラスト（<strong>${hiraganaWord}</strong>）でカードを完成させました！`);
-          } else {
-            showCustomAlert("success", "できたよ！", `「${hiraganaWord}」のえカードができました！`);
-          }
-          wordInput.value = '';
-        }
-      } catch (error) {
-        showCustomAlert("error", "エラーが発生しました", "作成できませんでした。もう一度お試しください。");
-      } finally {
-        toggleLoading(false);
-      }
-    }
-
-    function triggerUploadFileInput() {
-      const fileInput = document.getElementById('upload-card-file');
-      fileInput.value = "";
-      fileInput.click();
-    }
-
-    async function previewUploadImage(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      try {
-        toggleLoading(true);
-        updateLoadingStatus("画像を読み込んでいます...");
-        const optimizedBase64 = await processImageFile(file, 512, 512);
-        uploadedImageBase64 = optimizedBase64;
-        
-        document.getElementById('upload-preview-img').src = uploadedImageBase64;
-        document.getElementById('upload-preview-container').classList.remove('hidden');
-        document.getElementById('upload-file-label-text').innerText = file.name.length > 12 ? file.name.substr(0,10) + "..." : file.name;
-        document.getElementById('upload-status-subtext').innerText = "画像を選択中";
-        document.getElementById('upload-status-subtext').className = "text-[10px] text-teal-600 font-black";
-        document.getElementById('btn-reselect-upload').classList.remove('hidden');
-        playSound('complete');
-      } catch (err) {
-        showCustomAlert("error", "画像エラー", "画像の読み込みに失敗しました。");
-      } finally {
-        toggleLoading(false);
-      }
-    }
-
-    async function createUploadedCard() {
-      const wordInput = document.getElementById('upload-card-word');
-      const word = wordInput.value.trim();
-      if (!word || !uploadedImageBase64) {
-        showCustomAlert("warning", "入力エラー", "言葉と画像ファイルの両方を指定してね！");
-        return;
-      }
-
-      toggleLoading(true);
-      const hiraganaWord = await convertToHiragana(word);
-
-      try {
-        const newCard = {
-          id: 'card_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-          word: hiraganaWord,
-          imageUrl: uploadedImageBase64,
-          createdAt: new Date().toISOString()
-        };
-        await saveCardToDatabase(newCard);
-        await loadLibrary();
-        showCustomAlert("success", "できたよ！ ✨", `「<strong>${hiraganaWord}</strong>」のカードを登録しました！`);
-        resetUploadForm();
-      } catch (err) {
-        showCustomAlert("error", "エラー", "カードの登録中にエラーが発生しました。");
-      } finally {
-        toggleLoading(false);
-      }
-    }
-
-    function resetUploadForm() {
-      document.getElementById('upload-card-word').value = "";
-      document.getElementById('upload-card-file').value = "";
-      document.getElementById('upload-preview-img').src = "";
-      document.getElementById('upload-preview-container').classList.add('hidden');
-      document.getElementById('upload-file-label-text').innerText = "画像ファイルを選択";
-      document.getElementById('upload-status-subtext').innerText = "画像未選択";
-      document.getElementById('upload-status-subtext').className = "text-[10px] text-slate-400 font-bold";
-      document.getElementById('btn-reselect-upload').classList.add('hidden');
-      uploadedImageBase64 = "";
-    }
-
     // === ライブラリ ===
     function updateLibraryCount() {
       const el = document.getElementById('library-count');
@@ -2476,12 +2251,36 @@
       document.getElementById('celebration-overlay').classList.add('hidden');
     }
 
+    // === リポジトリ内 cards.json の自動同期（ある場合のみ） ===
+    async function loadSharedCardsFromRepo() {
+      try {
+        const res = await fetch('./cards.json?t=' + Date.now(), { cache: 'no-store' });
+        if (res.ok) {
+          const sharedData = await res.json();
+          if (sharedData.library && Array.isArray(sharedData.library)) {
+            for (const card of sharedData.library) {
+              await saveCardToDatabase(card);
+            }
+          }
+          if (!localStorage.getItem('ecard_choice_scenes_v3') && sharedData.choiceScenes) {
+            choiceScenes = sharedData.choiceScenes;
+            saveChoiceScenesToStorage();
+          }
+          if (!localStorage.getItem('ecard_dynamic_scenes_v1') && sharedData.scenes) {
+            scenes = sharedData.scenes;
+            saveScenesToStorage();
+          }
+        }
+      } catch (err) {}
+    }
+
     // === 起動時処理 ===
     window.onload = async () => {
       try {
+        await initDatabase();
+        await loadSharedCardsFromRepo();
         initScenes();
         initChoiceScenes();
-        await initDatabase();
         await loadLibrary();
         
         if (library.length === 0) {
