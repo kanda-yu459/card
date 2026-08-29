@@ -503,7 +503,6 @@ async function importBackupData(event) {
   reader.readAsText(file);
 }
 
-// APIキー管理
 function saveApiKey() {
   const keyVal = document.getElementById('settings-api-key-input').value.trim();
   processAndSetApiKey(keyVal);
