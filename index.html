@@ -74,7 +74,7 @@
         </div>
       </div>
 
-      <!-- Navigation Tabs: チョイス・シーン・せってい -->
+      <!-- Navigation Tabs -->
       <nav class="flex flex-wrap bg-indigo-100 p-1.5 rounded-2xl gap-1.5 justify-center">
         <button onclick="switchTab('practice')" id="tab-practice" class="px-6 py-2.5 rounded-xl text-sm font-black transition-all duration-300 flex items-center gap-1.5 bg-white text-indigo-700 shadow-sm">
           <i class="fa-solid fa-arrows-left-right"></i> チョイス
@@ -108,7 +108,6 @@
         <!-- Choice Top Control Bar -->
         <div class="bg-white p-4 rounded-3xl border-4 border-indigo-200 card-shadow flex flex-col lg:flex-row items-center justify-between gap-4">
           
-          <!-- Scene Selector & Title Input -->
           <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
             <div class="flex items-center gap-2">
               <span class="text-xs font-black text-indigo-700 whitespace-nowrap">場面：</span>
@@ -121,10 +120,7 @@
             </div>
           </div>
 
-          <!-- Choice Count & Actions -->
           <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-end">
-            
-            <!-- 2〜5択 切り替えボタン -->
             <div class="flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-200">
               <span class="text-[10px] font-black text-slate-500 px-1.5">選択数:</span>
               <button onclick="setChoiceCount(2)" id="btn-choice-count-2" class="px-3 py-1.5 rounded-xl text-xs font-black transition-all bg-indigo-600 text-white shadow-sm">2択</button>
@@ -149,13 +145,12 @@
 
         </div>
 
-        <!-- Cards Box Container -->
         <div id="choice-cards-container" class="my-auto py-2 flex-grow flex items-center justify-center w-full min-h-[320px]">
         </div>
 
       </section>
 
-      <!-- TAB 2: SCENES (手順表画面) -->
+      <!-- TAB 2: SCENES -->
       <section id="page-scenes" class="hidden space-y-4 flex-grow flex-col">
         <div class="bg-white p-4 rounded-3xl border-4 border-amber-200 card-shadow flex flex-col md:flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-3 w-full md:w-auto">
@@ -705,8 +700,8 @@
       }
     ];
 
-    // === 画像リサイズ・最適化 (300pxに自動軽量化) ===
-    function processImageFile(file, maxWidth = 300, maxHeight = 300) {
+    // === 画像リサイズ・最適化 (250px・軽量化) ===
+    function processImageFile(file, maxWidth = 250, maxHeight = 250) {
       return new Promise((resolve, reject) => {
         if (!file || !file.type.startsWith('image/')) {
           reject(new Error("画像ファイルではありません"));
@@ -736,7 +731,7 @@
             canvas.height = height;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
-            resolve(canvas.toDataURL('image/png', 0.85));
+            resolve(canvas.toDataURL('image/png', 0.8));
           };
           img.onerror = () => reject(new Error("画像の読み込みに失敗しました"));
           img.src = e.target.result;
@@ -746,10 +741,10 @@
       });
     }
 
-    // === 確実な二重保存 (LocalStorage + IndexedDB) ===
+    // === IndexedDB 永続ストレージ ===
     function initDatabase() {
       return new Promise((resolve) => {
-        const request = indexedDB.open('EcardAppDB', 1);
+        const request = indexedDB.open('EcardAppDB_v4', 1);
         request.onupgradeneeded = (event) => {
           const database = event.target.result;
           if (!database.objectStoreNames.contains('cards')) {
@@ -760,22 +755,13 @@
           db = event.target.result;
           resolve();
         };
-        request.onerror = () => resolve();
+        request.onerror = () => {
+          resolve();
+        };
       });
     }
 
     async function loadLibrary() {
-      // 1. LocalStorageから優先取得
-      const localData = localStorage.getItem('ecard_library_storage_v2');
-      if (localData) {
-        try {
-          library = JSON.parse(localData) || [];
-        } catch(e) {
-          library = [];
-        }
-      }
-
-      // 2. IndexedDBからも安全にマージ
       if (db) {
         try {
           await new Promise((resolve) => {
@@ -783,11 +769,7 @@
             const store = transaction.objectStore('cards');
             const request = store.getAll();
             request.onsuccess = () => {
-              const dbCards = request.result || [];
-              const map = new Map();
-              library.forEach(c => map.set(c.id, c));
-              dbCards.forEach(c => map.set(c.id, c));
-              library = Array.from(map.values());
+              library = request.result || [];
               resolve();
             };
             request.onerror = () => resolve();
@@ -803,7 +785,7 @@
     async function saveCardToDatabase(card) {
       if (!card || !card.id) return;
       
-      // メモリ配列を更新
+      // メモリ配列を即時更新
       const existingIndex = library.findIndex(c => c.id === card.id);
       if (existingIndex >= 0) {
         library[existingIndex] = card;
@@ -811,17 +793,16 @@
         library.unshift(card);
       }
 
-      // LocalStorageに即時保存
-      try {
-        localStorage.setItem('ecard_library_storage_v2', JSON.stringify(library));
-      } catch(e) {}
-
-      // IndexedDBにも保存
+      // IndexedDBへ確実に書き込み完了を待機
       if (db) {
         try {
-          const transaction = db.transaction(['cards'], 'readwrite');
-          const store = transaction.objectStore('cards');
-          store.put(card);
+          await new Promise((resolve, reject) => {
+            const transaction = db.transaction(['cards'], 'readwrite');
+            const store = transaction.objectStore('cards');
+            const req = store.put(card);
+            req.onsuccess = () => resolve();
+            req.onerror = () => reject();
+          });
         } catch(e) {}
       }
 
@@ -831,12 +812,15 @@
 
     async function clearDatabase() {
       library = [];
-      localStorage.removeItem('ecard_library_storage_v2');
       if (db) {
         try {
-          const transaction = db.transaction(['cards'], 'readwrite');
-          const store = transaction.objectStore('cards');
-          store.clear();
+          await new Promise((resolve) => {
+            const transaction = db.transaction(['cards'], 'readwrite');
+            const store = transaction.objectStore('cards');
+            const req = store.clear();
+            req.onsuccess = () => resolve();
+            req.onerror = () => resolve();
+          });
         } catch(e) {}
       }
       updateLibraryCount();
@@ -1122,7 +1106,7 @@
       try {
         toggleLoading(true);
         updateLoadingStatus("写真を処理しています...");
-        const optimizedBase64 = await processImageFile(file, 300, 300);
+        const optimizedBase64 = await processImageFile(file, 250, 250);
         choiceInstantPhotoBase64 = optimizedBase64;
         
         const previewImg = document.getElementById('choice-instant-preview-img');
@@ -1555,7 +1539,7 @@
     function renderSettingsForms() {
       const container = document.getElementById('settings-form-container');
       const activeScene = scenes.find(s => s.id === currentSceneId);
-      if (!activeScene) return;
+      if (!activeScene || !container) return;
 
       const steps = activeScene.steps || [];
 
@@ -1774,7 +1758,7 @@
       try {
         toggleLoading(true);
         updateLoadingStatus("画像を読み込んでいます...");
-        const optimizedBase64 = await processImageFile(file, 300, 300);
+        const optimizedBase64 = await processImageFile(file, 250, 250);
         editingCardImageBase64 = optimizedBase64;
         document.getElementById('edit-preview-img').src = optimizedBase64;
         playSound('complete');
@@ -1868,10 +1852,10 @@
         const textPrompt = `日本語「${wordText}」をすべて「ひらがな」に変換してください。漢字・カタカナ・アルファベットは子供向けひらがなにし、余計な説明や記号を含めず変換後の文字列のみを1行で出力してください。`;
         try {
           const apiResponse = await callGeminiText(textPrompt, GEMINI_API_KEY);
-          return apiResponse.replace(/[\\r\\n\\s\\.\\,\\、\\.「」\\、\\。"'`]/g, "");
+          return apiResponse.replace(/[\r\n\s\.\,\、\.「」\、\。"'`]/g, "");
         } catch (e) {}
       }
-      return wordText.replace(/[\\u30a1-\\u30f6]/g, m => String.fromCharCode(m.charCodeAt(0) - 0x60));
+      return wordText.replace(/[\u30a1-\u30f6]/g, m => String.fromCharCode(m.charCodeAt(0) - 0x60));
     }
 
     function generateProceduralCard(word) {
@@ -2012,7 +1996,7 @@
       try {
         toggleLoading(true);
         updateLoadingStatus("画像を読み込んでいます...");
-        const optimizedBase64 = await processImageFile(file, 300, 300);
+        const optimizedBase64 = await processImageFile(file, 250, 250);
         uploadedImageBase64 = optimizedBase64;
         
         const previewImg = document.getElementById('upload-preview-img');
@@ -2131,14 +2115,15 @@
       showCustomConfirm("warning", "カードの削除", `「${word}」のカードを削除してもよろしいですか？`, async (isConfirmed) => {
         if (isConfirmed) {
           library = library.filter(c => c.id !== id);
-          try {
-            localStorage.setItem('ecard_library_storage_v2', JSON.stringify(library));
-          } catch(e) {}
           if (db) {
             try {
-              const transaction = db.transaction(['cards'], 'readwrite');
-              const store = transaction.objectStore(['cards']);
-              store.delete(id);
+              await new Promise((resolve) => {
+                const transaction = db.transaction(['cards'], 'readwrite');
+                const store = transaction.objectStore(['cards']);
+                const req = store.delete(id);
+                req.onsuccess = () => resolve();
+                req.onerror = () => resolve();
+              });
             } catch(e) {}
           }
           
