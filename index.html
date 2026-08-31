@@ -74,7 +74,7 @@
         </div>
       </div>
 
-      <!-- Navigation Tabs -->
+      <!-- Navigation Tabs: チョイス・シーン・せってい -->
       <nav class="flex flex-wrap bg-indigo-100 p-1.5 rounded-2xl gap-1.5 justify-center">
         <button onclick="switchTab('practice')" id="tab-practice" class="px-6 py-2.5 rounded-xl text-sm font-black transition-all duration-300 flex items-center gap-1.5 bg-white text-indigo-700 shadow-sm">
           <i class="fa-solid fa-arrows-left-right"></i> チョイス
@@ -108,6 +108,7 @@
         <!-- Choice Top Control Bar -->
         <div class="bg-white p-4 rounded-3xl border-4 border-indigo-200 card-shadow flex flex-col lg:flex-row items-center justify-between gap-4">
           
+          <!-- Scene Selector & Title Input -->
           <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
             <div class="flex items-center gap-2">
               <span class="text-xs font-black text-indigo-700 whitespace-nowrap">場面：</span>
@@ -120,7 +121,10 @@
             </div>
           </div>
 
+          <!-- Choice Count & Actions -->
           <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-end">
+            
+            <!-- 2〜5択 切り替えボタン -->
             <div class="flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-200">
               <span class="text-[10px] font-black text-slate-500 px-1.5">選択数:</span>
               <button onclick="setChoiceCount(2)" id="btn-choice-count-2" class="px-3 py-1.5 rounded-xl text-xs font-black transition-all bg-indigo-600 text-white shadow-sm">2択</button>
@@ -145,13 +149,14 @@
 
         </div>
 
+        <!-- Cards Box Container -->
         <div id="choice-cards-container" class="my-auto py-2 flex-grow flex items-center justify-center w-full min-h-[320px]">
         </div>
 
       </section>
 
       <!-- TAB 2: SCENES (手順表画面) -->
-      <section id="page-scenes" class="hidden space-y-4 flex-grow flex flex-col">
+      <section id="page-scenes" class="hidden space-y-4 flex-grow flex-col">
         <div class="bg-white p-4 rounded-3xl border-4 border-amber-200 card-shadow flex flex-col md:flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-3 w-full md:w-auto">
             <div class="bg-amber-500 text-white w-10 h-10 rounded-2xl flex items-center justify-center text-lg font-black shadow-sm">
@@ -188,11 +193,11 @@
       </section>
 
       <!-- TAB 3: SETTINGS & CREATE -->
-      <section id="page-settings" class="hidden space-y-6 flex-grow flex flex-col">
+      <section id="page-settings" class="hidden space-y-6 flex-grow flex-col">
         
         <!-- CARD CREATION SECTION -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <!-- Plan A: AI Generator -->
+          <!-- Plan A: AI -->
           <div class="bg-white p-5 rounded-3xl border-4 border-indigo-100 card-shadow flex flex-col justify-between">
             <div>
               <div class="flex items-center justify-between mb-3">
@@ -622,7 +627,7 @@
   <script>
     // === グローバル共通変数 ===
     let GEMINI_API_KEY = "";
-    let db;
+    let db = null;
     let library = [];
     let currentTab = 'practice';
     
@@ -1863,10 +1868,10 @@
         const textPrompt = `日本語「${wordText}」をすべて「ひらがな」に変換してください。漢字・カタカナ・アルファベットは子供向けひらがなにし、余計な説明や記号を含めず変換後の文字列のみを1行で出力してください。`;
         try {
           const apiResponse = await callGeminiText(textPrompt, GEMINI_API_KEY);
-          return apiResponse.replace(/[\r\n\s\.\,\、\.「」\、\。"'`]/g, "");
+          return apiResponse.replace(/[\\r\\n\\s\\.\\,\\、\\.「」\\、\\。"'`]/g, "");
         } catch (e) {}
       }
-      return wordText.replace(/[\u30a1-\u30f6]/g, m => String.fromCharCode(m.charCodeAt(0) - 0x60));
+      return wordText.replace(/[\\u30a1-\\u30f6]/g, m => String.fromCharCode(m.charCodeAt(0) - 0x60));
     }
 
     function generateProceduralCard(word) {
@@ -2123,7 +2128,7 @@
     }
 
     function confirmDeleteCard(id, word) {
-      showCustomConfirm("warning", "カードの削除", `「${word}」のカードをけしてもいいですか？`, async (isConfirmed) => {
+      showCustomConfirm("warning", "カードの削除", `「${word}」のカードを削除してもよろしいですか？`, async (isConfirmed) => {
         if (isConfirmed) {
           library = library.filter(c => c.id !== id);
           try {
