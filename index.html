@@ -139,7 +139,7 @@
               <i class="fa-solid fa-trash-can"></i>
             </button>
             
-            <!-- 選び直しボタン（選択固定中は黄色く光ってわかりやすく表示） -->
+            <!-- 選び直しボタン（選択固定中は黄色く強調表示） -->
             <button onclick="resetPracticeSelection()" id="btn-choice-reset" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 px-4 py-2 rounded-xl text-xs font-black transition-all whitespace-nowrap flex items-center gap-1.5 shadow-sm" title="選び直す">
               <i class="fa-solid fa-rotate-right"></i> えらび直す ↺
             </button>
@@ -980,7 +980,7 @@
       renderLibraryGrid();
     }
 
-    // === チョイス管理（1度選んだら固定・選び直しボタン必須） ===
+    // === チョイス管理（1度選んだら完全固定・選び直しボタン必須） ===
     function setChoiceCount(count) {
       const scene = getActiveChoiceScene();
       scene.count = parseInt(count, 10);
@@ -996,6 +996,7 @@
       const scene = getActiveChoiceScene();
       const count = scene.count || 2;
       const cards = scene.cards || [];
+      const hasSelected = selectedChoiceCardIndex !== null;
 
       // 択数ボタン
       [2, 3, 4, 5].forEach(num => {
@@ -1012,7 +1013,7 @@
       // 選び直しボタンの視覚的強調（選択固定中は黄色く目立つ）
       const resetBtn = document.getElementById('btn-choice-reset');
       if (resetBtn) {
-        if (selectedChoiceCardIndex !== null) {
+        if (hasSelected) {
           resetBtn.className = "bg-amber-400 hover:bg-amber-500 text-slate-900 border-2 border-amber-500 px-4 py-2 rounded-xl text-xs font-black transition-all whitespace-nowrap flex items-center gap-1.5 shadow-md animate-bounce";
         } else {
           resetBtn.className = "bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 px-4 py-2 rounded-xl text-xs font-black transition-all whitespace-nowrap flex items-center gap-1.5 shadow-sm";
@@ -1030,21 +1031,30 @@
       for (let i = 0; i < count; i++) {
         const card = cards[i] || null;
         const isSelected = selectedChoiceCardIndex === i;
-        const isDimmed = selectedChoiceCardIndex !== null && selectedChoiceCardIndex !== i;
-        const hasChoiceMade = selectedChoiceCardIndex !== null;
+        const isDimmed = hasSelected && !isSelected;
+
+        // クラス設定：選択完了後はタップ不可・拡大等のアニメーションも無効化
+        let boxClass = "group relative bg-white border-4 sm:border-8 rounded-[28px] sm:rounded-[36px] p-3 sm:p-5 flex flex-col items-center justify-between aspect-square min-h-[140px] select-none overflow-hidden transition-all duration-300 ";
+        
+        if (isSelected) {
+          boxClass += "border-indigo-600 ring-4 ring-indigo-300 bg-indigo-50/50 scale-105 shadow-2xl selected-bounce cursor-default";
+        } else if (isDimmed) {
+          boxClass += "border-white card-shadow opacity-40 pointer-events-none cursor-not-allowed";
+        } else {
+          boxClass += "border-white card-shadow cursor-pointer active:scale-95 transform hover:-translate-y-1";
+        }
 
         html += `
-          <div id="choice-box-${i}" onclick="onSlotBoxClick(${i})" 
-               class="group relative bg-white border-4 sm:border-8 ${isSelected ? 'border-indigo-600 ring-4 ring-indigo-300 bg-indigo-50/50 scale-105' : 'border-white'} card-shadow rounded-[28px] sm:rounded-[36px] p-3 sm:p-5 flex flex-col items-center justify-between aspect-square min-h-[140px] ${hasChoiceMade ? 'cursor-default' : 'cursor-pointer active:scale-95 hover:-translate-y-1'} transition-all duration-300 select-none overflow-hidden ${isSelected ? 'selected-bounce shadow-2xl' : ''}">
+          <div id="choice-box-${i}" onclick="onSlotBoxClick(${i})" class="${boxClass}">
             
-            <!-- 選択中は変更ボタンを隠して誤操作を完全防止 -->
-            ${!hasChoiceMade ? `
+            <!-- 選択中は変更ボタンを非表示にして誤操作防止 -->
+            ${!hasSelected ? `
               <button type="button" onclick="openChoiceCardModal(${i}, event)" class="absolute top-2 right-2 bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white border border-indigo-200 w-8 h-8 rounded-full flex items-center justify-center text-xs font-black z-20 shadow transition-all" title="カードを変更">
                 <i class="fa-solid fa-repeat"></i>
               </button>
             ` : ''}
 
-            <!-- 選択中の「えらんだ！」バッジ -->
+            <!-- 選択中のカードに「えらんだ！」バッジを表示 -->
             ${isSelected ? `
               <div class="absolute top-2 right-2 bg-indigo-600 text-white text-[11px] font-black px-2.5 py-1 rounded-full shadow-md z-20 flex items-center gap-1">
                 <i class="fa-solid fa-star text-amber-300"></i> えらんだ！
@@ -1072,10 +1082,12 @@
               </div>
             `}
 
-            <!-- 選ばれなかったカードを完全に暗転・無効化 -->
-            <div class="absolute inset-0 bg-slate-900/60 backdrop-grayscale rounded-[24px] pointer-events-none transition-all duration-300 flex items-center justify-center ${isDimmed ? 'opacity-100' : 'opacity-0'}">
-              <i class="fa-solid fa-ban text-white/50 text-5xl"></i>
-            </div>
+            <!-- グレーアウト用の暗転オーバーレイ -->
+            ${isDimmed ? `
+              <div class="absolute inset-0 bg-slate-900/60 backdrop-grayscale rounded-[24px] pointer-events-none flex items-center justify-center z-10">
+                <i class="fa-solid fa-ban text-white/50 text-5xl"></i>
+              </div>
+            ` : ''}
 
           </div>
         `;
@@ -1087,7 +1099,7 @@
 
     // スロットBoxクリック時の制御（1度選んだら選び直すまで完全固定）
     function onSlotBoxClick(idx) {
-      // 既にカードが選択済みの場合は、選び直しボタンを押すまで完全に無反応にする
+      // 既にカードが選択済みの場合は、選び直しボタンを押すまで完全にガード
       if (selectedChoiceCardIndex !== null) {
         return;
       }
