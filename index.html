@@ -138,13 +138,16 @@
             <button onclick="deleteCurrentChoiceScene()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 px-3 py-2 rounded-xl text-xs font-black transition-all whitespace-nowrap" title="現在の場面を削除">
               <i class="fa-solid fa-trash-can"></i>
             </button>
-            <button onclick="resetPracticeSelection()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl text-xs font-black transition-all whitespace-nowrap" title="選び直す">
-              <i class="fa-solid fa-rotate-right"></i>
+            
+            <!-- 選び直しボタン（選択固定中は黄色く光ってわかりやすく表示） -->
+            <button onclick="resetPracticeSelection()" id="btn-choice-reset" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 px-4 py-2 rounded-xl text-xs font-black transition-all whitespace-nowrap flex items-center gap-1.5 shadow-sm" title="選び直す">
+              <i class="fa-solid fa-rotate-right"></i> えらび直す ↺
             </button>
           </div>
 
         </div>
 
+        <!-- Cards Box Container -->
         <div id="choice-cards-container" class="my-auto py-2 flex-grow flex items-center justify-center w-full min-h-[320px]">
         </div>
 
@@ -190,9 +193,50 @@
       <!-- TAB 3: SETTINGS & CREATE -->
       <section id="page-settings" class="hidden space-y-6 flex-grow flex-col">
         
+        <!-- DIRECT GITHUB SYNC WIDGET -->
+        <div class="bg-white p-5 rounded-3xl border-4 border-indigo-200 card-shadow">
+          <div class="flex items-center gap-2 border-b-2 border-slate-100 pb-3 mb-3">
+            <span class="bg-slate-900 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">
+              <i class="fa-brands fa-github"></i>
+            </span>
+            <h2 class="text-xl font-black text-slate-800">GitHub直接連携（PC ⇄ iPad自動共有）</h2>
+          </div>
+          <p class="text-xs text-slate-500 mb-4 leading-relaxed">
+            GitHub Personal Access Tokenを設定すると、<strong>「GitHubに直接保存」ボタンを押すだけでリポジトリの cards.json が即座に更新</strong>され、全端末で共有されます。
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+            <div>
+              <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">GitHubユーザー名</label>
+              <input type="text" id="github-username-input" placeholder="例: username" class="w-full px-3 py-2 bg-slate-50 border-2 border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-400">
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">リポジトリ名</label>
+              <input type="text" id="github-repo-input" placeholder="例: ecard" class="w-full px-3 py-2 bg-slate-50 border-2 border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-400">
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Access Token (ghp_...)</label>
+              <input type="password" id="github-token-input" placeholder="ghp_xxxxxxxxxxxx" class="w-full px-3 py-2 bg-slate-50 border-2 border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-400">
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+            <button onclick="saveGitHubSettings()" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2.5 rounded-xl text-xs font-black shadow transition-all">
+              連携設定を保存 💾
+            </button>
+            <div class="flex gap-2">
+              <button onclick="syncFromGitHubNow()" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2.5 rounded-xl text-xs font-black shadow transition-all flex items-center gap-1.5">
+                <i class="fa-solid fa-rotate"></i> GitHubから今すぐ同期 📥
+              </button>
+              <button onclick="uploadDirectToGitHub()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow transition-all flex items-center gap-1.5">
+                <i class="fa-solid fa-cloud-arrow-up"></i> GitHubに直接保存 🚀
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- CARD CREATION SECTION -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <!-- Plan A: AI -->
           <div class="bg-white p-5 rounded-3xl border-4 border-indigo-100 card-shadow flex flex-col justify-between">
             <div>
               <div class="flex items-center justify-between mb-3">
@@ -293,12 +337,8 @@
             <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">
               <i class="fa-solid fa-floppy-disk"></i>
             </span>
-            <h2 class="text-xl font-black text-slate-800">絵カード・シーン・チョイスのバックアップ保存</h2>
+            <h2 class="text-xl font-black text-slate-800">手動バックアップ保存・復元</h2>
           </div>
-          <p class="text-xs text-slate-500 mb-4 leading-relaxed">
-            作った絵カードや全シーン、チョイスの全場面設定を<strong>1つのバックアップファイルとしてダウンロード保存</strong>できます。
-          </p>
-          
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <button onclick="exportBackupData()" class="bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-2xl font-black text-sm shadow transition-all flex items-center justify-center gap-2">
               <i class="fa-solid fa-download text-lg"></i>
@@ -700,7 +740,122 @@
       }
     ];
 
-    // === 画像リサイズ・最適化 (250px・軽量化) ===
+    // === GitHub 直接連携機能 ===
+    function initGitHubSettings() {
+      const u = localStorage.getItem('gh_sync_user') || "";
+      const r = localStorage.getItem('gh_sync_repo') || "";
+      const t = localStorage.getItem('gh_sync_token') || "";
+
+      const userElem = document.getElementById('github-username-input');
+      const repoElem = document.getElementById('github-repo-input');
+      const tokenElem = document.getElementById('github-token-input');
+
+      if (userElem) userElem.value = u;
+      if (repoElem) repoElem.value = r;
+      if (tokenElem) tokenElem.value = t;
+    }
+
+    function saveGitHubSettings() {
+      const u = document.getElementById('github-username-input').value.trim();
+      const r = document.getElementById('github-repo-input').value.trim();
+      const t = document.getElementById('github-token-input').value.trim();
+
+      localStorage.setItem('gh_sync_user', u);
+      localStorage.setItem('gh_sync_repo', r);
+      localStorage.setItem('gh_sync_token', t);
+
+      showCustomAlert("success", "保存完了", "GitHub連携情報をブラウザに保存しました！");
+    }
+
+    async function uploadDirectToGitHub() {
+      const user = localStorage.getItem('gh_sync_user');
+      const repo = localStorage.getItem('gh_sync_repo');
+      const token = localStorage.getItem('gh_sync_token');
+
+      if (!user || !repo || !token) {
+        showCustomAlert("warning", "設定不足", "GitHubユーザー名、リポジトリ名、Access Tokenを入力して「連携設定を保存」してください。");
+        return;
+      }
+
+      toggleLoading(true);
+      updateLoadingStatus("GitHubに直接アップロードしています...");
+
+      try {
+        await loadLibrary();
+        const payload = {
+          version: "5.6",
+          exportDate: new Date().toISOString(),
+          library: library,
+          scenes: scenes,
+          choiceScenes: choiceScenes,
+          geminiApiKey: GEMINI_API_KEY || ""
+        };
+
+        const jsonStr = JSON.stringify(payload, null, 2);
+        const encodedContent = btoa(unescape(encodeURIComponent(jsonStr)));
+
+        const getUrl = `https://api.github.com/repos/${user}/${repo}/contents/cards.json`;
+        let sha = null;
+
+        try {
+          const getRes = await fetch(getUrl, {
+            headers: {
+              'Authorization': `token ${token}`,
+              'Accept': 'application/vnd.github.v3+json'
+            }
+          });
+          if (getRes.ok) {
+            const fileData = await getRes.json();
+            sha = fileData.sha;
+          }
+        } catch (e) {}
+
+        const putBody = {
+          message: `Update cards.json from Web App (${new Date().toLocaleString('ja-JP')})`,
+          content: encodedContent
+        };
+        if (sha) putBody.sha = sha;
+
+        const putRes = await fetch(getUrl, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(putBody)
+        });
+
+        if (putRes.ok) {
+          showCustomAlert("success", "GitHub保存成功！ 🚀", `GitHub上の <strong>cards.json</strong> に直接保存しました！<br>他端末で開くだけで自動反映されます。`);
+        } else {
+          const errData = await putRes.json();
+          throw new Error(errData.message || "アップロードに失敗しました");
+        }
+      } catch (err) {
+        showCustomAlert("error", "GitHub通信エラー", `保存に失敗しました。<br>トークン権限やリポジトリ名を確認してください。<br><span class="text-xs text-slate-400">${err.message}</span>`);
+      } finally {
+        toggleLoading(false);
+      }
+    }
+
+    async function syncFromGitHubNow() {
+      toggleLoading(true);
+      updateLoadingStatus("GitHubから最新データを取得しています...");
+      try {
+        await loadSharedCardsFromRepo();
+        await loadLibrary();
+        renderChoiceBoard();
+        renderSceneBoard();
+        showCustomAlert("success", "同期完了 📥", "GitHubから最新の絵カード・場面データを取得しました！");
+      } catch (err) {
+        showCustomAlert("error", "同期エラー", "データの取得に失敗しました。");
+      } finally {
+        toggleLoading(false);
+      }
+    }
+
+    // === 写真リサイズ・最適化 ===
     function processImageFile(file, maxWidth = 250, maxHeight = 250) {
       return new Promise((resolve, reject) => {
         if (!file || !file.type.startsWith('image/')) {
@@ -785,7 +940,6 @@
     async function saveCardToDatabase(card) {
       if (!card || !card.id) return;
       
-      // メモリ配列を即時更新
       const existingIndex = library.findIndex(c => c.id === card.id);
       if (existingIndex >= 0) {
         library[existingIndex] = card;
@@ -793,7 +947,6 @@
         library.unshift(card);
       }
 
-      // IndexedDBへ確実に書き込み完了を待機
       if (db) {
         try {
           await new Promise((resolve, reject) => {
@@ -827,92 +980,7 @@
       renderLibraryGrid();
     }
 
-    // === チョイス管理 ===
-    function initChoiceScenes() {
-      const stored = localStorage.getItem('ecard_choice_scenes_v3');
-      if (stored) {
-        try {
-          choiceScenes = JSON.parse(stored);
-        } catch (e) {
-          choiceScenes = JSON.parse(JSON.stringify(defaultChoiceScenes));
-        }
-      } else {
-        choiceScenes = JSON.parse(JSON.stringify(defaultChoiceScenes));
-      }
-
-      if (!Array.isArray(choiceScenes) || choiceScenes.length === 0) {
-        choiceScenes = JSON.parse(JSON.stringify(defaultChoiceScenes));
-      }
-
-      choiceScenes.forEach((scene, sIdx) => {
-        if (!scene.id) scene.id = 'c_' + Date.now() + '_' + sIdx;
-        if (!scene.title) scene.title = 'チョイス ' + (sIdx + 1);
-        if (!scene.count || scene.count < 2 || scene.count > 5) scene.count = 2;
-        if (!Array.isArray(scene.cards)) scene.cards = [];
-        while (scene.cards.length < 5) {
-          scene.cards.push(null);
-        }
-      });
-
-      const exists = choiceScenes.some(s => s.id === currentChoiceSceneId);
-      if (!exists) {
-        currentChoiceSceneId = choiceScenes[0].id;
-      }
-
-      selectedChoiceCardIndex = null;
-      renderChoiceSceneDropdown();
-      renderChoiceBoard();
-    }
-
-    function saveChoiceScenesToStorage() {
-      localStorage.setItem('ecard_choice_scenes_v3', JSON.stringify(choiceScenes));
-    }
-
-    function renderChoiceSceneDropdown() {
-      const select = document.getElementById('choice-scene-select');
-      const titleInput = document.getElementById('choice-scene-name-input');
-      if (!select) return;
-
-      select.innerHTML = choiceScenes.map(s => `
-        <option value="${s.id}" ${s.id === currentChoiceSceneId ? 'selected' : ''}>${s.title}</option>
-      `).join('');
-
-      const active = getActiveChoiceScene();
-      if (active && titleInput) {
-        titleInput.value = active.title;
-      }
-    }
-
-    function onChoiceSceneSelectChange(newId) {
-      currentChoiceSceneId = newId;
-      selectedChoiceCardIndex = null;
-      const active = getActiveChoiceScene();
-      if (active) {
-        const titleInput = document.getElementById('choice-scene-name-input');
-        if (titleInput) titleInput.value = active.title;
-      }
-      renderChoiceBoard();
-    }
-
-    function getActiveChoiceScene() {
-      if (!choiceScenes || choiceScenes.length === 0) {
-        choiceScenes = JSON.parse(JSON.stringify(defaultChoiceScenes));
-      }
-      let active = choiceScenes.find(s => s.id === currentChoiceSceneId);
-      if (!active) {
-        active = choiceScenes[0];
-        currentChoiceSceneId = active.id;
-      }
-      if (!Array.isArray(active.cards)) {
-        active.cards = [null, null, null, null, null];
-      }
-      while (active.cards.length < 5) {
-        active.cards.push(null);
-      }
-      if (!active.count) active.count = 2;
-      return active;
-    }
-
+    // === チョイス管理（1度選んだら固定・選び直しボタン必須） ===
     function setChoiceCount(count) {
       const scene = getActiveChoiceScene();
       scene.count = parseInt(count, 10);
@@ -929,6 +997,7 @@
       const count = scene.count || 2;
       const cards = scene.cards || [];
 
+      // 択数ボタン
       [2, 3, 4, 5].forEach(num => {
         const btn = document.getElementById(`btn-choice-count-${num}`);
         if (btn) {
@@ -939,6 +1008,16 @@
           }
         }
       });
+
+      // 選び直しボタンの視覚的強調（選択固定中は黄色く目立つ）
+      const resetBtn = document.getElementById('btn-choice-reset');
+      if (resetBtn) {
+        if (selectedChoiceCardIndex !== null) {
+          resetBtn.className = "bg-amber-400 hover:bg-amber-500 text-slate-900 border-2 border-amber-500 px-4 py-2 rounded-xl text-xs font-black transition-all whitespace-nowrap flex items-center gap-1.5 shadow-md animate-bounce";
+        } else {
+          resetBtn.className = "bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 px-4 py-2 rounded-xl text-xs font-black transition-all whitespace-nowrap flex items-center gap-1.5 shadow-sm";
+        }
+      }
 
       let gridClass = "grid gap-4 sm:gap-6 w-full mx-auto ";
       if (count === 2) gridClass += "grid-cols-2 max-w-3xl";
@@ -952,15 +1031,27 @@
         const card = cards[i] || null;
         const isSelected = selectedChoiceCardIndex === i;
         const isDimmed = selectedChoiceCardIndex !== null && selectedChoiceCardIndex !== i;
+        const hasChoiceMade = selectedChoiceCardIndex !== null;
 
         html += `
           <div id="choice-box-${i}" onclick="onSlotBoxClick(${i})" 
-               class="group relative bg-white border-4 sm:border-8 ${isSelected ? 'border-indigo-500 bg-indigo-50/30' : 'border-white'} card-shadow rounded-[28px] sm:rounded-[36px] p-3 sm:p-5 flex flex-col items-center justify-between aspect-square min-h-[140px] cursor-pointer transition-all duration-300 active:scale-95 transform hover:-translate-y-1 select-none overflow-hidden ${isSelected ? 'selected-bounce shadow-2xl' : ''}">
+               class="group relative bg-white border-4 sm:border-8 ${isSelected ? 'border-indigo-600 ring-4 ring-indigo-300 bg-indigo-50/50 scale-105' : 'border-white'} card-shadow rounded-[28px] sm:rounded-[36px] p-3 sm:p-5 flex flex-col items-center justify-between aspect-square min-h-[140px] ${hasChoiceMade ? 'cursor-default' : 'cursor-pointer active:scale-95 hover:-translate-y-1'} transition-all duration-300 select-none overflow-hidden ${isSelected ? 'selected-bounce shadow-2xl' : ''}">
             
-            <button type="button" onclick="openChoiceCardModal(${i}, event)" class="absolute top-2 right-2 bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white border border-indigo-200 w-8 h-8 rounded-full flex items-center justify-center text-xs font-black z-20 shadow transition-all" title="カードを変更">
-              <i class="fa-solid fa-repeat"></i>
-            </button>
+            <!-- 選択中は変更ボタンを隠して誤操作を完全防止 -->
+            ${!hasChoiceMade ? `
+              <button type="button" onclick="openChoiceCardModal(${i}, event)" class="absolute top-2 right-2 bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white border border-indigo-200 w-8 h-8 rounded-full flex items-center justify-center text-xs font-black z-20 shadow transition-all" title="カードを変更">
+                <i class="fa-solid fa-repeat"></i>
+              </button>
+            ` : ''}
 
+            <!-- 選択中の「えらんだ！」バッジ -->
+            ${isSelected ? `
+              <div class="absolute top-2 right-2 bg-indigo-600 text-white text-[11px] font-black px-2.5 py-1 rounded-full shadow-md z-20 flex items-center gap-1">
+                <i class="fa-solid fa-star text-amber-300"></i> えらんだ！
+              </div>
+            ` : ''}
+
+            <!-- スロット番号バッジ -->
             <span class="absolute top-2 left-2 w-6 h-6 sm:w-7 sm:h-7 bg-slate-100 text-slate-500 text-xs sm:text-sm font-black rounded-full flex items-center justify-center border border-slate-200 shadow-inner">
               ${i + 1}
             </span>
@@ -981,8 +1072,9 @@
               </div>
             `}
 
-            <div class="absolute inset-0 bg-slate-900/40 backdrop-grayscale rounded-[24px] pointer-events-none transition-all duration-300 flex items-center justify-center ${isDimmed ? 'opacity-100' : 'opacity-0'}">
-              <i class="fa-solid fa-ban text-white/40 text-5xl"></i>
+            <!-- 選ばれなかったカードを完全に暗転・無効化 -->
+            <div class="absolute inset-0 bg-slate-900/60 backdrop-grayscale rounded-[24px] pointer-events-none transition-all duration-300 flex items-center justify-center ${isDimmed ? 'opacity-100' : 'opacity-0'}">
+              <i class="fa-solid fa-ban text-white/50 text-5xl"></i>
             </div>
 
           </div>
@@ -993,15 +1085,23 @@
       container.innerHTML = html;
     }
 
+    // スロットBoxクリック時の制御（1度選んだら選び直すまで完全固定）
     function onSlotBoxClick(idx) {
+      // 既にカードが選択済みの場合は、選び直しボタンを押すまで完全に無反応にする
+      if (selectedChoiceCardIndex !== null) {
+        return;
+      }
+
       const scene = getActiveChoiceScene();
       const card = scene.cards[idx];
       
+      // 未設定枠ならカード設定モーダルを開く
       if (!card) {
         openChoiceCardModal(idx, null);
         return;
       }
 
+      // カードを選択状態に固定
       selectedChoiceCardIndex = idx;
       playSound('complete');
 
@@ -1015,6 +1115,7 @@
       renderChoiceBoard();
     }
 
+    // 選び直しボタンを押した時だけ固定解除
     function resetPracticeSelection() {
       selectedChoiceCardIndex = null;
       playSound('wrong');
@@ -1023,6 +1124,9 @@
 
     async function openChoiceCardModal(slotIdx, event) {
       if (event) event.stopPropagation();
+      // 選択固定中はモーダルを開かせない
+      if (selectedChoiceCardIndex !== null) return;
+
       currentChoicePickerIndex = slotIdx;
       
       const titleElem = document.getElementById('choice-modal-slot-title');
@@ -1852,10 +1956,10 @@
         const textPrompt = `日本語「${wordText}」をすべて「ひらがな」に変換してください。漢字・カタカナ・アルファベットは子供向けひらがなにし、余計な説明や記号を含めず変換後の文字列のみを1行で出力してください。`;
         try {
           const apiResponse = await callGeminiText(textPrompt, GEMINI_API_KEY);
-          return apiResponse.replace(/[\r\n\s\.\,\、\.「」\、\。"'`]/g, "");
+          return apiResponse.replace(/[\\r\\n\\s\\.\\,\\、\\.「」\\、\\。"'`]/g, "");
         } catch (e) {}
       }
-      return wordText.replace(/[\u30a1-\u30f6]/g, m => String.fromCharCode(m.charCodeAt(0) - 0x60));
+      return wordText.replace(/[\\u30a1-\\u30f6]/g, m => String.fromCharCode(m.charCodeAt(0) - 0x60));
     }
 
     function generateProceduralCard(word) {
@@ -2072,7 +2176,7 @@
       uploadedImageBase64 = "";
     }
 
-    // === ライブラリ ===
+    // === ライブラリ管理 ===
     function updateLibraryCount() {
       const el = document.getElementById('library-count');
       if (el) el.innerText = `${library.length}枚`;
@@ -2161,7 +2265,7 @@
       try {
         await loadLibrary();
         const backupData = {
-          version: "5.5",
+          version: "5.6",
           exportDate: new Date().toISOString(),
           library: library,
           scenes: scenes,
@@ -2560,6 +2664,7 @@
         await loadSharedCardsFromRepo();
         initScenes();
         initChoiceScenes();
+        initGitHubSettings();
         
         if (library.length === 0) {
           const sampleCards = [
