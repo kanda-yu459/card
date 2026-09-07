@@ -665,6 +665,77 @@ const GAS_API_URL =
   "https://script.google.com/macros/s/AKfycbzGg9OhzuiYST_C_0z_Kb43u2Rv08KK9XKyPJGcWE6FYYiJ4y0dyS7pq1Qd3Zr24jzsUg/exec";
 
 const GAS_SYNC_SECRET = "doaekguasosewo954oasnfoeqw4ru8asjf549sakfwe";
+
+    async function saveToGas() {
+  await loadLibrary();
+
+  const payload = {
+    version: "5.6",
+    updatedAt: Date.now(),
+    clientId: localStorage.getItem("ecard_client_id") || "",
+    library: library,
+    scenes: scenes,
+    choiceScenes: choiceScenes
+  };
+
+  const res = await fetch(GAS_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+    body: JSON.stringify({
+      secret: GAS_SYNC_SECRET,
+      payload: payload
+    })
+  });
+
+  const result = await res.json();
+
+  if (!result.ok) {
+    throw new Error(result.error || "GASへの保存に失敗しました");
+  }
+
+  return result;
+}
+    async function loadFromGas() {
+  const url =
+    GAS_API_URL +
+    "?secret=" +
+    encodeURIComponent(GAS_SYNC_SECRET);
+
+  const res = await fetch(url);
+  const result = await res.json();
+
+  if (!result.ok) {
+    throw new Error(result.error || "GASから取得できませんでした");
+  }
+
+  const data = result.data;
+
+  if (Array.isArray(data.library)) {
+    await clearDatabase();
+
+    for (const card of data.library) {
+      await saveCardToDatabase(card);
+    }
+  }
+
+  if (Array.isArray(data.scenes)) {
+    scenes = data.scenes;
+    saveScenesToStorage();
+  }
+
+  if (Array.isArray(data.choiceScenes)) {
+    choiceScenes = data.choiceScenes;
+    saveChoiceScenesToStorage();
+  }
+
+  await loadLibrary();
+  renderChoiceBoard();
+  renderSceneBoard();
+
+  return data;
+}
     
     let GEMINI_API_KEY = "";
     let db = null;
