@@ -327,6 +327,11 @@ function chooseCards(){
  prompt=dirWords[answerDir];
  return Object.fromEntries(pos.map(d=&gt;[d,0]));
 }
+function sgHideVisibleTiles(){
+ for(const t of tiles){
+   if(!t.classList.contains(&#x27;invisible&#x27;)){t.classList.add(&#x27;invisible&#x27;);t.disabled=true;t.setAttribute(&#x27;aria-hidden&#x27;,&#x27;true&#x27;);}
+ }
+}
 function sgQuestion(){if(state!==&#x27;running&#x27;||paused||left&lt;=0)return;
  answering=false;round+=1;sgClearGlow();currentCards=chooseCards();
  for(const t of tiles){
@@ -346,7 +351,7 @@ function sgQuestion(){if(state!==&#x27;running&#x27;||paused||left&lt;=0)return;
 }
 function sgStart(){sgClear();difficulty=Number(document.querySelector(&#x27;#levels button.active&#x27;)?.dataset.level||1);sPair=document.querySelector(&#x27;#sgSPair button.active&#x27;)?.dataset.pair||&#x27;vertical&#x27;;duration=Number($(&#x27;sgDuration&#x27;).value);left=duration;score=0;round=0;mistakes=[];paused=false;answering=false;sgView(&#x27;running&#x27;);sgSetScore();sgQuestion();timer=setInterval(()=&gt;{if(state!==&#x27;running&#x27;||paused)return;left=Math.max(0,left-0.1);sgSetScore();if(left&lt;=0)sgEnd()},100)}
 function sgChoose(dir){if(state!==&#x27;running&#x27;||paused||answering||left&lt;=0)return;
- const t=document.querySelector(&#x27;.sgTile[data-pick=&quot;&#x27;+dir+&#x27;&quot;]&#x27;);if(dir===answerDir){score++;answering=true;sgClearGlow();t.classList.add(&#x27;correct&#x27;);sgSound(0);sgSetStatus(&#x27;せいかい！&#x27;);sgSetScore();clearTimeout(roundTimer);roundTimer=setTimeout(()=&gt;{if(state===&#x27;running&#x27;&amp;&amp;!paused)sgQuestion()},650)}
+ const t=document.querySelector(&#x27;.sgTile[data-pick=&quot;&#x27;+dir+&#x27;&quot;]&#x27;);if(dir===answerDir){score++;answering=true;sgClearGlow();t.classList.add(&#x27;correct&#x27;);sgSound(0);sgSetStatus(&#x27;せいかい！&#x27;);sgSetScore();clearTimeout(roundTimer);setTimeout(()=&gt;{if(t&amp;&amp;t.isConnected){t.classList.remove(&#x27;correct&#x27;);}sgHideVisibleTiles();},220);roundTimer=setTimeout(()=&gt;{if(state===&#x27;running&#x27;&amp;&amp;!paused)sgQuestion()},760)}
  else{t.classList.add(&#x27;wrong&#x27;);sgSound(1);sgSetStatus(&#x27;もういちど！&#x27;);if(difficulty===4){mistakes.push({prompt, cards:{...currentCards},wrong:dir,answer:answerDir});}setTimeout(()=&gt;t.classList.remove(&#x27;wrong&#x27;),350)}
 }
 function sgClear(){clearInterval(timer);clearTimeout(roundTimer);sgClearGlow();timer=null;roundTimer=null;paused=false;if(window.speechSynthesis)speechSynthesis.cancel()}
